@@ -2386,61 +2386,63 @@ body.auth-only {
 
   </div>
 </nav>
-
+  
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <script>
+<script>
   const SUPABASE_URL = 'https://kxttoscdrdyckbhhhyvl.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_XbYvk8WDbZOSeZvtP4IDkg_r0TwmNrs';
+  const SUPABASE_ANON_KEY = 'sb_publishable_XbYvk8WDbZOSeZvtP4IDkg_r0TwmNrs';
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  </script>
+  let supabase = null;
+  try {
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+      throw new Error('ספריית Supabase לא נטענה');
+    }
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Supabase client initialized successfully');
+  } catch (e) {
+    console.error('Supabase init failed:', e);
+  }
+</script>
   
 <script>
-  
 async function loginWithGoogle() {
+  if (!supabase || !supabase.auth) {
+    alert('שגיאה: קליינט Supabase לא אותחל. בדוק את הטעינה של ה-CDN ואת המפתח.');
+    return;
+  }
   try {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: window.location.origin + window.location.pathname,
-        queryParams: {
-          prompt: 'select_account'
-        }
-      }
+      options: { redirectTo: window.location.origin + window.location.pathname,
+                 queryParams: { prompt: 'select_account' } }
     });
-
-    if (error) {
-      alert('שגיאה: ' + error.message);
-      console.error(error);
-      return;
-    }
-
-    if (data && data.url) {
-      window.location.href = data.url;
-    }
-  } catch (e) {
-    alert('שגיאה: ' + e.message);
-    console.error(e);
-  }
+    if (error) { alert('שגיאה: ' + error.message); return; }
+    if (data?.url) window.location.href = data.url;
+  } catch (e) { alert('שגיאה: ' + e.message); }
 }
+</script>
+  
+<script>
+  
+
   
   async function finishRegistration() {
   collectRegisterStep();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) {
     alert('יש להתחבר מחדש');
     renderLogin();
     return;
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('profiles')
     .upsert({
       id: user.id,
-      phone: registerData.phone || user.phone,
-      email: registerData.email,
+      phone: registerData.phone || null,
+      email: registerData.email || user.email,
       name: registerData.name,
       birth_date: registerData.birthDate || null,
       city: registerData.city,
@@ -2457,13 +2459,25 @@ async function loginWithGoogle() {
       kosher: registerData.kosher,
       about: registerData.about,
       registered: true,
-    });
+    })
+    .select()
+    .single();
 
   if (error) {
     alert('שגיאה בשמירה: ' + error.message);
+    console.error('upsert error:', error);
     return;
   }
+    
+if (error) {
+  console.error('upsert error:', error);
+  alert('שגיאה בשמירה: ' + error.message + '\n(code: ' + error.code + ')');
+  return;
+}
+    
+  console.log('profile saved:', data);
 
+  registerStep = 1;
   alert('ההרשמה הושלמה בהצלחה');
   showPage('home');
 }
@@ -2473,6 +2487,10 @@ async function loginWithGoogle() {
     renderLogin();
     return;
   }
+    if (insertError) {
+  console.error('profile insert error:', insertError);
+  alert('שגיאה ביצירת פרופיל: ' + insertError.message);
+}
 
   const { data: profile, error } = await supabase
     .from('profiles')
@@ -2481,73 +2499,39 @@ async function loginWithGoogle() {
     .maybeSingle();
 
   if (error) {
-    console.error(error);
-    alert('שגיאה בטעינת הפרופיל');
-    return;
+    console.error('profile load error:', error);
   }
 
   document.body.classList.remove('auth-only');
 
-  if (!profile || !profile.registered || !profile.name || !profile.email) {
+  // אם אין פרופיל בכלל — ננסה ליצור שורה בסיסית
+  if (!profile) {
+    const { error: insertError } = await supabase
+      .from('profiles')
+      .insert({
+        id: user.id,
+        email: user.email,
+        name: user.user_metadata?.full_name || user.user_metadata?.name || '',
+      });
+
+    if (insertError) {
+      console.error('profile insert error:', insertError);
+    }
+
+    prepareRegistrationFromProfile(null, user);
+    showPage('register');
+    return;
+  }
+
+  if (!profile.registered || !profile.name || !profile.email) {
     prepareRegistrationFromProfile(profile, user);
     showPage('register');
   } else {
     showPage('home');
   }
 }
-  // שליחת קוד SMS
-async function sendOtp(phone) {
-  // פורמט בינלאומי: +9725xxxxxxxx
-  const formatted = formatPhoneDisplay(phone); // הפונקציה שכבר יש לך
-
-  const { error } = await supabase.auth.signInWithOtp({
-    phone: formatted,
-  });
-
-  if (error) {
-    alert(error.message);
-    return false;
-  }
-  return true;
-}
-
-// אימות הקוד
-async function verifyOtp(phone, token) {
-  const formatted = formatPhoneDisplay(phone);
-
-  const { data, error } = await supabase.auth.verifyOtp({
-    phone: formatted,
-    token,
-    type: 'sms'
-  });
-
-  if (error) {
-    alert(error.message);
-    return null;
-  }
-
-  return data; // data.user + data.session
-}
   
-  function formatPhoneDisplay(phone) {
-  const cleaned = String(phone || '').replace(/[^\d+]/g, '');
-  if (cleaned.startsWith('+972')) return cleaned;
-  if (cleaned.startsWith('0')) return '+972' + cleaned.slice(1);
-  if (cleaned.startsWith('5')) return '+972' + cleaned;
-  return cleaned;
-}
-
-function isValidIsraeliPhone(phone) {
-  const cleaned = String(phone || '').replace(/[^\d+]/g, '');
-  return /^(?:\+972|0)?5\d{8}$/.test(cleaned);
-}
-
-  /* ===== מסך כניסה ===== */
-let loginState = {
-  step: 'phone', // 'phone' | 'otp'
-  phone: ''
-};
-
+  
 function renderLogin() {
   const content = document.getElementById('app-content');
   if (!content) return;
@@ -2574,47 +2558,6 @@ function renderLogin() {
       </div>
     </section>
   `;
-}
-
-function loginBackToPhone() {
-  loginState.step = 'phone';
-  renderLogin();
-}
-
-async function sendLoginOtp(isResend) {
-  const input = document.getElementById('login-phone');
-  const phone = (input ? input.value.trim() : loginState.phone);
-
-  if (!isValidIsraeliPhone(phone)) {
-    alert('יש להזין מספר טלפון ישראלי תקין (05X...)');
-    return;
-  }
-
-  loginState.phone = formatPhoneDisplay(phone);
-
-  const ok = await sendOtp(loginState.phone);
-  if (!ok) return;
-
-  loginState.step = 'otp';
-  renderLogin();
-  if (isResend) alert('קוד חדש נשלח');
-}
-
-async function verifyLoginOtp() {
-  const input = document.getElementById('login-otp');
-  const token = input ? input.value.trim() : '';
-
-  if (!token || token.length < 4) {
-    alert('יש להזין את הקוד שקיבלת');
-    return;
-  }
-
-  const data = await verifyOtp(loginState.phone, token);
-  if (!data || !data.user) return;
-
-  loginState = { step: 'phone', phone: '' };
-  document.body.classList.remove('auth-only');
-  await afterAuthSuccess(data.user);
 }
   
 let lockedRegisterFields = {};
@@ -2860,17 +2803,6 @@ function renderRegisterStep(step) {
           ${lockAttrs('email')}>
         <div class="auth-hint">ישמש להתראות ולשחזור חשבון.</div>
       </div>
-
-      ${registerData.phone ? `
-        <div class="auth-form-group auth-locked-field">
-          <label>
-            מספר טלפון
-            <span class="auth-locked-badge">מאומת</span>
-          </label>
-          <input type="tel" dir="ltr" class="auth-form-control"
-            value="${escapeHTML(registerData.phone)}" readonly disabled>
-        </div>
-      ` : ''}
     `;
   }
 
@@ -2896,7 +2828,19 @@ function renderRegisterStep(step) {
           ${lockAttrs('birthDate')}>
         <div class="auth-hint">הגיל יחושב אוטומטית מתאריך הלידה.</div>
       </div>
-
+    
+<div class="auth-form-group ${isLocked('phone') ? 'auth-locked-field' : ''}">
+  <label for="reg-phone">
+    ${labelWithLock('מספר טלפון', 'phone')}
+  </label>
+  <input id="reg-phone" name="phone" type="tel" dir="ltr"
+    inputmode="tel" autocomplete="tel"
+    value="${escapeHTML(registerData.phone)}"
+    placeholder="050-1234567"
+    ${lockAttrs('phone')}>
+  <div class="auth-hint">המספר ישמש ליצירת קשר לאחר התאמה בלבד.</div>
+</div>
+    
       <div class="auth-form-group ${isLocked('city') ? 'auth-locked-field' : ''}">
         <label for="reg-city">
           ${labelWithLock('עיר מגורים', 'city')}
@@ -3076,9 +3020,9 @@ function renderRegisterStep(step) {
       <label for="reg-about">
         ${labelWithLock('קצת עליי', 'about')}
       </label>
-      <textarea id="reg-about" name="about" maxlength="500"
-        placeholder="ספר על עצמך בכמה משפטים..."
-        \( {lockAttrs('about')}> \){escapeHTML(registerData.about)}</textarea>
+       <textarea id="reg-about" name="about" maxlength="500"
+  placeholder="ספר על עצמך בכמה משפטים..."
+  ${lockAttrs('about')}>${escapeHTML(registerData.about)}</textarea>
       <div class="auth-hint">עד 500 תווים. זה מה שאחרים יראו בפרופיל.</div>
     </div>
   `;
@@ -3175,147 +3119,6 @@ function registerPrevStep() {
   }
 }
 
-function finishRegistration() {
-  // שמירה מקומית זמנית — אחר כך תוחלף ב-Supabase Auth + profiles
-  const details = getPersonalDetails();
-  details.name = registerData.name;
-  details.birthDate = registerData.birthDate;
-  details.phone = registerData.phone;
-  details.city = registerData.city;
-  details.occupation = registerData.occupation;
-  details.status = registerData.status;
-  details.children = registerData.children;
-  details.religiousView = registerData.religiousView;
-  details.height = registerData.height;
-  details.service = registerData.service;
-  details.relationshipGoal = registerData.relationshipGoal;
-  details.languages = registerData.languages;
-  details.smoker = registerData.smoker;
-  details.health = registerData.health;
-  details.kosher = registerData.kosher;
-  details.about = registerData.about;
-  details.age = calculateAge(registerData.birthDate);
-
-  savePersonalDetails(details);
-
-  // איפוס לשלב הבא (אם ירצו להירשם שוב)
-  registerStep = 1;
-
-  alert('ההרשמה הושלמה. הפרטים נשמרו. בהמשך נחבר ל-Supabase.');
-  showPage('personal');
-}
-
-function showPage(name) {
-  const content = document.getElementById('app-content');
-  if (!content) return;
-  const interestsButton = document.getElementById('my-interests-button');
-
-if (interestsButton) {
-  interestsButton.classList.toggle('active', name === 'my-interests');
-}
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-
-  if (name === 'home') {
-    renderSwipe();
-    return;
-  }
-
-  
-if (name === 'notifications') {
-  renderNotifications();
-  return;
-}
-  
-if (name === 'register') {
-  renderRegister();
-  return;
-}
-
-  if (name === 'profiles') {
-    renderProfiles();
-    return;
-  }
-  
-if (name === 'my-interests') {
-  renderMyInterests();
-  return;
-}
-  
-  if (name === 'favorites') {
-    renderFavorites();
-    return;
-  }
-
-  if (name === 'personal') {
-    renderPersonal();
-    return;
-  }
-}
- 
- 
-const swipeProfiles = [
-  {
-    id: "p101",
-    name: "נועה",
-    age: 25,
-    city: "נתניה",
-    occupation: "מעצבת גרפית",
-    status: "רווקה",
-    bio: "אוהבת מוזיקה, טיולים ושיחות עם משמעות. מחפשת קשר רציני.",
-    photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=85"
-  },
-  {
-    id: "p102",
-    name: "איתי",
-    age: 29,
-    city: "תל אביב",
-    occupation: "מפתח תוכנה",
-    status: "רווק",
-    bio: "אוהב ים, אוכל טוב והומור. מחפש זוגיות אמיתית.",
-    photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=85"
-  },
-  {
-    id: "p103",
-    name: "יעל",
-    age: 27,
-    city: "חיפה",
-    occupation: "מורה",
-    status: "רווקה",
-    bio: "אוהבת ספרים, טבע ומשפחה. מאמינה בכנות ובתקשורת טובה.",
-    photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=85"
-  },
-  {
-    id: "p104",
-    name: "דניאל",
-    age: 31,
-    city: "ראשון לציון",
-    occupation: "עצמאי",
-    status: "רווק",
-    bio: "אוהב לטייל, לבשל וללמוד דברים חדשים.",
-    photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=85"
-  },
-  {
-    id: "p105",
-    name: "מיכל",
-    age: 26,
-    city: "ירושלים",
-    occupation: "אחות",
-    status: "רווקה",
-    bio: "אוהבת טיולים, משפחה ושיחות טובות.",
-    photo: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=85"
-  },
-  {
-    id: "p106",
-    name: "אורי",
-    age: 28,
-    city: "פתח תקווה",
-    occupation: "מנהל פרויקטים",
-    status: "רווק",
-    bio: "אוהב ספורט, מוזיקה וטיולים בסופי שבוע.",
-    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=85"
-  }
-];
 
 
 let profileFilterOpen = false;
@@ -4486,238 +4289,240 @@ function renderPersonalDetails(details) {
     heightOptions.push(`${height} ס"מ`);
   }
 
-    return `
-  <section class="personal-panel">
+  return `
+  <form id="personal-details-form" onsubmit="return false;">
+    <section class="personal-panel">
 
-    <div class="personal-panel-title">
-      <div>
-        <h2>הפרטים שלך</h2>
-        <p>אפשר לשנות כמה פרטים ולשמור את כולם יחד.</p>
-      </div>
-    </div>
-
-    <!-- שם: מוצג כנתון עם אפשרות עריכה -->
-    <div class="personal-field">
-      <div class="personal-field-info">
-        <span class="personal-field-label">השם שלי</span>
-
-        <div class="personal-field-value">
-          ${escapeHTML(details.name || 'לא הוזן שם')}
+      <div class="personal-panel-title">
+        <div>
+          <h2>הפרטים שלך</h2>
+          <p>אפשר לשנות כמה פרטים ולשמור את כולם יחד.</p>
         </div>
       </div>
 
-      <button
-        type="button"
-        class="personal-edit-btn"
-        onclick="editPersonalName()"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
+      <!-- שם: מוצג כנתון עם אפשרות עריכה -->
+      <div class="personal-field">
+        <div class="personal-field-info">
+          <span class="personal-field-label">השם שלי</span>
+
+          <div class="personal-field-value">
+            ${escapeHTML(details.name || 'לא הוזן שם')}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="personal-edit-btn"
+          onclick="editPersonalName()"
         >
-          <path d="M12 20h9"/>
-          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
-        </svg>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+          </svg>
 
-        עריכת שם
-      </button>
-    </div>
-
-    <!-- גיל: נתון לקריאה בלבד -->
-    <div class="personal-field">
-      <div class="personal-field-info">
-        <span class="personal-field-label">הגיל שלי</span>
-
-        <div class="personal-field-value">
-          ${
-            details.age !== '' &&
-            details.age !== null &&
-            details.age !== undefined
-              ? escapeHTML(details.age) + ' שנים'
-              : 'תאריך הלידה עדיין לא הוגדר'
-          }
-        </div>
-      </div>
-    </div>
-    <!-- מספר טלפון: נתון עם כפתור עריכה -->
-    <div class="personal-field">
-      <div class="personal-field-info">
-        <span class="personal-field-label">מספר טלפון</span>
-        <div class="personal-field-value" dir="ltr" style="text-align: right;">
-          ${escapeHTML(details.phone || 'אין עדיין מספר טלפון')}
-        </div>
+          עריכת שם
+        </button>
       </div>
 
-      <button
-        type="button"
-        class="personal-edit-btn"
-        onclick="editPersonalPhone()"
-      >
-        <svg
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
+      <!-- גיל: נתון לקריאה בלבד -->
+      <div class="personal-field">
+        <div class="personal-field-info">
+          <span class="personal-field-label">הגיל שלי</span>
+
+          <div class="personal-field-value">
+            ${
+              details.age !== '' &&
+              details.age !== null &&
+              details.age !== undefined
+                ? escapeHTML(details.age) + ' שנים'
+                : 'תאריך הלידה עדיין לא הוגדר'
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- מספר טלפון: נתון עם כפתור עריכה -->
+      <div class="personal-field">
+        <div class="personal-field-info">
+          <span class="personal-field-label">מספר טלפון</span>
+          <div class="personal-field-value" dir="ltr" style="text-align: right;">
+            ${escapeHTML(details.phone || 'אין עדיין מספר טלפון')}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="personal-edit-btn"
+          onclick="editPersonalPhone()"
         >
-          <path d="M12 20h9"/>
-          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
-        </svg>
-        עידכון המספר
-      </button>
-    </div>
-
-    <!-- עיר מגורים -->
-    <div class="personal-form-group" style="margin-top: 28px;">
-      <label for="personal-city">עיר מגורים</label>
-
-      <input
-        class="personal-form-control"
-        id="personal-city"
-        name="city"
-        list="personal-city-options"
-        autocomplete="address-level2"
-        value="${escapeHTML(details.city || '')}"
-        placeholder="הקלד או בחר עיר"
-      >
-
-      <datalist id="personal-city-options">
-        ${citySuggestions.map(city => `
-          <option value="${escapeHTML(city)}"></option>
-        `).join('')}
-      </datalist>
-
-      <div class="personal-form-hint">
-        אפשר לבחור עיר מהרשימה או לכתוב כל עיר אחרת.
-      </div>
-    </div>
-
-    <!-- עיסוק -->
-    <div class="personal-form-group">
-      <label for="personal-occupation">עיסוק</label>
-
-      <input
-        class="personal-form-control"
-        id="personal-occupation"
-        name="occupation"
-        value="${escapeHTML(details.occupation || '')}"
-        placeholder="במה אתה עוסק?"
-      >
-    </div>
-
-    <!-- מצב משפחתי -->
-    ${personalSelectField(
-      'status',
-      'מצב משפחתי',
-      ['רווק/ה', 'נשוי/אה', 'גרוש/ה', 'אלמן/ה'],
-      details.status
-    )}
-
-    <!-- ילדים -->
-    ${personalYesNoField(
-      'children',
-      'יש ילדים?',
-      details.children
-    )}
-
-    <!-- השקפה דתית -->
-    ${personalSelectField(
-      'religiousView',
-      'השקפה דתית',
-      religiousOptions,
-      details.religiousView
-    )}
-
-    <!-- גובה -->
-    ${personalSelectField(
-      'height',
-      'גובה',
-      heightOptions,
-      details.height
-    )}
-
-    <!-- מטרת הקשר -->
-    ${personalRadioField(
-      'relationshipGoal',
-      'מטרת הקשר',
-      ['קשר רציני', 'חתונה'],
-      details.relationshipGoal
-    )}
-
-    <!-- שירות צבאי או לאומי -->
-    ${personalSelectField(
-      'service',
-      'שירות צבאי/לאומי',
-      [
-        'שירות לאומי',
-        'שירות סדיר מלא',
-        'לא שרתתי',
-        'אחר'
-      ],
-      details.service
-    )}
-
-    <!-- שפות נוספות -->
-    <div class="personal-form-group">
-      <div class="personal-form-label">שפות נוספות</div>
-
-      <div class="personal-choice-list">
-        ${languageOptions.map(language => `
-          <label class="personal-choice">
-            <input
-              type="checkbox"
-              name="languages"
-              value="${escapeHTML(language)}"
-              ${
-                Array.isArray(details.languages) &&
-                details.languages.includes(language)
-                  ? 'checked'
-                  : ''
-              }
-            >
-
-            ${escapeHTML(language)}
-          </label>
-        `).join('')}
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 20h9"/>
+            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+          </svg>
+          עידכון המספר
+        </button>
       </div>
 
-      <div class="personal-form-hint">
-        אפשר לבחור כמה שפות.
+      <!-- עיר מגורים -->
+      <div class="personal-form-group" style="margin-top: 28px;">
+        <label for="personal-city">עיר מגורים</label>
+
+        <input
+          class="personal-form-control"
+          id="personal-city"
+          name="city"
+          list="personal-city-options"
+          autocomplete="address-level2"
+          value="${escapeHTML(details.city || '')}"
+          placeholder="הקלד או בחר עיר"
+        >
+
+        <datalist id="personal-city-options">
+          ${citySuggestions.map(city => `
+            <option value="${escapeHTML(city)}"></option>
+          `).join('')}
+        </datalist>
+
+        <div class="personal-form-hint">
+          אפשר לבחור עיר מהרשימה או לכתוב כל עיר אחרת.
+        </div>
       </div>
-    </div>
 
-    <!-- עישון -->
-    ${personalYesNoField(
-      'smoker',
-      'מעשן?',
-      details.smoker
-    )}
+      <!-- עיסוק -->
+      <div class="personal-form-group">
+        <label for="personal-occupation">עיסוק</label>
 
-    <!-- מצב בריאותי -->
-    ${personalRadioField(
-      'health',
-      'מצב בריאותי',
-      ['תקין', 'אספר בהמשך'],
-      details.health
-    )}
+        <input
+          class="personal-form-control"
+          id="personal-occupation"
+          name="occupation"
+          value="${escapeHTML(details.occupation || '')}"
+          placeholder="במה אתה עוסק?"
+        >
+      </div>
 
-    <!-- שמירת כשרות -->
-    ${personalYesNoField(
-      'kosher',
-      'שמירת כשרות',
-      details.kosher
-    )}
+      <!-- מצב משפחתי -->
+      ${personalSelectField(
+        'status',
+        'מצב משפחתי',
+        ['רווק/ה', 'נשוי/אה', 'גרוש/ה', 'אלמן/ה'],
+        details.status
+      )}
 
-  </section>
+      <!-- ילדים -->
+      ${personalYesNoField(
+        'children',
+        'יש ילדים?',
+        details.children
+      )}
+
+      <!-- השקפה דתית -->
+      ${personalSelectField(
+        'religiousView',
+        'השקפה דתית',
+        religiousOptions,
+        details.religiousView
+      )}
+
+      <!-- גובה -->
+      ${personalSelectField(
+        'height',
+        'גובה',
+        heightOptions,
+        details.height
+      )}
+
+      <!-- מטרת הקשר -->
+      ${personalRadioField(
+        'relationshipGoal',
+        'מטרת הקשר',
+        ['קשר רציני', 'חתונה'],
+        details.relationshipGoal
+      )}
+
+      <!-- שירות צבאי או לאומי -->
+      ${personalSelectField(
+        'service',
+        'שירות צבאי/לאומי',
+        [
+          'שירות לאומי',
+          'שירות סדיר מלא',
+          'לא שרתתי',
+          'אחר'
+        ],
+        details.service
+      )}
+
+      <!-- שפות נוספות -->
+      <div class="personal-form-group">
+        <div class="personal-form-label">שפות נוספות</div>
+
+        <div class="personal-choice-list">
+          ${languageOptions.map(language => `
+            <label class="personal-choice">
+              <input
+                type="checkbox"
+                name="languages"
+                value="${escapeHTML(language)}"
+                ${
+                  Array.isArray(details.languages) &&
+                  details.languages.includes(language)
+                    ? 'checked'
+                    : ''
+                }
+              >
+
+              ${escapeHTML(language)}
+            </label>
+          `).join('')}
+        </div>
+
+        <div class="personal-form-hint">
+          אפשר לבחור כמה שפות.
+        </div>
+      </div>
+
+      <!-- עישון -->
+      ${personalYesNoField(
+        'smoker',
+        'מעשן?',
+        details.smoker
+      )}
+
+      <!-- מצב בריאותי -->
+      ${personalRadioField(
+        'health',
+        'מצב בריאותי',
+        ['תקין', 'אספר בהמשך'],
+        details.health
+      )}
+
+      <!-- שמירת כשרות -->
+      ${personalYesNoField(
+        'kosher',
+        'שמירת כשרות',
+        details.kosher
+      )}
+
+    </section>
+  </form>
 `;
-  
 }
 
 function saveAllPersonalDetails() {

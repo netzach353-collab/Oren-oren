@@ -1914,7 +1914,10 @@ body.keyboard-open {
   max-width: 100%;
 }
 /* מרווחים אחידים בטופס הפרטים האישיים */
-
+#personal-tab-content .personal-panel > .personal-form-group {
+  margin-bottom: 22px;
+}
+  
 #personal-tab-content .personal-panel > .personal-field {
   margin-bottom: 8px;
 }
@@ -1946,7 +1949,299 @@ body.keyboard-open {
     padding: 20px 15px;
   }
  
+  /* ===== מסך הרשמה ===== */
+.auth-page {
+  max-width: 520px;
+  margin: 0 auto;
+  padding-bottom: 40px;
+}
+
+.auth-card {
+  background: #fff;
+  border: 1px solid #ead5de;
+  border-radius: 18px;
+  padding: 24px 20px 28px;
+  box-shadow: 0 8px 28px rgba(75, 25, 48, 0.06);
+}
+
+.auth-heading {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.auth-heading h1 {
+  margin: 0 0 8px;
+  font-size: 24px;
+  color: #4b1930;
+  font-weight: 800;
+}
+
+.auth-heading p {
+  margin: 0;
+  color: #718096;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* סרגל התקדמות */
+.auth-steps {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 26px;
+  padding: 0 4px;
+}
+
+.auth-step-dot {
+  flex: 1;
+  height: 4px;
+  border-radius: 99px;
+  background: #ead5de;
+  transition: background .25s;
+}
+
+.auth-step-dot.done,
+.auth-step-dot.active {
+  background: #7d2345;
+}
+
+.auth-step-label {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #7d2345;
+  margin-bottom: 14px;
+}
+
+.auth-form-group {
+  margin-bottom: 18px;
+}
+
+.auth-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #4b1930;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.auth-form-group input,
+.auth-form-group select,
+.auth-form-group textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #ead5de;
+  border-radius: 12px;
+  background: #fffafb;
+  color: #4b1930;
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.auth-form-group textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.auth-form-group input:focus,
+.auth-form-group select:focus,
+.auth-form-group textarea:focus {
+  border-color: #7d2345;
+  box-shadow: 0 0 0 3px #7d234514;
+}
+
+.auth-hint {
+  margin-top: 7px;
+  color: #718096;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.auth-error {
+  margin-top: 8px;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.auth-choice-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.auth-choice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 9px 13px;
+  border: 1px solid #ead5de;
+  border-radius: 12px;
+  background: #fff;
+  color: #7d2345;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.auth-choice:has(input:checked) {
+  border-color: #7d2345;
+  background: #f3e8ec;
+  box-shadow: inset 0 0 0 1px #7d2345;
+}
+
+.auth-choice input {
+  accent-color: #7d2345;
+  margin: 0 0 0 7px;
+  width: auto;
+  min-height: 0;
+}
+
+.auth-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.auth-btn {
+  flex: 1;
+  min-height: 50px;
+  border: 0;
+  border-radius: 13px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-btn-primary {
+  background: #7d2345;
+  color: #fff;
+  box-shadow: 0 4px 12px #7d234526;
+}
+
+.auth-btn-primary:hover {
+  background: #681b39;
+}
+
+.auth-btn-secondary {
+  background: #f3e8ec;
+  color: #7d2345;
+  border: 1px solid #ead5de;
+  flex: 0 0 auto;
+  padding: 0 18px;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 13px;
+  color: #718096;
+}
+
+.auth-switch button {
+  border: 0;
+  background: none;
+  color: #7d2345;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* כפתור הרשמה בסרגל (אופציונלי) */
+.topbar-register-btn {
+  border: 1px solid #e8cbd1;
+  background: #fff;
+  color: #7d2345;
+  border-radius: 11px;
+  padding: 10px 14px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.topbar-register-btn:hover {
+  background: #f3e8ec;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 18px 14px 22px;
+  }
+  .auth-heading h1 {
+    font-size: 21px;
+  }
+}
   
+  /* מסך כניסה */
+body.auth-only .bottom-nav,
+body.auth-only .topbar .icon-button {
+  display: none !important;
+}
+
+body.auth-only {
+  padding-bottom: 0 !important;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 22px 0 8px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #ead5de;
+}
+
+.login-google-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 50px;
+  margin-top: 14px;
+  border: 1px solid #ead5de;
+  border-radius: 13px;
+  background: #fff;
+  color: #4b1930;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.login-google-btn:hover { background: #f3e8ec; }
+
+.login-resend {
+  margin-top: 14px;
+  text-align: center;
+  font-size: 13px;
+  color: #718096;
+}
+.login-resend button {
+  border: 0;
+  background: none;
+  color: #7d2345;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+}
 </style>
 </head>
 
@@ -2092,9 +2387,274 @@ body.keyboard-open {
   </div>
 </nav>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+  <script>
+  const SUPABASE_URL = 'https://kxttoscdrdyckbhhhyvl.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_XbYvk8WDbZOSeZvtP4IDkg_r0TwmNrs';
 
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+  
 <script>
+  
+async function loginWithGoogle() {
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin + window.location.pathname,
+        queryParams: {
+          prompt: 'select_account'
+        }
+      }
+    });
+
+    if (error) {
+      alert('שגיאה: ' + error.message);
+      console.error(error);
+      return;
+    }
+
+    if (data && data.url) {
+      window.location.href = data.url;
+    }
+  } catch (e) {
+    alert('שגיאה: ' + e.message);
+    console.error(e);
+  }
+}
+  
+  async function finishRegistration() {
+  collectRegisterStep();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    alert('יש להתחבר מחדש');
+    renderLogin();
+    return;
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .upsert({
+      id: user.id,
+      phone: registerData.phone || user.phone,
+      email: registerData.email,
+      name: registerData.name,
+      birth_date: registerData.birthDate || null,
+      city: registerData.city,
+      occupation: registerData.occupation,
+      status: registerData.status,
+      children: registerData.children,
+      religious_view: registerData.religiousView,
+      height: registerData.height,
+      service: registerData.service,
+      relationship_goal: registerData.relationshipGoal,
+      languages: registerData.languages,
+      smoker: registerData.smoker,
+      health: registerData.health,
+      kosher: registerData.kosher,
+      about: registerData.about,
+      registered: true,
+    });
+
+  if (error) {
+    alert('שגיאה בשמירה: ' + error.message);
+    return;
+  }
+
+  alert('ההרשמה הושלמה בהצלחה');
+  showPage('home');
+}
+  
+  async function afterAuthSuccess(user) {
+  if (!user) {
+    renderLogin();
+    return;
+  }
+
+  const { data: profile, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (error) {
+    console.error(error);
+    alert('שגיאה בטעינת הפרופיל');
+    return;
+  }
+
+  document.body.classList.remove('auth-only');
+
+  if (!profile || !profile.registered || !profile.name || !profile.email) {
+    prepareRegistrationFromProfile(profile, user);
+    showPage('register');
+  } else {
+    showPage('home');
+  }
+}
+  // שליחת קוד SMS
+async function sendOtp(phone) {
+  // פורמט בינלאומי: +9725xxxxxxxx
+  const formatted = formatPhoneDisplay(phone); // הפונקציה שכבר יש לך
+
+  const { error } = await supabase.auth.signInWithOtp({
+    phone: formatted,
+  });
+
+  if (error) {
+    alert(error.message);
+    return false;
+  }
+  return true;
+}
+
+// אימות הקוד
+async function verifyOtp(phone, token) {
+  const formatted = formatPhoneDisplay(phone);
+
+  const { data, error } = await supabase.auth.verifyOtp({
+    phone: formatted,
+    token,
+    type: 'sms'
+  });
+
+  if (error) {
+    alert(error.message);
+    return null;
+  }
+
+  return data; // data.user + data.session
+}
+  
+  function formatPhoneDisplay(phone) {
+  const cleaned = String(phone || '').replace(/[^\d+]/g, '');
+  if (cleaned.startsWith('+972')) return cleaned;
+  if (cleaned.startsWith('0')) return '+972' + cleaned.slice(1);
+  if (cleaned.startsWith('5')) return '+972' + cleaned;
+  return cleaned;
+}
+
+function isValidIsraeliPhone(phone) {
+  const cleaned = String(phone || '').replace(/[^\d+]/g, '');
+  return /^(?:\+972|0)?5\d{8}$/.test(cleaned);
+}
+
+  /* ===== מסך כניסה ===== */
+let loginState = {
+  step: 'phone', // 'phone' | 'otp'
+  phone: ''
+};
+
+function renderLogin() {
+  const content = document.getElementById('app-content');
+  if (!content) return;
+
+  document.body.classList.add('auth-only');
+
+  content.innerHTML = `
+    <section class="auth-page">
+      <div class="auth-card">
+        <div class="auth-heading">
+          <h1>כניסה ללב אל לב</h1>
+          <p>היכנס עם חשבון Google כדי להמשיך</p>
+        </div>
+
+        <button type="button" class="login-google-btn" onclick="loginWithGoogle()">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          כניסה עם Google
+        </button>
+      </div>
+    </section>
+  `;
+}
+
+function loginBackToPhone() {
+  loginState.step = 'phone';
+  renderLogin();
+}
+
+async function sendLoginOtp(isResend) {
+  const input = document.getElementById('login-phone');
+  const phone = (input ? input.value.trim() : loginState.phone);
+
+  if (!isValidIsraeliPhone(phone)) {
+    alert('יש להזין מספר טלפון ישראלי תקין (05X...)');
+    return;
+  }
+
+  loginState.phone = formatPhoneDisplay(phone);
+
+  const ok = await sendOtp(loginState.phone);
+  if (!ok) return;
+
+  loginState.step = 'otp';
+  renderLogin();
+  if (isResend) alert('קוד חדש נשלח');
+}
+
+async function verifyLoginOtp() {
+  const input = document.getElementById('login-otp');
+  const token = input ? input.value.trim() : '';
+
+  if (!token || token.length < 4) {
+    alert('יש להזין את הקוד שקיבלת');
+    return;
+  }
+
+  const data = await verifyOtp(loginState.phone, token);
+  if (!data || !data.user) return;
+
+  loginState = { step: 'phone', phone: '' };
+  document.body.classList.remove('auth-only');
+  await afterAuthSuccess(data.user);
+}
+  
+let lockedRegisterFields = {};
+
+function prepareRegistrationFromProfile(profile, user) {
+  lockedRegisterFields = {};
+
+  registerData.phone = (profile && profile.phone) || user.phone || '';
+  registerData.email = (profile && profile.email) || user.email || '';
+  registerData.name = (profile && profile.name) || '';
+  registerData.birthDate = (profile && profile.birth_date) || '';
+  registerData.city = (profile && profile.city) || '';
+  registerData.occupation = (profile && profile.occupation) || '';
+  registerData.status = (profile && profile.status) || '';
+  registerData.children = (profile && profile.children) || '';
+  registerData.religiousView = (profile && profile.religious_view) || '';
+  registerData.height = (profile && profile.height) || '';
+  registerData.service = (profile && profile.service) || '';
+  registerData.relationshipGoal = (profile && profile.relationship_goal) || '';
+  registerData.languages = (profile && Array.isArray(profile.languages)) ? profile.languages : [];
+  registerData.smoker = (profile && profile.smoker) || '';
+  registerData.health = (profile && profile.health) || '';
+  registerData.kosher = (profile && profile.kosher) || '';
+  registerData.about = (profile && profile.about) || '';
+
+  // נועלים שדות שכבר מולאו
+  Object.keys(registerData).forEach(key => {
+    const val = registerData[key];
+    if (Array.isArray(val) ? val.length : (val && String(val).trim() !== '')) {
+      lockedRegisterFields[key] = true;
+    }
+  });
+
+  // קובעים מאיזה שלב להתחיל
+  if (!registerData.email) registerStep = 1;
+  else if (!registerData.name || !registerData.birthDate) registerStep = 2;
+  else if (!registerData.religiousView && !registerData.status) registerStep = 3;
+  else registerStep = 4;
+}
+  
  const PERSONAL_PRIVACY_MODE_KEY = 'lev_full_privacy_mode';
 
 function isFullPrivacyMode() {
@@ -2189,7 +2749,461 @@ function bottomNavigate(name, button) {
   showPage(name);
 }
 
+/* ===== הרשמה רב-שלבית ===== */
 
+let registerStep = 1;
+const REGISTER_TOTAL_STEPS = 4;
+
+const registerData = {
+  email: '',
+  password: '',
+  passwordConfirm: '',
+  name: '',
+  birthDate: '',
+  phone: '',
+  city: '',
+  occupation: '',
+  status: '',
+  children: '',
+  religiousView: '',
+  height: '',
+  service: '',
+  relationshipGoal: '',
+  languages: [],
+  smoker: '',
+  health: '',
+  kosher: '',
+  about: ''
+};
+
+function renderRegister() {
+  const content = document.getElementById('app-content');
+  if (!content) return;
+
+  const stepTitles = {
+    1: 'יצירת חשבון',
+    2: 'פרטים בסיסיים',
+    3: 'רקע אישי',
+    4: 'העדפות וקצת עליי'
+  };
+
+  content.innerHTML = `
+    <section class="auth-page">
+      <div class="auth-card">
+        <div class="auth-heading">
+          <h1>הרשמה ללב אל לב</h1>
+          <p>מלא את הפרטים כדי להתחיל. אפשר לעדכן אחר כך בפרטים שלי.</p>
+        </div>
+
+        <div class="auth-step-label">
+          שלב ${registerStep} מתוך ${REGISTER_TOTAL_STEPS} · ${stepTitles[registerStep]}
+        </div>
+
+        <div class="auth-steps" aria-hidden="true">
+          ${[1, 2, 3, 4].map(n => `
+            <div class="auth-step-dot ${n < registerStep ? 'done' : ''} ${n === registerStep ? 'active' : ''}"></div>
+          `).join('')}
+        </div>
+
+        <form id="register-form" onsubmit="return false;">
+          ${renderRegisterStep(registerStep)}
+        </form>
+
+        <div class="auth-actions">
+          ${registerStep > 1 ? `
+            <button type="button" class="auth-btn auth-btn-secondary"
+              onclick="registerPrevStep()">חזרה</button>
+          ` : `
+            <button type="button" class="auth-btn auth-btn-secondary"
+              onclick="showPage('home')">ביטול</button>
+          `}
+
+          <button type="button" class="auth-btn auth-btn-primary"
+            onclick="registerNextStep()">
+            ${registerStep === REGISTER_TOTAL_STEPS ? 'סיום הרשמה' : 'המשך'}
+          </button>
+        </div>
+
+        <div class="auth-switch">
+          כבר יש לך חשבון?
+          <button type="button" onclick="alert('מסך התחברות יתווסף בהמשך')">התחברות</button>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderRegisterStep(step) {
+  // עזר: האם השדה נעול
+  const isLocked = (key) => !!lockedRegisterFields[key];
+
+  // עזר: מאפייני input לנעול
+  const lockAttrs = (key) => isLocked(key) ? 'readonly disabled' : '';
+
+  // עזר: תווית + תג "נעול"
+  const labelWithLock = (text, key) => `
+    ${text}
+    ${isLocked(key) ? '<span class="auth-locked-badge">נעול</span>' : ''}
+  `;
+
+  // ---------- שלב 1: אימייל (+ טלפון מאומת) ----------
+  if (step === 1) {
+    return `
+      <div class="auth-form-group ${isLocked('email') ? 'auth-locked-field' : ''}">
+        <label for="reg-email">
+          ${labelWithLock('אימייל', 'email')}
+        </label>
+        <input id="reg-email" name="email" type="email" dir="ltr"
+          autocomplete="email" required
+          value="${escapeHTML(registerData.email)}"
+          placeholder="name@example.com"
+          ${lockAttrs('email')}>
+        <div class="auth-hint">ישמש להתראות ולשחזור חשבון.</div>
+      </div>
+
+      ${registerData.phone ? `
+        <div class="auth-form-group auth-locked-field">
+          <label>
+            מספר טלפון
+            <span class="auth-locked-badge">מאומת</span>
+          </label>
+          <input type="tel" dir="ltr" class="auth-form-control"
+            value="${escapeHTML(registerData.phone)}" readonly disabled>
+        </div>
+      ` : ''}
+    `;
+  }
+
+  // ---------- שלב 2: פרטים בסיסיים ----------
+  if (step === 2) {
+    return `
+      <div class="auth-form-group ${isLocked('name') ? 'auth-locked-field' : ''}">
+        <label for="reg-name">
+          ${labelWithLock('השם שלך', 'name')}
+        </label>
+        <input id="reg-name" name="name" type="text" required maxlength="60"
+          value="${escapeHTML(registerData.name)}"
+          placeholder="איך לקרוא לך בפרופיל"
+          ${lockAttrs('name')}>
+      </div>
+
+      <div class="auth-form-group ${isLocked('birthDate') ? 'auth-locked-field' : ''}">
+        <label for="reg-birth">
+          ${labelWithLock('תאריך לידה', 'birthDate')}
+        </label>
+        <input id="reg-birth" name="birthDate" type="date" required
+          value="${escapeHTML(registerData.birthDate)}"
+          ${lockAttrs('birthDate')}>
+        <div class="auth-hint">הגיל יחושב אוטומטית מתאריך הלידה.</div>
+      </div>
+
+      <div class="auth-form-group ${isLocked('city') ? 'auth-locked-field' : ''}">
+        <label for="reg-city">
+          ${labelWithLock('עיר מגורים', 'city')}
+        </label>
+        <input id="reg-city" name="city" type="text" list="reg-city-options"
+          value="${escapeHTML(registerData.city)}"
+          placeholder="הקלד או בחר עיר"
+          ${lockAttrs('city')}>
+        <datalist id="reg-city-options">
+          ${citySuggestions.map(c => '<option value="' + escapeHTML(c) + '">').join('')}
+        </datalist>
+      </div>
+    `;
+  }
+
+  // ---------- שלב 3: רקע אישי ----------
+  if (step === 3) {
+    const heightOptions = [];
+    for (let h = 130; h <= 220; h += 5) heightOptions.push(h + ' ס"מ');
+
+    return `
+      <div class="auth-form-group ${isLocked('occupation') ? 'auth-locked-field' : ''}">
+        <label for="reg-occupation">
+          ${labelWithLock('עיסוק', 'occupation')}
+        </label>
+        <input id="reg-occupation" name="occupation" type="text"
+          value="${escapeHTML(registerData.occupation)}"
+          placeholder="במה אתה עוסק?"
+          ${lockAttrs('occupation')}>
+      </div>
+
+      <div class="auth-form-group ${isLocked('status') ? 'auth-locked-field' : ''}">
+        <label for="reg-status">
+          ${labelWithLock('מצב משפחתי', 'status')}
+        </label>
+        <select id="reg-status" name="status" ${lockAttrs('status')}>
+          <option value="">בחירה</option>
+          ${['רווק/ה', 'נשוי/אה', 'גרוש/ה', 'אלמן/ה'].map(o =>
+            '<option value="' + escapeHTML(o) + '"' +
+            (registerData.status === o ? ' selected' : '') +
+            '>' + escapeHTML(o) + '</option>'
+          ).join('')}
+        </select>
+      </div>
+
+      <div class="auth-form-group ${isLocked('children') ? 'auth-locked-field' : ''}">
+        <label>${labelWithLock('יש ילדים?', 'children')}</label>
+        <div class="auth-choice-list">
+          ${['כן', 'לא'].map(o => `
+            <label class="auth-choice">
+              <input type="radio" name="children" value="${o}"
+                ${registerData.children === o ? 'checked' : ''}
+                ${isLocked('children') ? 'disabled' : ''}>
+              ${o}
+            </label>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="auth-form-group ${isLocked('religiousView') ? 'auth-locked-field' : ''}">
+        <label for="reg-religious">
+          ${labelWithLock('השקפה דתית', 'religiousView')}
+        </label>
+        <select id="reg-religious" name="religiousView" ${lockAttrs('religiousView')}>
+          <option value="">בחירה</option>
+          ${religiousOptions.map(o =>
+            '<option value="' + escapeHTML(o) + '"' +
+            (registerData.religiousView === o ? ' selected' : '') +
+            '>' + escapeHTML(o) + '</option>'
+          ).join('')}
+        </select>
+      </div>
+
+      <div class="auth-form-group ${isLocked('height') ? 'auth-locked-field' : ''}">
+        <label for="reg-height">
+          ${labelWithLock('גובה', 'height')}
+        </label>
+        <select id="reg-height" name="height" ${lockAttrs('height')}>
+          <option value="">בחירה</option>
+          ${heightOptions.map(o =>
+            '<option value="' + escapeHTML(o) + '"' +
+            (registerData.height === o ? ' selected' : '') +
+            '>' + escapeHTML(o) + '</option>'
+          ).join('')}
+        </select>
+      </div>
+
+      <div class="auth-form-group ${isLocked('service') ? 'auth-locked-field' : ''}">
+        <label for="reg-service">
+          ${labelWithLock('שירות צבאי/לאומי', 'service')}
+        </label>
+        <select id="reg-service" name="service" ${lockAttrs('service')}>
+          <option value="">בחירה</option>
+          ${['שירות לאומי', 'שירות סדיר מלא', 'לא שרתתי', 'אחר'].map(o =>
+            '<option value="' + escapeHTML(o) + '"' +
+            (registerData.service === o ? ' selected' : '') +
+            '>' + escapeHTML(o) + '</option>'
+          ).join('')}
+        </select>
+      </div>
+    `;
+  }
+
+  // ---------- שלב 4: העדפות וקצת עליי ----------
+  return `
+    <div class="auth-form-group ${isLocked('relationshipGoal') ? 'auth-locked-field' : ''}">
+      <label>${labelWithLock('מטרת הקשר', 'relationshipGoal')}</label>
+      <div class="auth-choice-list">
+        ${['קשר רציני', 'חתונה'].map(o => `
+          <label class="auth-choice">
+            <input type="radio" name="relationshipGoal" value="${escapeHTML(o)}"
+              ${registerData.relationshipGoal === o ? 'checked' : ''}
+              ${isLocked('relationshipGoal') ? 'disabled' : ''}>
+            ${escapeHTML(o)}
+          </label>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="auth-form-group ${isLocked('languages') ? 'auth-locked-field' : ''}">
+      <label>${labelWithLock('שפות נוספות', 'languages')}</label>
+      <div class="auth-choice-list">
+        ${languageOptions.map(lang => `
+          <label class="auth-choice">
+            <input type="checkbox" name="languages" value="${escapeHTML(lang)}"
+              ${registerData.languages.includes(lang) ? 'checked' : ''}
+              ${isLocked('languages') ? 'disabled' : ''}>
+            ${escapeHTML(lang)}
+          </label>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="auth-form-group ${isLocked('smoker') ? 'auth-locked-field' : ''}">
+      <label>${labelWithLock('מעשן?', 'smoker')}</label>
+      <div class="auth-choice-list">
+        ${['כן', 'לא'].map(o => `
+          <label class="auth-choice">
+            <input type="radio" name="smoker" value="${o}"
+              ${registerData.smoker === o ? 'checked' : ''}
+              ${isLocked('smoker') ? 'disabled' : ''}>
+            ${o}
+          </label>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="auth-form-group ${isLocked('health') ? 'auth-locked-field' : ''}">
+      <label>${labelWithLock('מצב בריאותי', 'health')}</label>
+      <div class="auth-choice-list">
+        ${['תקין', 'אספר בהמשך'].map(o => `
+          <label class="auth-choice">
+            <input type="radio" name="health" value="${escapeHTML(o)}"
+              ${registerData.health === o ? 'checked' : ''}
+              ${isLocked('health') ? 'disabled' : ''}>
+            ${escapeHTML(o)}
+          </label>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="auth-form-group ${isLocked('kosher') ? 'auth-locked-field' : ''}">
+      <label>${labelWithLock('שמירת כשרות', 'kosher')}</label>
+      <div class="auth-choice-list">
+        ${['כן', 'לא'].map(o => `
+          <label class="auth-choice">
+            <input type="radio" name="kosher" value="${o}"
+              ${registerData.kosher === o ? 'checked' : ''}
+              ${isLocked('kosher') ? 'disabled' : ''}>
+            ${o}
+          </label>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="auth-form-group ${isLocked('about') ? 'auth-locked-field' : ''}">
+      <label for="reg-about">
+        ${labelWithLock('קצת עליי', 'about')}
+      </label>
+      <textarea id="reg-about" name="about" maxlength="500"
+        placeholder="ספר על עצמך בכמה משפטים..."
+        \( {lockAttrs('about')}> \){escapeHTML(registerData.about)}</textarea>
+      <div class="auth-hint">עד 500 תווים. זה מה שאחרים יראו בפרופיל.</div>
+    </div>
+  `;
+}
+
+function collectRegisterStep() {
+  const form = document.getElementById('register-form');
+  if (!form) return;
+
+  const fd = new FormData(form);
+
+  if (registerStep === 1) {
+    registerData.email = String(fd.get('email') || '').trim();
+    registerData.password = String(fd.get('password') || '');
+    registerData.passwordConfirm = String(fd.get('passwordConfirm') || '');
+  }
+
+  if (registerStep === 2) {
+    registerData.name = String(fd.get('name') || '').trim();
+    registerData.birthDate = String(fd.get('birthDate') || '');
+    registerData.phone = String(fd.get('phone') || '').trim();
+    registerData.city = String(fd.get('city') || '').trim();
+  }
+
+  if (registerStep === 3) {
+    registerData.occupation = String(fd.get('occupation') || '').trim();
+    registerData.status = String(fd.get('status') || '');
+    registerData.children = String(fd.get('children') || '');
+    registerData.religiousView = String(fd.get('religiousView') || '');
+    registerData.height = String(fd.get('height') || '');
+    registerData.service = String(fd.get('service') || '');
+  }
+
+  if (registerStep === 4) {
+    registerData.relationshipGoal = String(fd.get('relationshipGoal') || '');
+    registerData.languages = fd.getAll('languages').map(String);
+    registerData.smoker = String(fd.get('smoker') || '');
+    registerData.health = String(fd.get('health') || '');
+    registerData.kosher = String(fd.get('kosher') || '');
+    registerData.about = String(fd.get('about') || '').trim();
+  }
+}
+
+function validateRegisterStep() {
+  if (registerStep === 1) {
+    if (!registerData.email || !registerData.email.includes('@')) {
+      alert('יש להזין אימייל תקין.');
+      return false;
+    }
+    if (registerData.password.length < 6) {
+      alert('הסיסמה חייבת להכיל לפחות 6 תווים.');
+      return false;
+    }
+    if (registerData.password !== registerData.passwordConfirm) {
+      alert('הסיסמאות אינן תואמות.');
+      return false;
+    }
+  }
+
+  if (registerStep === 2) {
+    if (!registerData.name) {
+      alert('יש להזין שם.');
+      return false;
+    }
+    if (!registerData.birthDate) {
+      alert('יש להזין תאריך לידה.');
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function registerNextStep() {
+  collectRegisterStep();
+  if (!validateRegisterStep()) return;
+
+  if (registerStep < REGISTER_TOTAL_STEPS) {
+    registerStep += 1;
+    renderRegister();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  finishRegistration();
+}
+
+function registerPrevStep() {
+  collectRegisterStep();
+  if (registerStep > 1) {
+    registerStep -= 1;
+    renderRegister();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function finishRegistration() {
+  // שמירה מקומית זמנית — אחר כך תוחלף ב-Supabase Auth + profiles
+  const details = getPersonalDetails();
+  details.name = registerData.name;
+  details.birthDate = registerData.birthDate;
+  details.phone = registerData.phone;
+  details.city = registerData.city;
+  details.occupation = registerData.occupation;
+  details.status = registerData.status;
+  details.children = registerData.children;
+  details.religiousView = registerData.religiousView;
+  details.height = registerData.height;
+  details.service = registerData.service;
+  details.relationshipGoal = registerData.relationshipGoal;
+  details.languages = registerData.languages;
+  details.smoker = registerData.smoker;
+  details.health = registerData.health;
+  details.kosher = registerData.kosher;
+  details.about = registerData.about;
+  details.age = calculateAge(registerData.birthDate);
+
+  savePersonalDetails(details);
+
+  // איפוס לשלב הבא (אם ירצו להירשם שוב)
+  registerStep = 1;
+
+  alert('ההרשמה הושלמה. הפרטים נשמרו. בהמשך נחבר ל-Supabase.');
+  showPage('personal');
+}
 
 function showPage(name) {
   const content = document.getElementById('app-content');
@@ -2212,7 +3226,11 @@ if (name === 'notifications') {
   renderNotifications();
   return;
 }
-
+  
+if (name === 'register') {
+  renderRegister();
+  return;
+}
 
   if (name === 'profiles') {
     renderProfiles();
@@ -3963,8 +4981,27 @@ function renderNotifications() {
 }
 
  
- showPage('home');
+ // בסוף ה־script, במקום: showPage('home');
+
+async function initApp() {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (!session) {
+      renderLogin();
+      return;
+    }
+
+    await afterAuthSuccess(session.user);
+  } catch (err) {
+    console.error(err);
+    renderLogin();
+  }
+}
+
+initApp();
 </script>
 
 </body>
 </html>
+    

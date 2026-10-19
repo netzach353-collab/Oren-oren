@@ -1730,6 +1730,223 @@ body.keyboard-open {
 .my-interests-link:active {
   transform: scale(.97);
 }
+  
+  
+/* ===== טופס פרטים אישיים חדש ===== */
+
+.personal-form {
+  display: grid;
+  gap: 18px;
+  padding-bottom: 100px;
+}
+
+.personal-form-group {
+  min-width: 0;
+}
+
+.personal-form-group > label,
+.personal-form-label {
+  display: block;
+  margin-bottom: 8px;
+  color: #4b1930;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.personal-form-control {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #ead5de;
+  border-radius: 12px;
+  background: #fffafb;
+  color: #4b1930;
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+}
+
+.personal-form-control:focus {
+  border-color: #7d2345;
+  box-shadow: 0 0 0 3px #7d234514;
+}
+
+.personal-form textarea.personal-form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.personal-choice-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+  
+
+.personal-choice {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 9px 13px;
+  border: 1px solid #ead5de;
+  border-radius: 12px;
+  background: #fff;
+  color: #7d2345;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.personal-choice:has(input:checked) {
+  border-color: #7d2345;
+  background: #f3e8ec;
+  box-shadow: inset 0 0 0 1px #7d2345;
+}
+
+.personal-choice input {
+  accent-color: #7d2345;
+  margin: 0 0 0 7px;
+}
+
+.personal-form-hint {
+  margin-top: px;
+  color: #718096;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* כפתור שמירה קבוע למסך */
+.personal-save-dock {
+  position: fixed;
+  z-index: 190;
+  right: 0;
+  bottom: calc(70px + env(safe-area-inset-bottom));
+  left: 0;
+  padding: 12px 16px;
+  background: rgba(255,255,255,.97);
+  border-top: 1px solid #ead5de;
+  box-shadow: 0 -5px 20px rgba(75,25,48,.07);
+}
+
+.personal-save-dock-inner {
+  max-width: 720px;
+  margin: auto;
+}
+
+.personal-save-dock .personal-save-btn {
+  display: block;
+  width: 100%;
+  min-height: 50px;
+  margin: 0;
+  border-radius: 13px;
+  background: #7d2345;
+  box-shadow: 0 4px 12px #7d234526;
+  font-size: 15px;
+}
+
+.personal-save-dock .personal-save-btn:active {
+  transform: scale(.99);
+}
+
+body.keyboard-open .personal-save-dock {
+  display: none !important;
+}
+
+body {
+  scroll-padding-bottom: 150px;
+}
+
+@media (max-width: 480px) {
+  .personal-form {
+    gap: 16px;
+  }
+
+  .personal-save-dock {
+    padding: 10px 12px;
+  }
+}
+
+  
+/* כשהמקלדת פתוחה: לא מציגים סרגלים קבועים */
+body.keyboard-open .bottom-nav,
+body.keyboard-open .personal-save-dock {
+  display: none !important;
+}
+
+body.keyboard-open {
+  padding-bottom: 0 !important;
+}
+
+/* שדות טופס נוחים במכשירים ניידים */
+.personal-form-control {
+  scroll-margin-top: 85px;
+  scroll-margin-bottom: 24px;
+}
+
+/* תפריטים ושדות בחירה בעיצוב אחיד */
+.personal-form-control,
+.personal-privacy-select,
+.filter-field select,
+.filter-field input {
+  min-height: 46px;
+  border: 1px solid #ead5de;
+  border-radius: 12px;
+  background-color: #fffafb;
+  color: #4b1930;
+  font: inherit;
+}
+
+.personal-form-control:focus,
+.personal-privacy-select:focus,
+.filter-field select:focus,
+.filter-field input:focus {
+  border-color: #7d2345;
+  outline: none;
+  box-shadow: 0 0 0 3px #7d234514;
+}
+
+.personal-form-control,
+.personal-privacy-select,
+.filter-field select {
+  max-width: 100%;
+}
+/* מרווחים אחידים בטופס הפרטים האישיים */
+
+#personal-tab-content .personal-panel > .personal-field {
+  margin-bottom: 8px;
+}
+
+#personal-tab-content .personal-panel > .personal-panel-title {
+  margin-bottom: 22px;
+}
+
+/* רווח בין התווית לשדה */
+.personal-form-group > label,
+.personal-form-label {
+  margin-bottom: 10px;
+}
+
+/* רווח בין בחירות בשדות מרובי אפשרויות */
+.personal-choice-list {
+  gap: 10px;
+}
+
+/* רווח בין ההסבר לשדה הבא */
+.personal-form-hint {
+  margin-top: 8px;
+  margin-bottom: 0;
+  line-height: 1.7;
+}
+  
+  .personal-privacy-mode{
+     border-bottom: 1px solid #7d2345;
+    padding: 20px 15px;
+  }
+ 
+  
 </style>
 </head>
 
@@ -1909,45 +2126,57 @@ function toggleFullPrivacyMode() {
   renderPersonal();
 }
 /* הסתרת הסרגל התחתון כשהמקלדת נפתחת בנייד */
+
+/* זיהוי מקלדת בנייד */
 (function () {
-  const bottomNav = document.querySelector('.bottom-nav');
+  const editableSelector =
+    'input, textarea, select, [contenteditable="true"]';
 
-  if (!bottomNav || !window.visualViewport) return;
-
-  let keyboardWasOpen = false;
-  
   function detectKeyboard() {
     const viewport = window.visualViewport;
+    const active = document.activeElement;
+    const editing = !!(
+      active && active.matches(editableSelector)
+    );
 
-    // זיהוי פתיחת מקלדת לפי צמצום גובה אזור התצוגה
-    const keyboardOpen =
-      window.innerHeight - viewport.height > 150;
+    let keyboardOpen = false;
 
-    // מסתירים את הסרגל רק כשהמיקוד נמצא בשדה עריכה
-    const activeElement = document.activeElement;
-    const editingField = activeElement &&
-      activeElement.matches(
-        'input, textarea, select, [contenteditable="true"]'
-      );
+    if (viewport && editing) {
+      keyboardOpen =
+        window.innerHeight - viewport.height > 120;
+    }
 
-    const shouldHide = keyboardOpen && editingField;
-
-    document.body.classList.toggle('keyboard-open', shouldHide);
-    keyboardWasOpen = shouldHide;
+    document.body.classList.toggle(
+      'keyboard-open',
+      keyboardOpen
+    );
   }
 
-  window.visualViewport.addEventListener('resize', detectKeyboard);
-  window.visualViewport.addEventListener('scroll', detectKeyboard);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener(
+      'resize', detectKeyboard
+    );
+    window.visualViewport.addEventListener(
+      'scroll', detectKeyboard
+    );
+  }
 
-  document.addEventListener('focusin', detectKeyboard);
+  document.addEventListener('focusin', () => {
+    requestAnimationFrame(detectKeyboard);
+  });
 
-  document.addEventListener('focusout', function () {
-    // מאפשר לדפדפן לעדכן את המיקוד לפני הבדיקה מחדש
-    setTimeout(detectKeyboard, 100);
+  document.addEventListener('focusout', () => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(detectKeyboard);
+    });
   });
 
   window.addEventListener('resize', detectKeyboard);
+  detectKeyboard();
 })();
+
+  
+  
 function bottomNavigate(name, button) {
   document.querySelectorAll('.bottom-item').forEach(item => {
     item.classList.remove('active');
@@ -2884,38 +3113,127 @@ function resetSwipeProfiles() {
   localStorage.removeItem("lev_interest_decisions");
   renderSwipe();
 }
- 
- 
- 
-/* ===== פרטים אישיים והגדרות פרטיות ===== */
 
 const PERSONAL_KEY = 'lev_personal_details';
 const PERSONAL_PRIVACY_KEY = 'lev_personal_privacy';
 
 const personalDefaultDetails = {
   name: '',
+  birthDate: '',
+  phone: '',
   age: '',
   city: '',
   occupation: '',
   status: '',
+  children: '',
+  religiousView: '',
+  height: '',
+  relationshipGoal: '',
+  service: '',
+  languages: [],
+  smoker: '',
+  health: '',
+  kosher: '',
   about: '',
   interests: ''
 };
 
 const personalFieldLabels = {
-  name: 'שם',
   age: 'גיל',
+  phone: 'מספר טלפון',
   city: 'עיר מגורים',
   occupation: 'עיסוק',
-  status: 'מצב אישי',
-  about: 'קצת עליי',
-  interests: 'תחומי עניין'
+  status: 'מצב משפחתי',
+  children: 'ילדים',
+  religiousView: 'השקפה דתית',
+  height: 'גובה',
+  relationshipGoal: 'מטרת הקשר',
+  service: 'שירות צבאי/לאומי',
+  languages: 'שפות נוספות',
+  smoker: 'מעשן?',
+  health: 'מצב בריאותי',
+  kosher: 'שמירת כשרות'
 };
+
+const religiousOptions = [
+  'דתי לאומי',
+  'מסורתי',
+  'דתי לייט',
+  'דתל"ש',
+  'חילוני',
+  'דתי לאומי תורני',
+  'חרדי',
+  'חרדי מודרני',
+  'ברסלב',
+  'חב"ד',
+  'חוזר בתשובה',
+  'דתי'
+];
+
+const languageOptions = [
+  'עברית',
+  'אנגלית',
+  'רוסית',
+  'יידיש',
+  'אמרית',
+  'ספרדית',
+  'צרפתית',
+  'אחר'
+];
+
+const citySuggestions = [
+  'ירושלים',
+  'תל אביב',
+  'חיפה',
+  'נתניה',
+  'פתח תקווה',
+  'ראשון לציון',
+  'באר שבע',
+  'אשדוד',
+  'אשקלון',
+  'בני ברק',
+  'בית שמש',
+  'רחובות',
+  'חולון',
+  'רמת גן',
+  'כפר סבא',
+  'הרצליה',
+  'רעננה',
+  'מודיעין',
+  'לוד',
+  'רמלה',
+  'טבריה',
+  'צפת',
+  'אילת',
+  'קריית גת',
+  'קריית שמונה'
+];
+
 
 function getPersonalDetails() {
   const saved = readMatchData(PERSONAL_KEY, {});
-  return { ...personalDefaultDetails, ...saved };
+
+  const details = {
+    ...personalDefaultDetails,
+    ...saved
+  };
+
+  // הגיל מחושב מתאריך הלידה ולא נערך ידנית
+  details.age = calculateAge(details.birthDate);
+
+  // תמיכה בנתוני שפות ישנים
+  if (!Array.isArray(details.languages)) {
+    details.languages = details.languages
+      ? String(details.languages)
+          .split(',')
+          .map(x => x.trim())
+          .filter(Boolean)
+      : [];
+  }
+
+  return details;
 }
+
 
 function savePersonalDetails(details) {
   saveMatchData(PERSONAL_KEY, details);
@@ -2931,13 +3249,97 @@ function getPersonalPrivacy() {
 
   return privacy;
 }
+  
+  function calculateAge(birthDate) {
+  if (!birthDate) return '';
 
+  const birth = new Date(birthDate + 'T00:00:00');
+  const today = new Date();
+
+  if (
+    Number.isNaN(birth.getTime()) ||
+    birth > today ||
+    birth.getFullYear() < 1900
+  ) {
+    return '';
+  }
+
+  let age = today.getFullYear() - birth.getFullYear();
+
+  const birthdayNotReached =
+    today.getMonth() < birth.getMonth() ||
+    (
+      today.getMonth() === birth.getMonth() &&
+      today.getDate() < birth.getDate()
+    );
+
+  if (birthdayNotReached) age--;
+
+  return age;
+}
+
+function editPersonalName() {
+  const details = getPersonalDetails();
+
+  const newName = prompt(
+    'מה השם שתרצה להציג בפרופיל?',
+    details.name || ''
+  );
+
+  if (newName === null) return;
+
+  const name = newName.trim();
+
+  if (!name) {
+    alert('יש להזין שם.');
+    return;
+  }
+
+  if (name.length > 60) {
+    alert('השם ארוך מדי. אפשר להזין עד 60 תווים.');
+    return;
+  }
+
+  details.name = name;
+  savePersonalDetails(details);
+
+  renderPersonal();
+}
+
+  
+  function editPersonalPhone() {
+  const details = getPersonalDetails();
+
+  const newPhone = prompt(
+    'מה מספר הטלפון שלך?\n(ישמש ליצירת קשר לאחר התאמה הדדית בלבד)',
+    details.phone || ''
+  );
+
+  if (newPhone === null) return;
+
+  const phone = newPhone.trim().replace(/[^0-9+\-\s()]/g, '');
+
+  if (phone && phone.replace(/\D/g, '').length < 9) {
+    alert('מספר הטלפון קצר מדי. יש להזין מספר תקין.');
+    return;
+  }
+
+  if (phone.length > 25) {
+    alert('מספר הטלפון ארוך מדי.');
+    return;
+  }
+
+  details.phone = phone;
+  savePersonalDetails(details);
+  renderPersonal();
+}
+  
+  
 function savePersonalPrivacy(privacy) {
   saveMatchData(PERSONAL_PRIVACY_KEY, privacy);
 }
 
 let personalActiveTab = 'details';
-let personalEditingField = '';
 
 function renderPersonal() {
   const content = document.getElementById('app-content');
@@ -2947,7 +3349,11 @@ function renderPersonal() {
 
   content.innerHTML = `
     <section class="personal-page">
-     
+
+      <div class="personal-heading">
+        <h1>הפרטים שלי</h1>
+        <p>מלא את הפרטים שלך כדי לעזור לאחרים להכיר אותך.</p>
+      </div>
 
       <div class="personal-tabs">
         <button type="button"
@@ -2956,23 +3362,19 @@ function renderPersonal() {
           הפרטים שלי
         </button>
 
-       
-<button type="button"
-  class="personal-tab ${personalActiveTab === 'privacy' ? 'active' : ''}"
-  onclick="switchPersonalTab('privacy')">
-
-  <svg class="personal-tab-icon"
-    viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" stroke-width="1.8"
-    stroke-linecap="round" stroke-linejoin="round"
-    aria-hidden="true">
-    <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/>
-    <path d="m9 12 2 2 4-4"/>
-  </svg>
-
-  הגדרות פרטיות
-</button>
-
+        <button type="button"
+          class="personal-tab ${personalActiveTab === 'privacy' ? 'active' : ''}"
+          onclick="switchPersonalTab('privacy')">
+          <svg class="personal-tab-icon"
+            viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round" stroke-linejoin="round"
+            aria-hidden="true">
+            <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+          הגדרות פרטיות
+        </button>
       </div>
 
       <div id="personal-tab-content">
@@ -2980,127 +3382,362 @@ function renderPersonal() {
           ? renderPersonalDetails(details)
           : renderPersonalPrivacy()}
       </div>
+
+      ${personalActiveTab === 'details' ? `
+        <div class="personal-save-dock">
+          <div class="personal-save-dock-inner">
+            <button type="button"
+              class="personal-save-btn"
+              onclick="saveAllPersonalDetails()">
+              שמירת כל השינויים
+            </button>
+          </div>
+        </div>
+      ` : ''}
     </section>
   `;
 }
 
 function switchPersonalTab(tab) {
+  // אין שינוי בפרטים השמורים במעבר בין הלשוניות.
   personalActiveTab = tab;
-  personalEditingField = '';
   renderPersonal();
 }
 
-function renderPersonalDetails(details) {
-  const fields = Object.keys(personalFieldLabels);
-
+function personalSelectField(key, label, options, value) {
   return `
-    <section class="personal-panel">
-      <div class="personal-panel-title">
-        <div>
-          <h2>הפרטים שלך</h2>
-          <p>אפשר לערוך כל פרט בנפרד.</p>
-        </div>
-      </div>
-
-      ${fields.map(key => {
-        const value = details[key] || '';
-        const editing = personalEditingField === key;
-
-        return `
-          <div class="personal-field">
-            <div class="personal-field-info">
-              <span class="personal-field-label">
-                ${escapeHTML(personalFieldLabels[key])}
-              </span>
-
-              ${editing ? `
-                <input
-                  class="personal-input"
-                  id="personal-edit-input"
-                  data-field="${key}"
-                  value="${escapeHTML(value)}"
-                  placeholder="הזן ${escapeHTML(personalFieldLabels[key])}"
-                  ${key === 'age' ? 'type="number" min="18" max="120"' : ''}
-                  ${key === 'about' || key === 'interests'
-                    ? 'style="min-height:80px"'
-                    : ''}>
-                <button type="button"
-                  class="personal-save-btn"
-                  onclick="savePersonalField('${key}')">
-                  שמירת השינוי
-                </button>
-                <button type="button"
-                  class="personal-cancel-btn"
-                  onclick="cancelPersonalEdit()">
-                  ביטול
-                </button>
-              ` : `
-                <div class="personal-field-value">
-                  ${escapeHTML(value || 'לא הוזן עדיין')}
-                </div>
-              `}
-            </div>
-
-            ${!editing ? `
-              <button type="button"
-                class="personal-edit-btn"
-                onclick="editPersonalField('${key}')"
-                aria-label="עריכת ${escapeHTML(personalFieldLabels[key])}">
-                <svg viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="1.8"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="m15 5 4 4"/>
-                  <path d="M4 20l4.5-1 10-10a2.8 2.8 0 0 0-4-4l-10 10L4 20Z"/>
-                </svg>
-                עריכה
-              </button>
-            ` : ''}
-          </div>
-        `;
-      }).join('')}
-    </section>
+    <div class="personal-form-group">
+      <label for="personal-${key}">${escapeHTML(label)}</label>
+      <select class="personal-form-control"
+        id="personal-${key}"
+        name="${key}">
+        <option value="">בחירה</option>
+        ${options.map(option => `
+          <option value="${escapeHTML(option)}"
+            ${String(value) === option ? 'selected' : ''}>
+            ${escapeHTML(option)}
+          </option>
+        `).join('')}
+      </select>
+    </div>
   `;
 }
 
-function editPersonalField(key) {
-  if (!Object.prototype.hasOwnProperty.call(personalFieldLabels, key)) return;
-  personalEditingField = key;
-  renderPersonal();
-
-  const input = document.getElementById('personal-edit-input');
-  if (input) input.focus();
+function personalYesNoField(key, label, value) {
+  return `
+    <div class="personal-form-group">
+      <div class="personal-form-label">${escapeHTML(label)}</div>
+      <div class="personal-choice-list">
+        ${['כן', 'לא'].map(option => `
+          <label class="personal-choice">
+            <input type="radio"
+              name="${key}"
+              value="${option}"
+              ${value === option ? 'checked' : ''}>
+            ${option}
+          </label>
+        `).join('')}
+      </div>
+    </div>
+  `;
 }
 
-function savePersonalField(key) {
-  if (!Object.prototype.hasOwnProperty.call(personalFieldLabels, key)) return;
+function personalRadioField(key, label, options, value) {
+  return `
+    <div class="personal-form-group">
+      <div class="personal-form-label">${escapeHTML(label)}</div>
+      <div class="personal-choice-list">
+        ${options.map(option => `
+          <label class="personal-choice">
+            <input type="radio"
+              name="${key}"
+              value="${escapeHTML(option)}"
+              ${value === option ? 'checked' : ''}>
+            ${escapeHTML(option)}
+          </label>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
 
-  const input = document.getElementById('personal-edit-input');
-  if (!input) return;
+function renderPersonalDetails(details) {
+  const heightOptions = [];
 
-  const details = getPersonalDetails();
-  let value = input.value.trim();
-
-  if (key === 'age' && value !== '') {
-    const age = Number(value);
-
-    if (!Number.isInteger(age) || age < 18 || age > 120) {
-      alert('יש להזין גיל בין 18 ל־120.');
-      return;
-    }
-
-    value = String(age);
+  for (let height = 130; height <= 220; height += 5) {
+    heightOptions.push(`${height} ס"מ`);
   }
 
-  details[key] = value;
-  savePersonalDetails(details);
+    return `
+  <section class="personal-panel">
 
-  personalEditingField = '';
-  renderPersonal();
+    <div class="personal-panel-title">
+      <div>
+        <h2>הפרטים שלך</h2>
+        <p>אפשר לשנות כמה פרטים ולשמור את כולם יחד.</p>
+      </div>
+    </div>
+
+    <!-- שם: מוצג כנתון עם אפשרות עריכה -->
+    <div class="personal-field">
+      <div class="personal-field-info">
+        <span class="personal-field-label">השם שלי</span>
+
+        <div class="personal-field-value">
+          ${escapeHTML(details.name || 'לא הוזן שם')}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="personal-edit-btn"
+        onclick="editPersonalName()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+        </svg>
+
+        עריכת שם
+      </button>
+    </div>
+
+    <!-- גיל: נתון לקריאה בלבד -->
+    <div class="personal-field">
+      <div class="personal-field-info">
+        <span class="personal-field-label">הגיל שלי</span>
+
+        <div class="personal-field-value">
+          ${
+            details.age !== '' &&
+            details.age !== null &&
+            details.age !== undefined
+              ? escapeHTML(details.age) + ' שנים'
+              : 'תאריך הלידה עדיין לא הוגדר'
+          }
+        </div>
+      </div>
+    </div>
+    <!-- מספר טלפון: נתון עם כפתור עריכה -->
+    <div class="personal-field">
+      <div class="personal-field-info">
+        <span class="personal-field-label">מספר טלפון</span>
+        <div class="personal-field-value" dir="ltr" style="text-align: right;">
+          ${escapeHTML(details.phone || 'אין עדיין מספר טלפון')}
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="personal-edit-btn"
+        onclick="editPersonalPhone()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 20h9"/>
+          <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+        </svg>
+        עידכון המספר
+      </button>
+    </div>
+
+    <!-- עיר מגורים -->
+    <div class="personal-form-group" style="margin-top: 28px;">
+      <label for="personal-city">עיר מגורים</label>
+
+      <input
+        class="personal-form-control"
+        id="personal-city"
+        name="city"
+        list="personal-city-options"
+        autocomplete="address-level2"
+        value="${escapeHTML(details.city || '')}"
+        placeholder="הקלד או בחר עיר"
+      >
+
+      <datalist id="personal-city-options">
+        ${citySuggestions.map(city => `
+          <option value="${escapeHTML(city)}"></option>
+        `).join('')}
+      </datalist>
+
+      <div class="personal-form-hint">
+        אפשר לבחור עיר מהרשימה או לכתוב כל עיר אחרת.
+      </div>
+    </div>
+
+    <!-- עיסוק -->
+    <div class="personal-form-group">
+      <label for="personal-occupation">עיסוק</label>
+
+      <input
+        class="personal-form-control"
+        id="personal-occupation"
+        name="occupation"
+        value="${escapeHTML(details.occupation || '')}"
+        placeholder="במה אתה עוסק?"
+      >
+    </div>
+
+    <!-- מצב משפחתי -->
+    ${personalSelectField(
+      'status',
+      'מצב משפחתי',
+      ['רווק/ה', 'נשוי/אה', 'גרוש/ה', 'אלמן/ה'],
+      details.status
+    )}
+
+    <!-- ילדים -->
+    ${personalYesNoField(
+      'children',
+      'יש ילדים?',
+      details.children
+    )}
+
+    <!-- השקפה דתית -->
+    ${personalSelectField(
+      'religiousView',
+      'השקפה דתית',
+      religiousOptions,
+      details.religiousView
+    )}
+
+    <!-- גובה -->
+    ${personalSelectField(
+      'height',
+      'גובה',
+      heightOptions,
+      details.height
+    )}
+
+    <!-- מטרת הקשר -->
+    ${personalRadioField(
+      'relationshipGoal',
+      'מטרת הקשר',
+      ['קשר רציני', 'חתונה'],
+      details.relationshipGoal
+    )}
+
+    <!-- שירות צבאי או לאומי -->
+    ${personalSelectField(
+      'service',
+      'שירות צבאי/לאומי',
+      [
+        'שירות לאומי',
+        'שירות סדיר מלא',
+        'לא שרתתי',
+        'אחר'
+      ],
+      details.service
+    )}
+
+    <!-- שפות נוספות -->
+    <div class="personal-form-group">
+      <div class="personal-form-label">שפות נוספות</div>
+
+      <div class="personal-choice-list">
+        ${languageOptions.map(language => `
+          <label class="personal-choice">
+            <input
+              type="checkbox"
+              name="languages"
+              value="${escapeHTML(language)}"
+              ${
+                Array.isArray(details.languages) &&
+                details.languages.includes(language)
+                  ? 'checked'
+                  : ''
+              }
+            >
+
+            ${escapeHTML(language)}
+          </label>
+        `).join('')}
+      </div>
+
+      <div class="personal-form-hint">
+        אפשר לבחור כמה שפות.
+      </div>
+    </div>
+
+    <!-- עישון -->
+    ${personalYesNoField(
+      'smoker',
+      'מעשן?',
+      details.smoker
+    )}
+
+    <!-- מצב בריאותי -->
+    ${personalRadioField(
+      'health',
+      'מצב בריאותי',
+      ['תקין', 'אספר בהמשך'],
+      details.health
+    )}
+
+    <!-- שמירת כשרות -->
+    ${personalYesNoField(
+      'kosher',
+      'שמירת כשרות',
+      details.kosher
+    )}
+
+  </section>
+`;
+  
 }
 
-function cancelPersonalEdit() {
-  personalEditingField = '';
+function saveAllPersonalDetails() {
+  const form = document.getElementById('personal-details-form');
+  if (!form) return;
+
+  const formData = new FormData(form);
+  const details = getPersonalDetails();
+
+
+  const textFields = [
+    'city',
+    'occupation',
+    'status',
+    'children',
+    'religiousView',
+    'height',
+    'relationshipGoal',
+    'service',
+    'smoker',
+    'health',
+    'kosher'
+  ];
+
+  textFields.forEach(key => {
+    details[key] = String(formData.get(key) || '').trim();
+  });
+
+  details.languages = formData.getAll('languages')
+    .map(value => String(value).trim())
+    .filter(Boolean);
+
+  savePersonalDetails(details);
+
+  // מרעננים את הטופס עם הנתונים שנשמרו.
   renderPersonal();
+
+  alert('הפרטים נשמרו בהצלחה.');
 }
 
 function renderPersonalPrivacy() {
@@ -3108,27 +3745,24 @@ function renderPersonalPrivacy() {
 
   return `
     <section class="personal-panel">
-<div class="personal-privacy-mode">
-  <div>
-    <h3>מצב פרטיות מלא</h3>
-   <p>
-  רק שם המשתמש ותמונות הפרופיל יהיו גלויים לאחרים.
-  שאר הפרטים ייחשפו רק לאחר שתיווצר התאמה הדדית.
-</p>
-  </div>
 
- 
-<button
-  type="button"
-  role="switch"
-  aria-checked="${isFullPrivacyMode()}"
-  aria-label="מצב פרטיות מלא"
-  class="privacy-mode-button ${isFullPrivacyMode() ? 'active' : ''}"
-  onclick="toggleFullPrivacyMode()">
-</button>
+      <div class="personal-privacy-mode">
+        <div>
+          <h3>מצב פרטיות מלא</h3>
+  <button type="button"
+          role="switch"
+          aria-checked="${isFullPrivacyMode()}"
+          aria-label="מצב פרטיות מלא"
+          class="privacy-mode-button ${isFullPrivacyMode() ? 'active' : ''}"
+          onclick="toggleFullPrivacyMode()">
+        </button>
+          <p>
+            רק שם המשתמש ותמונות הפרופיל יהיו גלויים לאחרים.
+            שאר הפרטים ייחשפו רק לאחר שתיווצר התאמה הדדית.
+          </p>
+        </div>
+      </div>
 
-</div>
-     
       ${Object.keys(personalFieldLabels).map(key => `
         <div class="personal-privacy-row">
           <div class="personal-privacy-top">
@@ -3136,6 +3770,7 @@ function renderPersonalPrivacy() {
               <div class="personal-privacy-name">
                 ${escapeHTML(personalFieldLabels[key])}
               </div>
+
               <div class="personal-privacy-description">
                 ${privacy[key] === 'public'
                   ? 'מוגדר להצגה בפרופיל הרגיל.'
@@ -3147,19 +3782,24 @@ function renderPersonalPrivacy() {
           </div>
 
           <select class="personal-privacy-select"
+            aria-label="הגדרת פרטיות: ${escapeHTML(personalFieldLabels[key])}"
             onchange="updatePersonalPrivacy('${key}', this.value)">
-            <option value="public" ${privacy[key] === 'public' ? 'selected' : ''}>
+            <option value="public"
+              ${privacy[key] === 'public' ? 'selected' : ''}>
               גלוי לכולם
             </option>
-            <option value="matched" ${privacy[key] === 'matched' ? 'selected' : ''}>
-        לחשוף להתאמות
+            <option value="matched"
+              ${privacy[key] === 'matched' ? 'selected' : ''}>
+              לחשוף להתאמות
             </option>
-            <option value="private" ${privacy[key] === 'private' ? 'selected' : ''}>
+            <option value="private"
+              ${privacy[key] === 'private' ? 'selected' : ''}>
               פרטי — רק אני
             </option>
           </select>
         </div>
       `).join('')}
+
     </section>
   `;
 }
@@ -3174,6 +3814,7 @@ function updatePersonalPrivacy(key, value) {
 
   renderPersonal();
 }
+
 
  
  

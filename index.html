@@ -1,0 +1,3329 @@
+
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>האתר שלי</title>
+
+<style>
+:root {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --text: #172033;
+  --muted: #718096;
+  --border: #e5e9f2;
+  --primary: #4f46e5;
+  --primary-light: #eef2ff;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* סרגל עליון */
+
+.topbar {
+  height: 68px;
+  background: #7d2345;
+  border-bottom: 1px solid #681b39;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+
+.topbar-inner {
+  max-width: 1100px;
+  height: 100%;
+  margin: auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* לוגו */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 21px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.brand-icon {
+  width: 39px;
+  height: 39px;
+  display: grid;
+  place-items: center;
+  color: #7d2345;
+  background: white;
+  border-radius: 12px;
+}
+
+.brand-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+/* ניווט */
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.nav-button {
+  border: 0;
+  background: transparent;
+  color: #596579;
+  padding: 11px 15px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: .2s;
+}
+
+.nav-button:hover {
+  background: #f3f5fa;
+  color: var(--primary);
+}
+
+.nav-button.active {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+/* פעולות */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  background: white;
+  color: #475569;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  
+  position: relative;
+}
+
+.icon-button:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.icon-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.notification-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border: 2px solid white;
+  border-radius: 50%;
+  top: 8px;
+  right: 8px;
+}
+
+.login-button {
+  border: none;
+  background: var(--primary);
+  color: white;
+  border-radius: 11px;
+  padding: 12px 19px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.login-button:hover {
+  background: #4338ca;
+}
+
+/* תוכן */
+.container {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 0 20px;
+}
+
+.welcome {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 30px;
+}
+
+.welcome h1 {
+  margin: 0 0 10px;
+  font-size: 27px;
+}
+
+.welcome p {
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.8;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 23px;
+  min-height: 140px;
+}
+
+.card h3 {
+  margin: 0 0 10px;
+  font-size: 17px;
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.page-title {
+  font-size: 23px;
+  margin: 0 0 18px;
+}
+
+/* התאמה לנייד */
+@media (max-width: 720px) {
+  .topbar {
+    height: 62px;
+  }
+
+  .topbar-inner {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .brand {
+    font-size: 17px;
+    gap: 7px;
+  }
+
+  .brand-icon {
+    width: 35px;
+    height: 35px;
+  }
+
+  .navigation {
+    gap: 0;
+  }
+
+  .nav-button {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+
+  .actions {
+    gap: 6px;
+  }
+
+  .icon-button {
+    width: 37px;
+    height: 37px;
+  }
+
+  .login-button {
+    padding: 10px;
+    font-size: 12px;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome {
+    padding: 23px;
+  }
+
+  .welcome h1 {
+    font-size: 23px;
+  }
+}
+
+@media (max-width: 390px) {
+  .brand-name {
+    display: none;
+  }
+
+  .nav-button {
+    padding: 9px 6px;
+  }
+}
+ 
+ 
+/* סרגל ניווט תחתון */
+body {
+  padding-bottom: calc(82px + env(safe-area-inset-bottom));
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  z-index: 200;
+  background: #ffffff;
+  border-top: 1px solid #e8eaf1;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.bottom-nav-inner {
+  width: 100%;
+  max-width: 700px;
+  height: 70px;
+  margin: auto;
+  padding: 4px 8px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.bottom-item {
+  border: 0;
+  background: transparent;
+  color: #81879a;
+  font-family: inherit;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  
+  border-radius: 12px;
+}
+
+.bottom-item svg {
+  width: 23px;
+  height: 23px;
+}
+
+.bottom-item.active {
+  color: #a8325c;
+}
+
+.bottom-item.active svg {
+  stroke-width: 2.2;
+}
+
+.bottom-item:active {
+  background: #fbeaf0;
+}
+
+ /* עמוד ההחלקה */
+/* ===== מסך החלקה נקי ===== */
+.swipe-screen {
+  width: 100%;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+.swipe-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  margin: 0 auto;
+  perspective: 1000px;
+}
+
+.swipe-card {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 24px;
+  background: #7d2345;
+  box-shadow: 0 15px 38px rgba(23, 32, 51, .16);
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+  isolation: isolate;
+  transform: translateX(0) rotate(0);
+  opacity: 1;
+  transition: transform .32s ease, opacity .32s ease;
+}
+
+.swipe-card.dragging {
+  transition: none;
+  cursor: grabbing;
+}
+
+.swipe-card.swipe-out-left {
+  transform: translateX(-125%) rotate(-16deg);
+  opacity: 0;
+}
+
+.swipe-card.swipe-out-right {
+  transform: translateX(125%) rotate(16deg);
+  opacity: 0;
+}
+
+/* תמונת פרופיל */
+.swipe-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* הצללה מאחורי פרטי הפרופיל */
+.swipe-card.profile-card::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 35%,
+    rgba(0, 0, 0, .12) 48%,
+    rgba(0, 0, 0, .78) 76%,
+    rgba(0, 0, 0, .92) 100%
+  );
+  pointer-events: none;
+}
+
+.swipe-details {
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  padding: 26px 22px 24px;
+  color: white;
+  pointer-events: none;
+}
+
+.swipe-name {
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1.25;
+  margin-bottom: 9px;
+  color: white;
+}
+
+.swipe-meta {
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(255,255,255,.94);
+  margin-bottom: 10px;
+}
+
+.swipe-bio {
+  font-size: 14px;
+  line-height: 1.75;
+  color: rgba(255,255,255,.96);
+  overflow-wrap: anywhere;
+}
+
+/* חותמת בזמן גרירה */
+.swipe-stamp {
+  position: absolute;
+  z-index: 4;
+  top: 28px;
+  padding: 9px 14px;
+  border: 3px solid white;
+  border-radius: 10px;
+  font-size: 19px;
+  font-weight: 900;
+  color: white;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.swipe-stamp.like {
+  left: 78px;
+  transform: rotate(-10deg);
+}
+
+.swipe-stamp.pass {
+  right: 70px;
+  transform: rotate(10deg);
+}
+
+/* כרטיס ההדרכה הראשון */
+.swipe-card.instruction-card {
+  background:
+    radial-gradient(ellipse at 85% 15%, rgba(255,255,255,.15), transparent 42%),
+    linear-gradient(145deg, #8c3154 0%, #70203f 55%, #4b172e 100%);
+  color: white;
+}
+
+.instruction-content {
+  position: absolute;
+  inset: 0;
+  padding: 32px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.instruction-mark {
+  width: 74px;
+  height: 74px;
+  border-radius: 24px;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,.13);
+  border: 1px solid rgba(255,255,255,.24);
+  margin-bottom: 26px;
+}
+
+.instruction-mark svg {
+  width: 39px;
+  height: 39px;
+}
+
+.instruction-content h2 {
+  font-size: 30px;
+  line-height: 1.3;
+  margin: 0 0 12px;
+  color: white;
+}
+
+.instruction-content > p {
+  max-width: 290px;
+  font-size: 15px;
+  line-height: 1.8;
+  margin: 0;
+  color: rgba(255,255,255,.85);
+}
+
+.instruction-directions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+  margin-top: 32px;
+}
+
+.instruction-direction {
+  padding: 18px 9px;
+  border: 1px solid rgba(255,255,255,.24);
+  border-radius: 17px;
+  background: rgba(255,255,255,.09);
+}
+
+.instruction-direction svg {
+  display: block;
+  width: 27px;
+  height: 27px;
+  margin: 0 auto 10px;
+}
+
+.instruction-direction strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 5px;
+  color: white;
+}
+
+.instruction-direction span {
+  font-size: 12px;
+  color: rgba(255,255,255,.8);
+}
+
+.instruction-footer {
+  margin-top: 29px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: rgba(255,255,255,.82);
+  font-size: 12px;
+}
+
+.instruction-footer svg {
+  width: 19px;
+  height: 19px;
+}
+
+@media (max-width: 480px) {
+  .swipe-screen {
+    margin-top: 0;
+  }
+
+  .swipe-stage {
+    height: min(76dvh, 690px);
+    min-height: 430px;
+  }
+
+  .swipe-card {
+    border-radius: 21px;
+  }
+
+  .swipe-details {
+    padding: 22px 18px;
+  }
+
+  .swipe-name {
+    font-size: 28px;
+  }
+
+  .instruction-content {
+    padding: 25px 19px;
+  }
+
+  .instruction-content h2 {
+    font-size: 27px;
+  }
+
+  .instruction-directions {
+    gap: 9px;
+    margin-top: 25px;
+  }
+}
+/* ===== כל הפרופילים ===== */
+.profiles-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.profiles-toolbar h2 {
+  margin: 0;
+  font-size: 23px;
+  color: var(--text);
+}
+
+.profiles-count {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 5px;
+}
+
+.filter-toggle,
+.profile-interest-btn,
+.filter-apply,
+.filter-reset {
+  border: 0;
+  border-radius: 11px;
+  padding: 11px 15px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.filter-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.filter-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 18px;
+  box-shadow: 0 5px 18px #17203308;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.filter-field label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.filter-field input,
+.filter-field select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  padding: 11px 9px;
+  border-radius: 10px;
+  font: inherit;
+  outline: none;
+}
+
+.filter-field input:focus,
+.filter-field select:focus {
+  border-color: var(--primary);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 9px;
+  margin-top: 15px;
+}
+
+.filter-apply {
+  background: var(--primary);
+  color: white;
+  flex: 1;
+}
+
+.filter-reset {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.profiles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.profile-tile {
+  min-width: 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+
+.profile-tile:active {
+  transform: scale(.985);
+}
+
+.profile-tile img {
+  display: block;
+  width: 100%;
+  height: 185px;
+  object-fit: cover;
+  background: var(--primary-light);
+}
+
+.profile-tile-info {
+  padding: 11px;
+}
+
+.profile-tile-name {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.profile-tile-meta {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.profile-tile-about {
+  color: var(--text);
+  font-size: 12px;
+  line-height: 1.5;
+  margin-top: 8px;
+  min-height: 36px;
+  overflow-wrap: anywhere;
+}
+
+.profile-tile-open {
+  display: block;
+  margin-top: 10px;
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.profile-detail {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.profile-detail-photo {
+  width: 100%;
+  height: min(55vh, 390px);
+  object-fit: cover;
+  display: block;
+  background: var(--primary-light);
+}
+
+.profile-detail-body {
+  padding: 20px;
+}
+
+.profile-detail-body h2 {
+  margin: 0 0 7px;
+  font-size: 25px;
+}
+
+.profile-detail-meta {
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
+.profile-detail-section {
+  padding: 13px 0;
+  border-top: 1px solid var(--border);
+}
+
+.profile-detail-section h3 {
+  font-size: 14px;
+  margin: 0 0 7px;
+}
+
+.profile-detail-section p {
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.profile-detail-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.profile-interest-btn {
+  background: var(--primary);
+  color: white;
+  flex: 1;
+}
+
+.profile-back-btn {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 0;
+  border-radius: 11px;
+  padding: 11px 15px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profiles-empty {
+  grid-column: 1 / -1;
+  padding: 35px 16px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+}
+
+@media (max-width: 380px) {
+  .profiles-grid {
+    gap: 9px;
+  }
+
+  .profile-tile img {
+    height: 145px;
+  }
+
+  .profile-tile-info {
+    padding: 9px;
+  }
+
+  .profile-tile-name {
+    font-size: 14px;
+  }
+
+  .profiles-toolbar h2 {
+    font-size: 20px;
+  }
+}
+ 
+ /* מסך החלקה בגובה מלא בין הסרגלים */
+body:has(.swipe-screen) {
+  overflow-x: hidden;
+}
+
+body:has(.swipe-screen) #app-content {
+  height: calc(
+    100dvh
+    - 56px
+    - 68px
+    - env(safe-area-inset-bottom, 0px)
+  );
+  min-height: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 10px 12px;
+  box-sizing: border-box;
+}
+
+.swipe-screen {
+  width: 100%;
+  max-width: 460px;
+  height: 100%;
+  margin: 0 auto;
+}
+
+.swipe-stage {
+  height: 100%;
+}
+
+.swipe-card {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+@media (min-width: 721px) {
+  .swipe-card {
+    height: 100%;
+  }
+}
+
+/* ===== עמוד הפרטים שלי ===== */
+
+.personal-page {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.personal-heading {
+  margin-bottom: 22px;
+}
+
+.personal-heading h1 {
+  margin: 0 0 7px;
+  font-size: 26px;
+  color: #4b1930;
+}
+
+.personal-heading p {
+  margin: 0;
+  color: #718096;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.personal-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 6px;
+  background: #f3e8ec;
+  border: 1px solid #ead5de;
+  border-radius: 14px;
+  margin-bottom: 20px;
+}
+
+.personal-tab {
+  border: 0;
+  border-radius: 10px;
+  padding: 13px 8px;
+  background: transparent;
+  color: #7d2345;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.personal-tab.active {
+  color: #fff;
+  background: #7d2345;
+  box-shadow: 0 3px 8px #7d234526;
+}
+
+.personal-panel {
+  background: #fff;
+  border: 1px solid #e5e9f2;
+  border-radius: 17px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.personal-panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.personal-panel-title h2 {
+  margin: 0;
+  color: #4b1930;
+  font-size: 18px;
+}
+
+.personal-panel-title p {
+  margin: 5px 0 0;
+  color: #718096;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.personal-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid #f0e7eb;
+}
+
+.personal-field:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.personal-field-info {
+  min-width: 0;
+  flex: 1;
+}
+
+.personal-field-label {
+  display: block;
+  color: #718096;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.personal-field-value {
+  color: #4b1930;
+  font-size: 15px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.personal-edit-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  padding: 9px 12px;
+  border: 1px solid #ead5de;
+  border-radius: 10px;
+  background: #f3e8ec;
+  color: #7d2345;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.personal-edit-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.personal-edit-btn:hover {
+  background: #ead5de;
+}
+
+.personal-input {
+  display: block;
+  width: 100%;
+  margin-top: 9px;
+  padding: 12px;
+  border: 1px solid #e5c8d4;
+  border-radius: 10px;
+  background: #fffafb;
+  color: #4b1930;
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.personal-input:focus {
+  border-color: #7d2345;
+  box-shadow: 0 0 0 3px #7d234514;
+}
+
+.personal-save-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px;
+  border: 0;
+  border-radius: 11px;
+  background: #7d2345;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.personal-save-btn:hover {
+  background: #681b39;
+}
+
+.personal-cancel-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 11px;
+  border: 1px solid #ead5de;
+  border-radius: 11px;
+  background: #f3e8ec;
+  color: #7d2345;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.personal-privacy-row {
+  padding: 16px 0;
+  border-bottom: 1px solid #f0e7eb;
+}
+
+.personal-privacy-row:last-child {
+  border-bottom: 0;
+}
+
+.personal-privacy-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.personal-privacy-name {
+  color: #4b1930;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.personal-privacy-description {
+  margin-top: 5px;
+  color: #718096;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.personal-privacy-select {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 11px;
+  border: 1px solid #ead5de;
+  border-radius: 10px;
+  background: #fffafb;
+  color: #4b1930;
+  font: inherit;
+  font-size: 13px;
+}
+
+.personal-privacy-note {
+  padding: 13px;
+  border-radius: 12px;
+  background: #f3e8ec;
+  color: #7d2345;
+  font-size: 12px;
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.personal-empty {
+  padding: 25px 15px;
+  text-align: center;
+  color: #718096;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+@media (max-width: 480px) {
+  .personal-heading h1 {
+    font-size: 23px;
+  }
+
+  .personal-panel {
+    padding: 16px;
+  }
+
+  .personal-field {
+    gap: 8px;
+  }
+
+  .personal-edit-btn {
+    padding: 9px;
+  }
+}
+
+/* אייקונים בהגדרות הפרטיות */
+
+.personal-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.personal-tab-icon {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.personal-privacy-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.personal-privacy-heading svg {
+  width: 21px;
+  height: 21px;
+  flex-shrink: 0;
+  color: #7d2345;
+}
+
+.personal-tab.active .personal-tab-icon {
+  color: #ffffff;
+}
+ 
+ /* הסתרת הסרגל התחתון בזמן פתיחת המקלדת */
+body.keyboard-open .bottom-nav {
+  display: none !important;
+}
+
+/* ביטול הרווח התחתון בזמן שהמקלדת פתוחה */
+body.keyboard-open {
+  padding-bottom: 0 !important;
+}
+
+ 
+ /* מצב פרטיות מלא */
+
+/* מתג פרטיות */
+.privacy-mode-button {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 48px;
+  width: 48px;
+  min-width: 48px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition: background-color .22s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.privacy-mode-button::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .18);
+  transition: transform .22s ease;
+}
+
+.privacy-mode-button.active {
+  background: #7d2345;
+}
+
+.privacy-mode-button.active::after {
+  transform: translateX(-20px);
+}
+
+.privacy-mode-button:focus-visible {
+  outline: 3px solid #7d234540;
+  outline-offset: 3px;
+}
+
+ /* כותרת עמוד התעניינו בי */
+.interested-heading {
+  margin: 8px 0 20px;
+  text-align: right;
+}
+
+.interested-heading h2 {
+  margin: 0 0 8px;
+  color: var(--text, #0f172a);
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.interested-heading p {
+  margin: 0;
+  color: var(--muted, #64748b);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* כרטיסים בגובה אחיד */
+.interested-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 320px;
+  box-sizing: border-box;
+}
+
+/* אזור הכפתור תמיד בתחתית */
+.interested-card .interested-actions {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.interested-card .interested-actions button {
+  width: 100%;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+ 
+ 
+/* עיצוב עמוד התעניינו בי */
+.interested-heading {
+  margin: 4px 0 26px;
+  text-align: right;
+}
+
+.interested-heading-label {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f3e8ec;
+  color: #7d2345;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.interested-heading h2 {
+  margin: 0 0 8px;
+  color: #4b1930;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.interested-heading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.interested-toolbar {
+  margin-bottom: 14px;
+}
+
+.interested-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.interested-card-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.interested-card .profile-tile-about {
+  flex: 1;
+}
+
+.interested-actions {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 12px;
+  min-height: 38px;
+}
+
+.interested-actions .profile-tile-open {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+}
+
+.interested-card {
+  cursor: pointer;
+}
+
+.interested-card:active {
+  transform: scale(.985);
+}
+
+ 
+/* כפתור צפייה בפרופיל — עמוד כל הפרופילים */
+.profiles-grid:not(.interested-grid) .profile-tile {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.profiles-grid:not(.interested-grid) .profile-tile-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.profiles-grid:not(.interested-grid) .profile-tile-about {
+  flex: 1;
+}
+
+.profiles-grid:not(.interested-grid) .profile-tile-open {
+  display: block;
+  width: 100%;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13px;
+}
+
+/* גובה אחיד לכרטיסים */
+.profiles-grid:not(.interested-grid) .profile-tile {
+  min-height: 320px;
+}
+
+ .brand-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 13px;
+  background: #ffffff;
+  border: 1px solid #e8cbd1;
+  border-radius: 10px;
+  color: #7b2438;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+ 
+ 
+/* ===== עמוד ההתראות ===== */
+
+.notifications-page {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.notifications-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 25px;
+}
+
+.notifications-heading-icon {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: #7d2345;
+  color: #fff;
+  border-radius: 13px;
+}
+
+.notifications-heading-icon svg {
+  width: 23px;
+  height: 23px;
+}
+
+.notifications-heading h1 {
+  margin: 0 0 5px;
+  color: #4b1930;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.notifications-heading p {
+  margin: 0;
+  color: #718096;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.notifications-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 13px;
+  padding: 18px;
+  background: #fff;
+  border: 1px solid #ead5de;
+  border-radius: 15px;
+}
+
+.notification-item-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  background: #f3e8ec;
+  color: #7d2345;
+  border-radius: 12px;
+}
+
+.notification-item-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.notification-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-item-top {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.notification-item-title {
+  color: #4b1930;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.notification-item-label {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 7px;
+  background: #f3e8ec;
+  color: #7d2345;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.notification-item-message {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+.notification-item-date {
+  margin-top: 11px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+.notifications-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 18px;
+  padding: 12px 2px;
+  color: #718096;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.notifications-note svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #7d2345;
+}
+
+@media (max-width: 480px) {
+  .notifications-heading h1 {
+    font-size: 23px;
+  }
+
+  .notification-item {
+    padding: 14px;
+    gap: 11px;
+  }
+
+  .notification-item-icon {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* כפתור סגירה בעמוד ההתראות */
+.notifications-close {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ead5de;
+  border-radius: 50%;
+  background: #fff;
+  color: #7d2345;
+  cursor: pointer;
+  transition: background .2s, color .2s, transform .2s;
+}
+
+.notifications-close svg {
+  width: 21px;
+  height: 21px;
+}
+
+.notifications-close:hover {
+  background: #7d2345;
+  color: #fff;
+}
+
+.notifications-close:active {
+  transform: scale(.94);
+}
+
+ 
+.notifications-close-wrap {
+  position: absolute;
+  top: 85px;
+  left: 16px;
+  z-index: 99;
+  margin: 0;
+}
+
+.notifications-close {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #681b39;
+  border-radius: 20%;
+  background: #fff;
+  color: #7d2345;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+  transition: background .2s, transform .2s;
+}
+
+.notifications-close svg {
+  width: 21px;
+  height: 21px;
+}
+
+.notifications-close:hover {
+  background: #681b39;
+}
+
+.notifications-close:active {
+  transform: scale(.94);
+}
+  
+  .brand-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: #fff;
+  border: 1px solid #e8cbd1;
+  border-radius: 10px;
+  color: #7b2438;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.religious-icon {
+  display: block;
+  width: 29px;
+  height: 29px;
+  flex-shrink: 0;
+  color: #7d2345;
+}
+  
+  /* כפתור מעבר להתעניינתי בעמוד רוצים להכיר אותך */
+.interested-page-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.my-interests-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border: 1px solid #ead5de;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #7d2345;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+
+.my-interests-link svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+.my-interests-link:hover {
+  background: #f3e8ec;
+}
+
+.my-interests-link:active {
+  transform: scale(.97);
+}
+</style>
+</head>
+
+<body>
+
+
+<header class="topbar">
+  <div class="topbar-inner">
+
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M12 20s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6.5-8 11-8 11Z"/>
+        </svg>
+      </div>
+      <span class="brand-name">לב אל לב</span>
+    </div>
+<div class="brand-title">
+  <span>השדכן</span>
+
+  <svg class="religious-icon"
+       xmlns="http://www.w3.org/2000/svg"
+       viewBox="0 0 64 64"
+       fill="none"
+       stroke="currentColor"
+       stroke-width="2.5"
+       stroke-linecap="round"
+       stroke-linejoin="round"
+       aria-label="אדם עם כיפה"
+       role="img">
+
+    <!-- כיפה -->
+    <path d="M23 13 Q32 7 41 13 L39 17 Q32 14 25 17 Z"
+          fill="currentColor"
+          stroke="none"/>
+
+    <!-- ראש -->
+    <path d="M24 19 Q21 22 22 29 L24 36
+             Q25 42 32 44 Q39 42 40 36
+             L42 29 Q43 22 40 19"/>
+
+    <!-- אוזניים -->
+    <path d="M22 27 Q17 25 19 32 Q20 35 23 34"/>
+    <path d="M42 27 Q47 25 45 32 Q44 35 41 34"/>
+
+    <!-- פנים -->
+    <path d="M27 28 L30 28"/>
+    <path d="M34 28 L37 28"/>
+    <path d="M32 29 L31 34 L33 34"/>
+    <path d="M29 38 Q32 40 35 38"/>
+
+    <!-- כתפיים ובגד -->
+    <path d="M12 57 Q13 47 23 44 L28 43
+             L32 48 L36 43 L41 44 Q51 47 52 57"/>
+
+    <!-- צווארון -->
+    <path d="M26 44 L32 51 L38 44"/>
+  </svg>
+</div>
+    <button class="icon-button"
+      aria-label="התראות"
+      title="התראות"
+      onclick="showPage('notifications')">
+
+      <svg viewBox="0 0 24 24" fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round">
+        <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+        <path d="M10 21h4"/>
+      </svg>
+
+      <span class="notification-dot"></span>
+    </button>
+
+  </div>
+</header>
+
+ 
+<main id="app-content" class="container"></main>
+
+ 
+<nav class="bottom-nav">
+  <div class="bottom-nav-inner">
+
+    <button class="bottom-item active"
+      onclick="bottomNavigate('home', this)">
+      
+<svg viewBox="0 0 24 24" fill="none"
+  stroke="currentColor" stroke-width="1.8"
+  stroke-linecap="round" stroke-linejoin="round">
+  <rect x="6" y="4" width="12" height="16" rx="3"/>
+  <circle cx="12" cy="9" r="2"/>
+  <path d="M9 14c.8-1.5 5.2-1.5 6 0"/>
+  <path d="M3 9H1m2 0-2-2m2 2-2 2"/>
+  <path d="M21 15h2m-2 0 2-2m-2 2 2 2"/>
+</svg>
+
+      <span>החלקה</span>
+    </button>
+
+    <button class="bottom-item"
+      onclick="bottomNavigate('profiles', this)">
+      <svg viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="9" cy="8" r="4"/>
+        <path d="M2 21v-2a7 7 0 0 1 14 0v2"/>
+        <path d="M16 4.5a4 4 0 0 1 0 7.5"/>
+        <path d="M19 14a6 6 0 0 1 3 5v2"/>
+      </svg>
+      <span>כל הפרופילים</span>
+    </button>
+
+    <button class="bottom-item"
+      onclick="bottomNavigate('favorites', this)">
+      <svg viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>
+      </svg>
+     <span>התעניינו בי</span>
+    </button>
+    
+
+    
+    <button class="bottom-item"
+      onclick="bottomNavigate('personal', this)">
+      <svg viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="1.8"
+        stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 21v-2a8 8 0 0 1 16 0v2"/>
+      </svg>
+      <span>פרטים שלי</span>
+    </button>
+
+  </div>
+</nav>
+
+
+
+<script>
+ const PERSONAL_PRIVACY_MODE_KEY = 'lev_full_privacy_mode';
+
+function isFullPrivacyMode() {
+  return localStorage.getItem(PERSONAL_PRIVACY_MODE_KEY) === 'yes';
+}
+
+function toggleFullPrivacyMode() {
+  const enable = !isFullPrivacyMode();
+
+  if (enable) {
+    localStorage.setItem(PERSONAL_PRIVACY_MODE_KEY, 'yes');
+
+    const privacy = getPersonalPrivacy();
+
+    Object.keys(personalFieldLabels).forEach(key => {
+      // השם וההערה נשארים גלויים
+      if (key === 'name' || key === 'about') {
+        privacy[key] = 'public';
+      } else {
+        privacy[key] = 'matched';
+      }
+    });
+
+    savePersonalPrivacy(privacy);
+  } else {
+    localStorage.setItem(PERSONAL_PRIVACY_MODE_KEY, 'no');
+  }
+
+  renderPersonal();
+}
+/* הסתרת הסרגל התחתון כשהמקלדת נפתחת בנייד */
+(function () {
+  const bottomNav = document.querySelector('.bottom-nav');
+
+  if (!bottomNav || !window.visualViewport) return;
+
+  let keyboardWasOpen = false;
+  
+  function detectKeyboard() {
+    const viewport = window.visualViewport;
+
+    // זיהוי פתיחת מקלדת לפי צמצום גובה אזור התצוגה
+    const keyboardOpen =
+      window.innerHeight - viewport.height > 150;
+
+    // מסתירים את הסרגל רק כשהמיקוד נמצא בשדה עריכה
+    const activeElement = document.activeElement;
+    const editingField = activeElement &&
+      activeElement.matches(
+        'input, textarea, select, [contenteditable="true"]'
+      );
+
+    const shouldHide = keyboardOpen && editingField;
+
+    document.body.classList.toggle('keyboard-open', shouldHide);
+    keyboardWasOpen = shouldHide;
+  }
+
+  window.visualViewport.addEventListener('resize', detectKeyboard);
+  window.visualViewport.addEventListener('scroll', detectKeyboard);
+
+  document.addEventListener('focusin', detectKeyboard);
+
+  document.addEventListener('focusout', function () {
+    // מאפשר לדפדפן לעדכן את המיקוד לפני הבדיקה מחדש
+    setTimeout(detectKeyboard, 100);
+  });
+
+  window.addEventListener('resize', detectKeyboard);
+})();
+function bottomNavigate(name, button) {
+  document.querySelectorAll('.bottom-item').forEach(item => {
+    item.classList.remove('active');
+  });
+
+  if (button) {
+    button.classList.add('active');
+  }
+
+  showPage(name);
+}
+
+
+
+function showPage(name) {
+  const content = document.getElementById('app-content');
+  if (!content) return;
+  const interestsButton = document.getElementById('my-interests-button');
+
+if (interestsButton) {
+  interestsButton.classList.toggle('active', name === 'my-interests');
+}
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (name === 'home') {
+    renderSwipe();
+    return;
+  }
+
+  
+if (name === 'notifications') {
+  renderNotifications();
+  return;
+}
+
+
+  if (name === 'profiles') {
+    renderProfiles();
+    return;
+  }
+  
+if (name === 'my-interests') {
+  renderMyInterests();
+  return;
+}
+  
+  if (name === 'favorites') {
+    renderFavorites();
+    return;
+  }
+
+  if (name === 'personal') {
+    renderPersonal();
+    return;
+  }
+}
+ 
+ 
+const swipeProfiles = [
+  {
+    id: "p101",
+    name: "נועה",
+    age: 25,
+    city: "נתניה",
+    occupation: "מעצבת גרפית",
+    status: "רווקה",
+    bio: "אוהבת מוזיקה, טיולים ושיחות עם משמעות. מחפשת קשר רציני.",
+    photo: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=900&q=85"
+  },
+  {
+    id: "p102",
+    name: "איתי",
+    age: 29,
+    city: "תל אביב",
+    occupation: "מפתח תוכנה",
+    status: "רווק",
+    bio: "אוהב ים, אוכל טוב והומור. מחפש זוגיות אמיתית.",
+    photo: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=85"
+  },
+  {
+    id: "p103",
+    name: "יעל",
+    age: 27,
+    city: "חיפה",
+    occupation: "מורה",
+    status: "רווקה",
+    bio: "אוהבת ספרים, טבע ומשפחה. מאמינה בכנות ובתקשורת טובה.",
+    photo: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=900&q=85"
+  },
+  {
+    id: "p104",
+    name: "דניאל",
+    age: 31,
+    city: "ראשון לציון",
+    occupation: "עצמאי",
+    status: "רווק",
+    bio: "אוהב לטייל, לבשל וללמוד דברים חדשים.",
+    photo: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=85"
+  },
+  {
+    id: "p105",
+    name: "מיכל",
+    age: 26,
+    city: "ירושלים",
+    occupation: "אחות",
+    status: "רווקה",
+    bio: "אוהבת טיולים, משפחה ושיחות טובות.",
+    photo: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=900&q=85"
+  },
+  {
+    id: "p106",
+    name: "אורי",
+    age: 28,
+    city: "פתח תקווה",
+    occupation: "מנהל פרויקטים",
+    status: "רווק",
+    bio: "אוהב ספורט, מוזיקה וטיולים בסופי שבוע.",
+    photo: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=900&q=85"
+  }
+];
+
+
+let profileFilterOpen = false;
+let profileFilters = {
+  search: '',
+  minAge: '',
+  maxAge: '',
+  city: '',
+  gender: ''
+};
+
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
+function getProfileById(id) {
+  return swipeProfiles.find(profile => String(profile.id) === String(id));
+}
+
+function getProfileName(profile) {
+  return profile.name || profile.fullName || 'משתמש/ת';
+}
+
+function getProfileAge(profile) {
+  return Number(profile.age) || '';
+}
+
+function getProfileCity(profile) {
+  return profile.city || profile.location || '';
+}
+
+function getProfileAbout(profile) {
+  return profile.about || profile.description || profile.bio || 'עדיין לא נוספו פרטים.';
+}
+
+
+const DEFAULT_PROFILE_PHOTO = "20261016_163405.jpg";
+
+function getProfileImage(profile) {
+  return profile.photo || "";
+}
+
+
+function renderProfiles() {
+  const content = document.getElementById('app-content');
+  if (!content) return;
+
+  const filteredProfiles = swipeProfiles.filter(profile => {
+    const name = getProfileName(profile).toLowerCase();
+    const city = getProfileCity(profile).toLowerCase();
+    const age = getProfileAge(profile);
+    const search = profileFilters.search.trim().toLowerCase();
+
+    if (search && !name.includes(search) && !city.includes(search)) {
+      return false;
+    }
+
+    if (profileFilters.minAge && age < Number(profileFilters.minAge)) {
+      return false;
+    }
+
+    if (profileFilters.maxAge && age > Number(profileFilters.maxAge)) {
+      return false;
+    }
+
+    if (profileFilters.city &&
+        !city.includes(profileFilters.city.trim().toLowerCase())) {
+      return false;
+    }
+
+    if (profileFilters.gender &&
+        String(profile.gender || '') !== profileFilters.gender) {
+      return false;
+    }
+
+    return true;
+  });
+
+  content.innerHTML = `
+    <div class="profiles-toolbar">
+      <div>
+        <h2>כל הפרופילים</h2>
+        <div class="profiles-count">${filteredProfiles.length} פרופילים נמצאו</div>
+      </div>
+
+      <button class="filter-toggle"
+        type="button"
+        onclick="toggleProfileFilters()"
+        aria-expanded="${profileFilterOpen}">
+        <svg width="18" height="18" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round">
+          <path d="M4 7h16M7 12h10M10 17h4"/>
+          <circle cx="8" cy="7" r="1.5" fill="currentColor"/>
+          <circle cx="15" cy="12" r="1.5" fill="currentColor"/>
+        </svg>
+        סינון
+      </button>
+    </div>
+
+    ${profileFilterOpen ? `
+      <section class="filter-panel">
+        <div class="filter-grid">
+          <div class="filter-field">
+            <label for="filter-search">שם או עיר</label>
+            <input id="filter-search"
+              value="${escapeHTML(profileFilters.search)}"
+              placeholder="חיפוש..."
+              oninput="updateProfileFilter('search', this.value)">
+          </div>
+
+          <div class="filter-field">
+            <label for="filter-city">עיר</label>
+            <input id="filter-city"
+              value="${escapeHTML(profileFilters.city)}"
+              placeholder="לדוגמה: נתניה"
+              oninput="updateProfileFilter('city', this.value)">
+          </div>
+
+          <div class="filter-field">
+            <label for="filter-min-age">גיל מינימלי</label>
+            <input id="filter-min-age" type="number" min="18" max="120"
+              value="${escapeHTML(profileFilters.minAge)}"
+              placeholder="מגיל"
+              oninput="updateProfileFilter('minAge', this.value)">
+          </div>
+
+          <div class="filter-field">
+            <label for="filter-max-age">גיל מקסימלי</label>
+            <input id="filter-max-age" type="number" min="18" max="120"
+              value="${escapeHTML(profileFilters.maxAge)}"
+              placeholder="עד גיל"
+              oninput="updateProfileFilter('maxAge', this.value)">
+          </div>
+
+          <div class="filter-field" style="grid-column:1/-1">
+            <label for="filter-gender">מגדר</label>
+            <select id="filter-gender"
+              onchange="updateProfileFilter('gender', this.value)">
+              <option value="">הכול</option>
+              <option value="female" ${profileFilters.gender === 'female' ? 'selected' : ''}>נשים</option>
+              <option value="male" ${profileFilters.gender === 'male' ? 'selected' : ''}>גברים</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button class="filter-apply" type="button"
+            onclick="applyProfileFilters()">הצגת תוצאות</button>
+          <button class="filter-reset" type="button"
+            onclick="resetProfileFilters()">איפוס</button>
+        </div>
+      </section>
+    ` : ''}
+
+    <div class="profiles-grid">
+      ${filteredProfiles.length ? filteredProfiles.map(profile => `
+        <article class="profile-tile"
+          onclick="openProfileDetail('${escapeHTML(profile.id)}')">
+          <img
+            src="${escapeHTML(getProfileImage(profile))}"
+            alt="${escapeHTML(getProfileName(profile))}"
+            loading="lazy">
+
+          <div class="profile-tile-info">
+            <div class="profile-tile-name">
+              ${escapeHTML(getProfileName(profile))}${getProfileAge(profile) ? ', ' + getProfileAge(profile) : ''}
+            </div>
+
+            <div class="profile-tile-meta">
+              ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
+            </div>
+
+            <div class="profile-tile-about">
+              ${escapeHTML(getProfileAbout(profile))}
+            </div>
+
+            <span class="profile-tile-open">לצפייה בפרופיל ←</span>
+          </div>
+        </article>
+      `).join('') : `
+        <div class="profiles-empty">
+          לא נמצאו פרופילים לפי הסינון שבחרת.
+          <br><br>
+          אפשר לשנות את הגדרות הסינון ולנסות שוב.
+        </div>
+      `}
+    </div>
+  `;
+}
+  
+function renderMyInterests() {
+  const content = document.getElementById('app-content');
+  if (!content) return;
+
+  // הפרופילים שבהם המשתמש הביע עניין
+  const sent = readMatchData('lev_sent_interests', []);
+
+  const interestedProfiles = sent
+    .map(item => getProfileById(item.profileId))
+    .filter(Boolean);
+
+  content.innerHTML = `
+  <div class="interested-page-toolbar">
+  <button
+    type="button"
+    class="my-interests-link"
+    onclick="showPage('favorites')">
+
+    <svg viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>
+    </svg>
+
+    יתעניינו בי
+  </button>
+</div>
+    <section class="interested-heading">
+
+     
+
+      <h2>הפרופילים שהתעניינתי בהם</h2>
+
+      <p>
+        כאן מרוכזים כל הפרופילים שסימנת בהם עניין.
+      </p>
+
+    </section>
+
+    <div class="profiles-grid interested-grid">
+
+      ${interestedProfiles.length
+        ? interestedProfiles.map(profile => `
+          <article class="profile-tile interested-card"
+            onclick="openProfileDetailFromMyInterests('${escapeHTML(profile.id)}')">
+
+            <img
+              src="${escapeHTML(getProfileImage(profile))}"
+              alt="${escapeHTML(getProfileName(profile))}"
+              loading="lazy">
+
+            <div class="profile-tile-info interested-card-info">
+
+              <div class="profile-tile-name">
+                ${escapeHTML(getProfileName(profile))}${getProfileAge(profile) ? ', ' + getProfileAge(profile) : ''}
+              </div>
+
+              <div class="profile-tile-meta">
+                ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
+              </div>
+
+              <div class="profile-tile-about">
+                ${escapeHTML(getProfileAbout(profile))}
+              </div>
+
+              <div class="interested-actions">
+                <span class="profile-tile-open">
+                  לצפייה בפרופיל ←
+                </span>
+              </div>
+
+            </div>
+          </article>
+        `).join('')
+        : `
+          <div class="profiles-empty">
+            <strong>עדיין לא סימנת פרופילים</strong>
+            <p>
+              כשתביע עניין בפרופיל באמצעות ההחלקה
+              או כפתור ההתעניינות, הוא יופיע כאן.
+            </p>
+          </div>
+        `
+      }
+
+    </div>
+  `;
+}
+
+function openProfileDetailFromMyInterests(id) {
+  openProfileDetail(id);
+}
+function toggleProfileFilters() {
+  profileFilterOpen = !profileFilterOpen;
+  renderProfiles();
+}
+
+function updateProfileFilter(key, value) {
+  profileFilters[key] = value;
+}
+
+function applyProfileFilters() {
+  renderProfiles();
+}
+
+function resetProfileFilters() {
+  profileFilters = {
+    search: '',
+    minAge: '',
+    maxAge: '',
+    city: '',
+    gender: ''
+  };
+  renderProfiles();
+}
+
+function openProfileDetail(id) {
+  const profile = getProfileById(id);
+  if (!profile) return;
+
+  const content = document.getElementById('app-content');
+  if (!content) return;
+
+  const image = getProfileImage(profile);
+  const sent = readMatchData('lev_sent_interests', []);
+  const alreadySent = sent.some(item => String(item.profileId) === String(profile.id));
+
+  content.innerHTML = `
+    <section class="profile-detail">
+      <img class="profile-detail-photo"
+        src="${escapeHTML(image)}"
+        alt="${escapeHTML(getProfileName(profile))}">
+
+      <div class="profile-detail-body">
+        <h2>${escapeHTML(getProfileName(profile))}${getProfileAge(profile) ? ', ' + getProfileAge(profile) : ''}</h2>
+
+        <div class="profile-detail-meta">
+          ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
+        </div>
+
+        <div class="profile-detail-section">
+          <h3>קצת עליי</h3>
+          <p>${escapeHTML(getProfileAbout(profile))}</p>
+        </div>
+
+        ${profile.occupation ? `
+          <div class="profile-detail-section">
+            <h3>עיסוק</h3>
+            <p>${escapeHTML(profile.occupation)}</p>
+          </div>
+        ` : ''}
+
+        ${profile.interests ? `
+          <div class="profile-detail-section">
+            <h3>תחומי עניין</h3>
+            <p>${escapeHTML(Array.isArray(profile.interests) ? profile.interests.join(' · ') : profile.interests)}</p>
+          </div>
+        ` : ''}
+
+        <div class="profile-detail-actions">
+          <button class="profile-back-btn" type="button"
+            onclick="renderProfiles()">חזרה</button>
+
+          <button class="profile-interest-btn" type="button"
+            ${alreadySent ? 'disabled' : ''}
+            onclick="sendProfileInterest('${escapeHTML(profile.id)}')">
+            ${alreadySent ? 'נשלח עניין' : 'אני מעוניין/ת'}
+          </button>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function sendProfileInterest(id) {
+  const profile = getProfileById(id);
+  if (!profile) return;
+
+  const sent = readMatchData('lev_sent_interests', []);
+  const alreadySent = sent.some(item => String(item.profileId) === String(id));
+
+  if (!alreadySent) {
+    sent.push({
+      profileId: id,
+      status: 'pending',
+      createdAt: new Date().toISOString()
+    });
+
+    saveMatchData('lev_sent_interests', sent);
+  }
+
+  openProfileDetail(id);
+}
+
+function readMatchData(key, fallback) {
+  try {
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch (error) {
+    return fallback;
+  }
+}
+
+function saveMatchData(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+
+
+
+function renderFavorites() {
+  const content = document.getElementById('app-content');
+  if (!content) return;
+
+  const interestedProfiles = [
+    getProfileById('p103'),
+    getProfileById('p105')
+  ].filter(Boolean);
+
+  content.innerHTML = `
+    <div class="interested-page-toolbar">
+      <button
+        type="button"
+        class="my-interests-link"
+        onclick="showPage('my-interests')">
+
+        <svg viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>
+        </svg>
+
+        התעניינתי
+      </button>
+    </div>
+
+    <section class="interested-heading">
+        <h2>רוצים להכיר אותך</h2>
+      <p>הפרופילים שהביעו בך עניין מחכים שתכיר אותם קצת יותר.</p>
+    </section>
+
+    
+    </div>
+
+    <div class="profiles-grid interested-grid">
+      ${interestedProfiles.length ? interestedProfiles.map(profile => `
+        <article class="profile-tile interested-card"
+          onclick="openProfileDetail('${escapeHTML(profile.id)}')">
+
+          <img
+            src="${escapeHTML(getProfileImage(profile))}"
+            alt="${escapeHTML(getProfileName(profile))}"
+            loading="lazy">
+
+          <div class="profile-tile-info interested-card-info">
+            <div class="profile-tile-name">
+              ${escapeHTML(getProfileName(profile))}${getProfileAge(profile) ? ', ' + getProfileAge(profile) : ''}
+            </div>
+
+            <div class="profile-tile-meta">
+              ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
+            </div>
+
+            <div class="profile-tile-about">
+              ${escapeHTML(getProfileAbout(profile))}
+            </div>
+
+            <div class="interested-actions">
+              <span class="profile-tile-open">
+                צפייה בפרופיל ←
+              </span>
+            </div>
+          </div>
+        </article>
+      `).join('') : `
+        <div class="profiles-empty">
+          <strong>עדיין אין התעניינויות</strong>
+          <p>כשמישהו יביע בך עניין, הפרופיל שלו יופיע כאן.</p>
+        </div>
+      `}
+    </div>
+  `;
+}
+
+
+
+function renderSwipe() {
+  const content = document.getElementById("app-content");
+  if (!content) return;
+
+  const introSeen = localStorage.getItem("lev_swipe_intro_seen") === "yes";
+  const decisions = readMatchData("lev_interest_decisions", []);
+  const alreadySeen = decisions.map(item => String(item.profileId));
+
+  const profile = swipeProfiles.find(
+    item => !alreadySeen.includes(String(item.id))
+  );
+
+  if (!introSeen) {
+    content.innerHTML = `
+      <div class="swipe-screen">
+        <div class="swipe-stage">
+          <article class="swipe-card instruction-card"
+            data-card-type="intro"
+            onpointerdown="swipePointerDown(event)"
+            onpointerup="swipePointerUp(event)"
+            onpointercancel="swipePointerCancel()">
+
+            <div class="instruction-content">
+              <div class="instruction-mark">
+                <svg viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.7"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M8 12V6a2 2 0 0 1 4 0v5"/>
+                  <path d="M12 10V5a2 2 0 0 1 4 0v7"/>
+                  <path d="M16 11a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6h-2a6 6 0 0 1-4.8-2.4L4 15a2 2 0 0 1 3-2.6L8 14"/>
+                </svg>
+              </div>
+
+              <h2>לב אל לב</h2>
+              <p>
+                כך מגלים היכרויות חדשות.
+                החליקו את הכרטיס כדי להמשיך.
+              </p>
+
+              <div class="instruction-directions">
+                <div class="instruction-direction">
+                  <svg viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5"/>
+                    <path d="m11 6-6 6 6 6"/>
+                  </svg>
+                  <strong>שמאלה</strong>
+                  <span>מעוניין/ת</span>
+                </div>
+
+                <div class="instruction-direction">
+                  <svg viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M5 12h14"/>
+                    <path d="m13 6 6 6-6 6"/>
+                  </svg>
+                  <strong>ימינה</strong>
+                  <span>לדלג הלאה</span>
+                </div>
+              </div>
+
+              <div class="instruction-footer">
+                <svg viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.7"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14"/>
+                  <path d="m13 6 6 6-6 6"/>
+                </svg>
+                החליקו את הכרטיס כדי להתחיל
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  if (!profile) {
+    content.innerHTML = `
+      <div class="swipe-screen">
+        <div class="swipe-stage">
+          <article class="swipe-card instruction-card"
+            style="cursor:default">
+            <div class="instruction-content">
+              <div class="instruction-mark">
+                <svg viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 7 10 17l-5-5"/>
+                </svg>
+              </div>
+              <h2>זה הכול בינתיים</h2>
+              <p>עברת על כל הפרופילים הזמינים כרגע.</p>
+              <div style="height:24px"></div>
+              <button class="swipe-action interested"
+                style="pointer-events:auto;max-width:220px"
+                onclick="resetSwipeProfiles()">
+                להתחיל מחדש
+              </button>
+            </div>
+          </article>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  content.innerHTML = `
+    <div class="swipe-screen">
+      <div class="swipe-stage">
+        <article class="swipe-card profile-card"
+          id="active-swipe-card"
+          data-profile-id="${escapeHTML(profile.id)}"
+          onpointerdown="swipePointerDown(event)"
+          onpointermove="swipePointerMove(event)"
+          onpointerup="swipePointerUp(event)"
+          onpointercancel="swipePointerCancel()">
+
+         
+<img class="swipe-photo"
+  src="${escapeHTML(getProfileImage(profile))}"
+  alt="תמונת הפרופיל של ${escapeHTML(profile.name)}"
+  draggable="false">
+
+          <div class="swipe-stamp like" id="swipe-like-stamp">
+            מעוניין/ת
+          </div>
+
+          <div class="swipe-stamp pass" id="swipe-pass-stamp">
+            דילוג
+          </div>
+
+          <div class="swipe-details">
+            <div class="swipe-name">
+              ${escapeHTML(profile.name)}, ${escapeHTML(profile.age)}
+            </div>
+            <div class="swipe-meta">
+              ${escapeHTML(profile.city)} · ${escapeHTML(profile.occupation)}
+              <br>${escapeHTML(profile.status)}
+            </div>
+            <div class="swipe-bio">
+              ${escapeHTML(profile.bio)}
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  `;
+}
+
+
+
+let swipeStartX = null;
+let swipeStartY = null;
+let swipePointerElement = null;
+let swipePointerId = null;
+let swipeCurrentX = 0;
+let swipeCurrentY = 0;
+
+function swipePointerDown(event) {
+  if (event.pointerType === "mouse" && event.button !== 0) return;
+
+  const element = event.currentTarget;
+
+  swipeStartX = event.clientX;
+  swipeStartY = event.clientY;
+  swipeCurrentX = 0;
+  swipeCurrentY = 0;
+  swipePointerElement = element;
+  swipePointerId = event.pointerId;
+
+  element.classList.add("dragging");
+
+  try {
+    element.setPointerCapture(event.pointerId);
+  } catch (error) {}
+}
+
+function swipePointerMove(event) {
+  const element = event.currentTarget;
+
+  if (
+    swipePointerElement !== element ||
+    swipeStartX === null
+  ) return;
+
+  swipeCurrentX = event.clientX - swipeStartX;
+  swipeCurrentY = event.clientY - swipeStartY;
+
+  if (Math.abs(swipeCurrentX) > Math.abs(swipeCurrentY)) {
+    element.style.transform =
+      `translate(${swipeCurrentX}px, ${swipeCurrentY * 0.25}px) rotate(${swipeCurrentX * 0.045}deg)`;
+  }
+
+  const likeStamp = element.querySelector(".swipe-stamp.like");
+  const passStamp = element.querySelector(".swipe-stamp.pass");
+
+  if (likeStamp) {
+    likeStamp.style.opacity = swipeCurrentX < -20
+      ? Math.min(1, Math.abs(swipeCurrentX) / 100)
+      : 0;
+  }
+
+  if (passStamp) {
+    passStamp.style.opacity = swipeCurrentX > 20
+      ? Math.min(1, swipeCurrentX / 100)
+      : 0;
+  }
+}
+
+function swipePointerUp(event) {
+  const element = event.currentTarget;
+
+  if (
+    swipePointerElement !== element ||
+    swipeStartX === null
+  ) return;
+
+  const deltaX = event.clientX - swipeStartX;
+  const deltaY = event.clientY - swipeStartY;
+  const cardType = element.dataset.cardType;
+  const profileId = element.dataset.profileId;
+
+  element.classList.remove("dragging");
+
+  const shouldSwipe =
+    Math.abs(deltaX) >= 90 &&
+    Math.abs(deltaX) > Math.abs(deltaY) * 1.15;
+
+  swipeStartX = null;
+  swipeStartY = null;
+  swipePointerElement = null;
+  swipePointerId = null;
+  swipeCurrentX = 0;
+  swipeCurrentY = 0;
+
+  if (!shouldSwipe) {
+    element.style.transform = "";
+    const likeStamp = element.querySelector(".swipe-stamp.like");
+    const passStamp = element.querySelector(".swipe-stamp.pass");
+    if (likeStamp) likeStamp.style.opacity = 0;
+    if (passStamp) passStamp.style.opacity = 0;
+    return;
+  }
+
+  const direction = deltaX < 0 ? "left" : "right";
+
+  element.classList.add(
+    direction === "left" ? "swipe-out-left" : "swipe-out-right"
+  );
+
+  if (cardType === "intro") {
+    localStorage.setItem("lev_swipe_intro_seen", "yes");
+    setTimeout(() => renderSwipe(), 260);
+    return;
+  }
+
+  if (profileId) {
+    setTimeout(() => {
+      recordSwipe(
+        profileId,
+        direction === "left" ? "interested" : "no"
+      );
+    }, 180);
+  }
+}
+
+function swipePointerCancel() {
+  if (swipePointerElement) {
+    swipePointerElement.classList.remove("dragging");
+    swipePointerElement.style.transform = "";
+
+    const likeStamp = swipePointerElement.querySelector(".swipe-stamp.like");
+    const passStamp = swipePointerElement.querySelector(".swipe-stamp.pass");
+
+    if (likeStamp) likeStamp.style.opacity = 0;
+    if (passStamp) passStamp.style.opacity = 0;
+  }
+
+  swipeStartX = null;
+  swipeStartY = null;
+  swipePointerElement = null;
+  swipePointerId = null;
+  swipeCurrentX = 0;
+  swipeCurrentY = 0;
+}
+
+function recordSwipe(profileId, decision) {
+  const decisions = readMatchData("lev_interest_decisions", []);
+
+  if (decisions.some(item => item.profileId === profileId)) {
+    renderSwipe();
+    return;
+  }
+
+  decisions.push({
+    profileId,
+    decision,
+    date: new Date().toISOString()
+  });
+
+  saveMatchData("lev_interest_decisions", decisions);
+
+  if (decision === "interested") {
+    const sent = readMatchData("lev_sent_interests", []);
+
+    if (!sent.some(item => item.profileId === profileId)) {
+      sent.push({
+        profileId,
+        date: new Date().toISOString(),
+        status: "pending"
+      });
+
+      saveMatchData("lev_sent_interests", sent);
+    }
+  }
+
+  renderSwipe();
+}
+
+function resetSwipeProfiles() {
+  localStorage.removeItem("lev_interest_decisions");
+  renderSwipe();
+}
+ 
+ 
+ 
+/* ===== פרטים אישיים והגדרות פרטיות ===== */
+
+const PERSONAL_KEY = 'lev_personal_details';
+const PERSONAL_PRIVACY_KEY = 'lev_personal_privacy';
+
+const personalDefaultDetails = {
+  name: '',
+  age: '',
+  city: '',
+  occupation: '',
+  status: '',
+  about: '',
+  interests: ''
+};
+
+const personalFieldLabels = {
+  name: 'שם',
+  age: 'גיל',
+  city: 'עיר מגורים',
+  occupation: 'עיסוק',
+  status: 'מצב אישי',
+  about: 'קצת עליי',
+  interests: 'תחומי עניין'
+};
+
+function getPersonalDetails() {
+  const saved = readMatchData(PERSONAL_KEY, {});
+  return { ...personalDefaultDetails, ...saved };
+}
+
+function savePersonalDetails(details) {
+  saveMatchData(PERSONAL_KEY, details);
+}
+
+function getPersonalPrivacy() {
+  const saved = readMatchData(PERSONAL_PRIVACY_KEY, {});
+  const privacy = {};
+
+  Object.keys(personalFieldLabels).forEach(key => {
+    privacy[key] = saved[key] || 'public';
+  });
+
+  return privacy;
+}
+
+function savePersonalPrivacy(privacy) {
+  saveMatchData(PERSONAL_PRIVACY_KEY, privacy);
+}
+
+let personalActiveTab = 'details';
+let personalEditingField = '';
+
+function renderPersonal() {
+  const content = document.getElementById('app-content');
+  if (!content) return;
+
+  const details = getPersonalDetails();
+
+  content.innerHTML = `
+    <section class="personal-page">
+     
+
+      <div class="personal-tabs">
+        <button type="button"
+          class="personal-tab ${personalActiveTab === 'details' ? 'active' : ''}"
+          onclick="switchPersonalTab('details')">
+          הפרטים שלי
+        </button>
+
+       
+<button type="button"
+  class="personal-tab ${personalActiveTab === 'privacy' ? 'active' : ''}"
+  onclick="switchPersonalTab('privacy')">
+
+  <svg class="personal-tab-icon"
+    viewBox="0 0 24 24" fill="none"
+    stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round"
+    aria-hidden="true">
+    <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/>
+    <path d="m9 12 2 2 4-4"/>
+  </svg>
+
+  הגדרות פרטיות
+</button>
+
+      </div>
+
+      <div id="personal-tab-content">
+        ${personalActiveTab === 'details'
+          ? renderPersonalDetails(details)
+          : renderPersonalPrivacy()}
+      </div>
+    </section>
+  `;
+}
+
+function switchPersonalTab(tab) {
+  personalActiveTab = tab;
+  personalEditingField = '';
+  renderPersonal();
+}
+
+function renderPersonalDetails(details) {
+  const fields = Object.keys(personalFieldLabels);
+
+  return `
+    <section class="personal-panel">
+      <div class="personal-panel-title">
+        <div>
+          <h2>הפרטים שלך</h2>
+          <p>אפשר לערוך כל פרט בנפרד.</p>
+        </div>
+      </div>
+
+      ${fields.map(key => {
+        const value = details[key] || '';
+        const editing = personalEditingField === key;
+
+        return `
+          <div class="personal-field">
+            <div class="personal-field-info">
+              <span class="personal-field-label">
+                ${escapeHTML(personalFieldLabels[key])}
+              </span>
+
+              ${editing ? `
+                <input
+                  class="personal-input"
+                  id="personal-edit-input"
+                  data-field="${key}"
+                  value="${escapeHTML(value)}"
+                  placeholder="הזן ${escapeHTML(personalFieldLabels[key])}"
+                  ${key === 'age' ? 'type="number" min="18" max="120"' : ''}
+                  ${key === 'about' || key === 'interests'
+                    ? 'style="min-height:80px"'
+                    : ''}>
+                <button type="button"
+                  class="personal-save-btn"
+                  onclick="savePersonalField('${key}')">
+                  שמירת השינוי
+                </button>
+                <button type="button"
+                  class="personal-cancel-btn"
+                  onclick="cancelPersonalEdit()">
+                  ביטול
+                </button>
+              ` : `
+                <div class="personal-field-value">
+                  ${escapeHTML(value || 'לא הוזן עדיין')}
+                </div>
+              `}
+            </div>
+
+            ${!editing ? `
+              <button type="button"
+                class="personal-edit-btn"
+                onclick="editPersonalField('${key}')"
+                aria-label="עריכת ${escapeHTML(personalFieldLabels[key])}">
+                <svg viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m15 5 4 4"/>
+                  <path d="M4 20l4.5-1 10-10a2.8 2.8 0 0 0-4-4l-10 10L4 20Z"/>
+                </svg>
+                עריכה
+              </button>
+            ` : ''}
+          </div>
+        `;
+      }).join('')}
+    </section>
+  `;
+}
+
+function editPersonalField(key) {
+  if (!Object.prototype.hasOwnProperty.call(personalFieldLabels, key)) return;
+  personalEditingField = key;
+  renderPersonal();
+
+  const input = document.getElementById('personal-edit-input');
+  if (input) input.focus();
+}
+
+function savePersonalField(key) {
+  if (!Object.prototype.hasOwnProperty.call(personalFieldLabels, key)) return;
+
+  const input = document.getElementById('personal-edit-input');
+  if (!input) return;
+
+  const details = getPersonalDetails();
+  let value = input.value.trim();
+
+  if (key === 'age' && value !== '') {
+    const age = Number(value);
+
+    if (!Number.isInteger(age) || age < 18 || age > 120) {
+      alert('יש להזין גיל בין 18 ל־120.');
+      return;
+    }
+
+    value = String(age);
+  }
+
+  details[key] = value;
+  savePersonalDetails(details);
+
+  personalEditingField = '';
+  renderPersonal();
+}
+
+function cancelPersonalEdit() {
+  personalEditingField = '';
+  renderPersonal();
+}
+
+function renderPersonalPrivacy() {
+  const privacy = getPersonalPrivacy();
+
+  return `
+    <section class="personal-panel">
+<div class="personal-privacy-mode">
+  <div>
+    <h3>מצב פרטיות מלא</h3>
+   <p>
+  רק שם המשתמש ותמונות הפרופיל יהיו גלויים לאחרים.
+  שאר הפרטים ייחשפו רק לאחר שתיווצר התאמה הדדית.
+</p>
+  </div>
+
+ 
+<button
+  type="button"
+  role="switch"
+  aria-checked="${isFullPrivacyMode()}"
+  aria-label="מצב פרטיות מלא"
+  class="privacy-mode-button ${isFullPrivacyMode() ? 'active' : ''}"
+  onclick="toggleFullPrivacyMode()">
+</button>
+
+</div>
+     
+      ${Object.keys(personalFieldLabels).map(key => `
+        <div class="personal-privacy-row">
+          <div class="personal-privacy-top">
+            <div>
+              <div class="personal-privacy-name">
+                ${escapeHTML(personalFieldLabels[key])}
+              </div>
+              <div class="personal-privacy-description">
+                ${privacy[key] === 'public'
+                  ? 'מוגדר להצגה בפרופיל הרגיל.'
+                  : privacy[key] === 'matched'
+                    ? 'מיועד להצגה רק לאחר התאמה הדדית.'
+                    : 'מוגדר כפרט פרטי.'}
+              </div>
+            </div>
+          </div>
+
+          <select class="personal-privacy-select"
+            onchange="updatePersonalPrivacy('${key}', this.value)">
+            <option value="public" ${privacy[key] === 'public' ? 'selected' : ''}>
+              גלוי לכולם
+            </option>
+            <option value="matched" ${privacy[key] === 'matched' ? 'selected' : ''}>
+        לחשוף להתאמות
+            </option>
+            <option value="private" ${privacy[key] === 'private' ? 'selected' : ''}>
+              פרטי — רק אני
+            </option>
+          </select>
+        </div>
+      `).join('')}
+    </section>
+  `;
+}
+
+function updatePersonalPrivacy(key, value) {
+  if (!Object.prototype.hasOwnProperty.call(personalFieldLabels, key)) return;
+  if (!['public', 'matched', 'private'].includes(value)) return;
+
+  const privacy = getPersonalPrivacy();
+  privacy[key] = value;
+  savePersonalPrivacy(privacy);
+
+  renderPersonal();
+}
+
+ 
+ 
+function renderNotifications() {
+  const content = document.getElementById('app-content');
+  if (!content) return;
+
+  content.innerHTML = `
+    <section class="notifications-page">
+
+
+      <header class="notifications-heading">
+        <div class="notifications-heading-icon">
+          <svg viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+            <path d="M10 21h4"/>
+          </svg>
+        </div>
+
+        <div>
+          <h1>ההתראות שלי</h1>
+          <p>עדכונים והודעות מאתר לב אל לב</p>
+        </div>
+      </header>
+
+     
+      <div class="notifications-list">
+<a href="index2.html" class="notification-item"
+   style="text-decoration:none;color:inherit;cursor:pointer;">
+
+  <div class="notification-item-icon">
+    <svg viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="1.8"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 11l3 3L22 4"/>
+      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+    </svg>
+  </div>
+
+  <div class="notification-item-content">
+    <div class="notification-item-top">
+      <span class="notification-item-title">אורן</span>
+      <span class="notification-item-label">הודעה מהאתר</span>
+    </div>
+
+    <p class="notification-item-message">
+      אורן, תעבור לשאלות כדי להמשיך בתהליך.
+    </p>
+
+    <div class="notification-item-date">
+      הודעת מערכת · תזכורת
+    </div>
+  </div>
+
+</a>
+        <!-- הודעה 1 -->
+        <article class="notification-item">
+          <div class="notification-item-icon">
+            <svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 9v4"/>
+              <path d="M12 17h.01"/>
+              <path d="M10.3 3.9 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.9a2 2 0 0 0-3.4 0Z"/>
+            </svg>
+          </div>
+          <div class="notification-item-content">
+            <div class="notification-item-top">
+              <span class="notification-item-title">עצור אתה הומו</span>
+              <span class="notification-item-label">הודעה מהאתר</span>
+            </div>
+            <p class="notification-item-message">עצור אתה</p>
+            <div class="notification-item-date">הודעת מערכת · הודעת דוגמה</div>
+          </div>
+        </article>
+
+        <!-- הודעה 2 -->
+        <article class="notification-item">
+          <div class="notification-item-icon">
+            <svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 9v4"/>
+              <path d="M12 17h.01"/>
+              <path d="M10.3 3.9 2.6 17.2A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-2.8L13.7 3.9a2 2 0 0 0-3.4 0Z"/>
+            </svg>
+          </div>
+          <div class="notification-item-content">
+            <div class="notification-item-top">
+              <span class="notification-item-title">אנחנו עוצרים אותך על התחזות למשודך</span>
+              <span class="notification-item-label">הודעה מהאתר</span>
+            </div>
+            <p class="notification-item-message">אנחנו עוצרים אותך על התחזות למשודך</p>
+            <div class="notification-item-date">הודעת מערכת · הודעת דוגמה</div>
+          </div>
+        </article>
+
+        <!-- הודעה 3 -->
+        <article class="notification-item">
+          <div class="notification-item-icon">
+            <svg viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="5" width="18" height="14" rx="2"/>
+              <path d="m3 7 9 6 9-6"/>
+            </svg>
+          </div>
+          <div class="notification-item-content">
+            <div class="notification-item-top">
+              <span class="notification-item-title">מקייאק</span>
+              <span class="notification-item-label">הודעה מהאתר</span>
+            </div>
+            <p class="notification-item-message">מקייאק</p>
+            <div class="notification-item-date">הודעת מערכת · הודעת דוגמה</div>
+          </div>
+        </article>
+
+      </div>
+
+
+      <div class="notifications-note">
+        <svg viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 11v5"/>
+          <path d="M12 8h.01"/>
+        </svg>
+
+        <span>
+          כאן יופיעו הודעות נוספות ועדכונים מהאתר
+          ככל שנוסיף אותם בהמשך.
+        </span>
+      </div>
+
+    </section>
+  `;
+}
+
+ 
+ showPage('home');
+</script>
+
+</body>
+</html>

@@ -1,0 +1,999 @@
+
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>השאלון</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  --bg:#ffffff;
+  --fg:#0a0a0a;
+  --border:#e5e5e5;
+  --muted:#f5f5f5;
+  --muted-fg:#737373;
+  --card:#ffffff;
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+
+body {
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--fg);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 20px;
+  border-bottom:1px solid var(--border);
+}
+header h1 { font-size:18px; font-weight:700; }
+header .actions { display:flex; align-items:center; gap:8px; }
+
+.btn {
+  font:inherit;
+  cursor:pointer;
+  border:1px solid var(--border);
+  background:var(--card);
+  border-radius:10px;
+  padding:8px 12px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:14px;
+}
+.btn:hover { background:var(--muted); }
+#sidebarToggle { display:none; }
+
+.layout { display:flex; flex:1; overflow:hidden; }
+
+aside {
+  width:320px;
+  flex-shrink:0;
+  border-left:1px solid var(--border);
+  background:#fafafa;
+  display:flex;
+  flex-direction:column;
+}
+
+aside .side-head {
+  padding:18px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+}
+aside .side-head h3 { font-size:16px; font-weight:600; margin-bottom:4px; }
+aside .side-head p { font-size:13px; color:var(--muted-fg); }
+#sideClose { display:none; }
+
+.side-list {
+  flex:1;
+  overflow-y:auto;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.side-item {
+  width:100%;
+  text-align:right;
+  border:none;
+  background:transparent;
+  cursor:pointer;
+  display:flex;
+  gap:10px;
+  padding:10px;
+  border-radius:12px;
+  font:inherit;
+  color:inherit;
+}
+.side-item:hover { background:var(--muted); }
+.side-item.active { background:var(--fg); color:var(--bg); }
+
+.side-dot {
+  flex-shrink:0;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  margin-top:2px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+}
+.side-item.answered .side-dot { background:var(--fg); color:var(--bg); }
+.side-item.active.answered .side-dot { background:var(--bg); color:var(--fg); }
+.side-item:not(.answered) .side-dot { border:2px solid #d4d4d4; }
+.side-item.active:not(.answered) .side-dot { border-color:rgba(255,255,255,.5); }
+
+.side-text { flex:1; min-width:0; }
+.side-q {
+  font-size:14px;
+  font-weight:500;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.side-a {
+  font-size:12px;
+  color:var(--muted-fg);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  margin-top:2px;
+}
+.side-item.active .side-a { color:rgba(255,255,255,.75); }
+.side-a.empty { opacity:.6; }
+
+main { flex:1; overflow-y:auto; }
+
+.wrap {
+  max-width:640px;
+  margin:0 auto;
+  padding:48px 24px;
+}
+
+.progress-top {
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  color:var(--muted-fg);
+  margin-bottom:10px;
+}
+
+.bar {
+  height:6px;
+  background:var(--muted);
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:36px;
+}
+.bar > div {
+  height:100%;
+  background:var(--fg);
+  border-radius:999px;
+  transition:width .35s ease;
+}
+
+.q-text {
+  font-size:30px;
+  font-weight:700;
+  line-height:1.35;
+  margin-bottom:30px;
+}
+
+.opt {
+  width:100%;
+  text-align:right;
+  font:inherit;
+  font-size:17px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:16px 18px;
+  margin-bottom:10px;
+  border:2px solid var(--border);
+  border-radius:16px;
+  background:var(--card);
+  color:var(--fg);
+  transition:all .15s;
+}
+.opt:hover { border-color:#a3a3a3; }
+.opt.selected {
+  background:var(--fg);
+  color:var(--bg);
+  border-color:var(--fg);
+}
+
+.opt-label { display:flex; align-items:center; gap:8px; font-weight:500; }
+
+.radio {
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  border:2px solid #d4d4d4;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+.opt.selected .radio {
+  border-color:var(--bg);
+  background:var(--bg);
+  color:var(--fg);
+}
+.radio svg { width:14px; height:14px; }
+
+#customBox { display:none; margin-bottom:16px; }
+#customBox.show { display:block; }
+
+#customText {
+  width:100%;
+  font:inherit;
+  font-size:17px;
+  padding:16px 18px;
+  border:2px solid var(--border);
+  border-radius:16px;
+  resize:vertical;
+  min-height:90px;
+  background:var(--card);
+  color:var(--fg);
+}
+#customText:focus { outline:none; border-color:var(--fg); }
+
+.nav {
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:28px;
+}
+.nav .next {
+  background:var(--fg);
+  color:var(--bg);
+  border-color:var(--fg);
+  padding:12px 26px;
+  font-weight:600;
+}
+.nav .next:disabled {
+  background:var(--muted);
+  color:var(--muted-fg);
+  border-color:var(--muted);
+  cursor:not-allowed;
+}
+.nav .prev:disabled { opacity:.4; cursor:not-allowed; }
+
+.done { text-align:center; padding:60px 0; }
+.done .badge {
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  background:var(--fg);
+  color:var(--bg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 22px;
+}
+.done h2 { font-size:28px; margin-bottom:10px; }
+.done p { color:var(--muted-fg); margin-bottom:12px; }
+
+.save-note {
+  font-size:12px;
+  color:var(--muted-fg);
+  text-align:center;
+  margin:0 auto 20px;
+  padding:0 16px;
+}
+
+@media (max-width:767px) {
+  #sidebarToggle { display:flex; }
+
+  aside {
+    position:fixed;
+    top:0;
+    right:0;
+    height:100%;
+    height:100dvh;
+    width:320px;
+    max-width:85vw;
+    z-index:50;
+    transform:translateX(100%);
+    transition:transform .25s ease;
+    box-shadow:-6px 0 24px rgba(0,0,0,.15);
+  }
+  aside.open { transform:translateX(0); }
+  #sideClose { display:flex; }
+
+  #overlay {
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.4);
+    z-index:40;
+    display:none;
+  }
+  #overlay.show { display:block; }
+
+  .q-text { font-size:24px; }
+  .wrap { padding:28px 18px; }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>השאלון</h1>
+
+  <div class="actions">
+    <button id="sidebarToggle" class="btn" title="הצג שאלות">
+      <svg width="16" height="16" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18M3 12h18M3 18h18"/>
+      </svg>
+      תשובות
+    </button>
+    <button id="sendWhatsApp" type="button">
+  שלח ב־WhatsApp
+</button>
+
+<div id="whatsappBanner" style="display:none;">
+  <div>
+    <strong>השאלון עדיין לא הושלם</strong>
+    <p>יש לסיים את כל השאלות לפני שליחת השאלון ב־WhatsApp.</p>
+    <button id="closeWhatsAppBanner" type="button">הבנתי</button>
+  </div>
+</div>
+
+<style>
+  #sendWhatsApp {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: #25D366;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  #whatsappBanner {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(15, 23, 42, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  #whatsappBanner > div {
+    width: 100%;
+    max-width: 340px;
+    background: white;
+    color: #0f172a;
+    padding: 24px;
+    border-radius: 18px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+  }
+
+  #whatsappBanner p {
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  #closeWhatsAppBanner {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #7c3aed;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+  }
+</style>
+  </div>
+</header>
+
+<div id="overlay"></div>
+
+<div class="layout">
+  <aside id="sidebar">
+    <div class="side-head">
+      <div>
+        <h3>סקירת תשובות</h3>
+        <p>ענית על <b id="answeredCount">0</b> מתוך
+          <b id="totalCount">0</b> שאלות</p>
+      </div>
+
+      <button id="sideClose" class="btn"
+        style="padding:6px" title="סגור">
+        <svg width="20" height="20" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6 6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="side-list" id="sideList"></div>
+  </aside>
+
+  <main>
+    <div class="wrap" id="mainArea"></div>
+    <p class="save-note" id="saveNote"></p>
+  </main>
+</div>
+
+<script>
+"use strict";
+
+// =====================================
+// הגדרות השאלון
+// =====================================
+
+
+const QUESTIONS = [
+  {
+    id: 1,
+    question: "זה אתר שאלות. המטרה היא לקחת את זה באיזי ולבנות את אתר השידוכים בהדרגה השאלון שומר את כל התאליך ובסוף תשלח לי את התשובות בכפטור הווצאפ וגם תוכל לענות תשובות אישיות בכל שאלה .",
+    options: ["בסדר"]
+  },
+  {
+    id: 2,
+    question: "המטרה היא לבנות לאט, לקחת באיזי ובצורה איכותית, גם אם זה ייקח יותר זמן. זה נצרך כדי ליצור מוצר שעובד. מבחינתי, בסופו של דבר זו תעסוקה, וזה טוב בלי קשר לשאלה אם הצלחנו או נתקענו.",
+    options: ["בסדר"]
+  },
+  {
+    id: 3,
+    question: "האתר בנוי מדף שנקרא צד הלקוח, או צד המשתמשים באתר, ולדף יש ענן מידע שבו נשמרים הנתונים שהמשתמש מזין, לצרכים כמו זיהוי הלקוח שנכנס לדף.",
+    options: ["בסדר"]
+  },
+  {
+  
+  id: 4,
+  question: "הערה — מטרות כלליות של האתר: שמירת פרטי הלקוח, נוחות למשתמשים, מציאת שידוך למשתמש, תהליך אוטומטי ככל האפשר, עם כמה שפחות התעסקות מצד הניהול.",
+  options: [
+    "בסדר"
+  ]
+},
+  {
+    id: 5,
+    question: "שאלה א׳ — איך תתבצע החלפת הפרטים בין המשתמשים?",
+    options: [
+      "יוצגו רק תמונות. לאחר מכן, המשתמש יוכל לשלוח בקשה לקבלת פרטים נוספים ומספר טלפון. הפרטים יופיעו רק לאחר אישור המשתמש השני.",
+      "יוצגו תמונות ופרטים נוספים, ללא מספר טלפון. לאחר בקשה ואישור מהצד השני, מספר הטלפון יופיע.",
+      "כל הפרטים יוצגו מראש."
+    ]
+  },
+  {
+    id: 6,
+    question: "שאלה ב׳ — האם יש צורך בצ׳אט זמני באתר?",
+    options: [
+      "כן, זה עוזר להכיר טוב יותר לפני שמדברים בשיחת טלפון.",
+      "לא, זה מיותר."
+    ]
+  },
+  {
+    id: 7,
+    question: "שאלה ג׳ — איך האתר ירוויח כסף?",
+    options: [
+      "באמצעות מנוי חודשי או שנתי.",
+      "באמצעות החתמת חוזה במקרה של חתונה, לפני חשיפת הפרטים של אותו לקוח, כגון מספר הטלפון, מתוך הפרטים הקיימים במערכת."
+    ]
+  },
+  {
+    id: 8,
+    question: "שאלה ד׳ — אם נבחר במודל של חוזה, האם יהיה צורך במספר זהות או בצילום תעודה? הדבר מצריך בדיקה משפטית בנושא הפרטיות עם עורך דין.",
+    options: [
+      "כן, נבדוק.",
+      "לא, אין צורך."
+    ]
+  },
+  {
+    id: 9,
+    question: "הערה — אם נבחר במודל החוזה, יש לבדוק אם צריך להפיק את החוזה באותו רגע עם פרטי החותם, ולתעד אותו במאגר האתר עם אפשרות להדפסה עבור הלקוח. אפשר גם ליצור חוזה אוטומטי באתר, עם הפרטים הנדרשים ובניסוח תקין משפטית, ולשמור עותק הן בצד הניהול והן אצל הלקוח.",
+    options: ["בסדר, אני מבין."]
+  },
+  {
+    id: 10,
+    question: "שאלה ה׳ — איך המשתמש או המשתמשת ייכנסו לאתר?",
+    options: [
+      "באמצעות כפתור התחברות מהיר ומאובטח עם Google.",
+      "באמצעות מספר טלפון וקוד חד־פעמי ב־SMS.",
+    "לא משנה לי.."
+    ]
+  },
+  {
+    id: 11,
+    question: "הערה — האתר ישלח התראות כאשר תידרש פעולה מצד המשתמש, למשל אישור לחשיפת פרטים נוספים ללקוח אחר כמו מספר טלפון וכו וגם התראות מצד ניהול האתר ",
+    options: ["בסדר"]
+  },
+  {
+    id: 12,
+    question: "שאלה הבאה — אם האתר ישלח התראות, באיזה ערוץ הן יישלחו?",
+    options: [
+      "גם ב־SMS וגם ב־Gmail. גם באתר עצמו",
+    "רק באתר"
+    ]
+  },
+  {
+    id: 13,
+    question: "הערה — נשים פרטים בסיסיים כמו גיל, גובה, רמה דתית, אזור, שם, מספר טלפון ומוצא. כל שאר הפרטים הם ילמדו בהמשך בפגישות. מה שלא קיים ברשימה, הלקוח ילחץ (לא ברשימה), ובצד של מי שרואה את הפרופיל לא יהיה בכלל את הנתון הזה .",
+    options: ["בסדר"]
+  },
+  {
+    id: 14,
+    question: "שאלה — יהיה סינון פרופילים, או שאפשר יהיה לראות ישר את כל הפרופילים?",
+    options: [
+      "לא צריך סינון בכלל",
+      "אני רוצה שיהיה רק סינון מראש",
+    "שיהיה סינון אבל יהיה אפשר לראות את הפרופילים מראש"
+    ]
+  },
+  {
+    id: 15,
+    question: "שאלה — יהיה עמוד החלקת פרופילים ימינה רוצה פרטים נוספים שמאלה לא מעוניין",
+    options: [
+      "כן",
+      "לא"
+    ]
+  },
+  {
+    id: 16,
+    question: "הערה — יהיה מספר טלפון שמשויך למנהל האתר. לאחר הזדהות וכניסה עם אותו מספר טלפון או הג׳ימייל של מנהל האתר, תהיה אפשרות לחסום פרופילים מהאתר ולהחזיר במידת הצורך. כמו כן, המנהל יוכל לתקשר עם המשתמש באתר דרך התראות האתר ודרך המייל או מספר הטלפון של המשתמש.",
+    options: ["בסדר"]
+  }
+];
+
+// =====================================
+// מצב השאלון
+// =====================================
+
+let currentIndex = 0;
+let answers = {};
+let customAnswers = {};
+let customMode = false;
+let finished = false;
+
+const PROGRESS_KEY = "matchmaking_questionnaire_progress";
+
+function saveProgress() {
+  const progress = {
+    currentIndex,
+    answers,
+    customAnswers,
+    customMode,
+    finished
+  };
+
+  localStorage.setItem(PROGRESS_KEY, JSON.stringify(progress));
+}
+
+function loadProgress() {
+  try {
+    const saved = localStorage.getItem(PROGRESS_KEY);
+
+    if (!saved) return;
+
+    const progress = JSON.parse(saved);
+
+    if (progress && typeof progress === "object") {
+      answers = progress.answers || {};
+      customAnswers = progress.customAnswers || {};
+      customMode = Boolean(progress.customMode);
+      finished = Boolean(progress.finished);
+
+      if (
+        Number.isInteger(progress.currentIndex) &&
+        progress.currentIndex >= 0 &&
+        progress.currentIndex < QUESTIONS.length
+      ) {
+        currentIndex = progress.currentIndex;
+      }
+    }
+  } catch (error) {
+    console.error("לא ניתן לטעון את התקדמות השאלון:", error);
+  }
+}
+
+// =====================================
+// אלמנטים מה-HTML שלך
+// =====================================
+
+const mainArea = document.getElementById("mainArea");
+const sideList = document.getElementById("sideList");
+const answeredCount = document.getElementById("answeredCount");
+const totalCount = document.getElementById("totalCount");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const sidebarToggle = document.getElementById("sidebarToggle");
+const sideClose = document.getElementById("sideClose");
+const saveNote = document.getElementById("saveNote");
+
+// =====================================
+// כלי עזר
+// =====================================
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
+}
+
+function getAnswer(question) {
+  const custom = (customAnswers[question.id] || "").trim();
+  return custom || answers[question.id] || "";
+}
+
+function hasAnswer(question) {
+  return getAnswer(question).length > 0;
+}
+
+function countAnswered() {
+  return QUESTIONS.filter(hasAnswer).length;
+}
+
+function closeSidebar() {
+  sidebar.classList.remove("open");
+  overlay.classList.remove("show");
+}
+
+function openSidebar() {
+  sidebar.classList.add("open");
+  overlay.classList.add("show");
+}
+
+// =====================================
+// הצגת השאלה הנוכחית
+// =====================================
+
+function renderQuestion() {
+  saveProgress();
+  if (finished) {
+    renderFinished();
+    return;
+  }
+
+  const question = QUESTIONS[currentIndex];
+
+  if (!question) return;
+
+  const number = currentIndex + 1;
+  const progress = Math.round(number / QUESTIONS.length * 100);
+  const selected = answers[question.id] || "";
+  const customText = customAnswers[question.id] || "";
+
+  const optionsHTML = question.options.map(option => {
+    const isSelected = !customMode && selected === option;
+
+    return `
+      <button
+        type="button"
+        class="opt ${isSelected ? "selected" : ""}"
+        data-option="${escapeHTML(option)}"
+        aria-pressed="${isSelected}"
+      >
+        <span class="opt-label">
+          ${escapeHTML(option)}
+        </span>
+
+        <span class="radio">
+          ${
+            isSelected
+              ? `<svg viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="3">
+                    <path d="m5 12 4 4L19 6"/>
+                 </svg>`
+              : ""
+          }
+        </span>
+      </button>
+    `;
+  }).join("");
+
+  mainArea.innerHTML = `
+    <div class="progress-top">
+      <span>שאלה ${number} מתוך ${QUESTIONS.length}</span>
+      <span>${progress}%</span>
+    </div>
+
+    <div class="bar">
+      <div style="width:${progress}%"></div>
+    </div>
+
+    <h2 class="q-text">${escapeHTML(question.question)}</h2>
+
+    <div id="optionsContainer">
+      ${optionsHTML}
+    </div>
+
+    <button
+      type="button"
+      class="btn"
+      id="customToggle"
+      style="margin-top:12px;margin-bottom:12px;
+             ${customMode ? "background:#f5f5f5;border-color:#737373;" : ""}"
+    >
+      ${customMode ? "בחירת תשובה מהרשימה" : "כתיבת תשובה אישית"}
+    </button>
+
+    <div id="customBox" class="${customMode ? "show" : ""}">
+      <textarea
+        id="customText"
+        placeholder="כתוב את התשובה שלך כאן..."
+        maxlength="500"
+      >${escapeHTML(customText)}</textarea>
+    </div>
+
+    <div class="nav">
+      <button
+        type="button"
+        class="btn prev"
+        id="prevBtn"
+        ${currentIndex === 0 ? "disabled" : ""}
+      >
+        הקודם
+      </button>
+
+      <button
+        type="button"
+        class="btn next"
+        id="nextBtn"
+        ${hasAnswer(question) ? "" : "disabled"}
+      >
+        ${currentIndex === QUESTIONS.length - 1 ? "סיום השאלון" : "השאלה הבאה"}
+      </button>
+    </div>
+  `;
+
+  // בחירת תשובה מהרשימה
+  mainArea.querySelectorAll("[data-option]").forEach(button => {
+    button.addEventListener("click", () => {
+      answers[question.id] = button.dataset.option;
+delete customAnswers[question.id];
+customMode = false;
+
+saveProgress();
+renderQuestion();
+    });
+  });
+
+  // מעבר לתשובה אישית או חזרה לרשימה
+  document.getElementById("customToggle").addEventListener("click", () => {
+    if (customMode) {
+      customMode = false;
+    } else {
+      delete answers[question.id];
+      customMode = true;
+    }
+
+    renderQuestion();
+
+    const textarea = document.getElementById("customText");
+    if (textarea) textarea.focus();
+  });
+
+  // עדכון תשובה אישית
+  const textarea = document.getElementById("customText");
+
+  if (textarea) {
+    textarea.addEventListener("input", () => {
+      customAnswers[question.id] = textarea.value;
+
+      document.getElementById("nextBtn").disabled =
+        !hasAnswer(question);
+
+      renderSidebar();
+    });
+  }
+
+  // שאלה קודמת
+  document.getElementById("prevBtn").addEventListener("click", () => {
+    if (currentIndex > 0) {
+      currentIndex--;
+      customMode = false;
+      renderQuestion();
+    }
+  });
+
+  // שאלה הבאה או סיום
+  document.getElementById("nextBtn").addEventListener("click", () => {
+    if (!hasAnswer(question)) return;
+
+    if (customMode) {
+      customAnswers[question.id] =
+        (customAnswers[question.id] || "").trim();
+    }
+
+    if (currentIndex < QUESTIONS.length - 1) {
+      currentIndex++;
+      customMode = false;
+      renderQuestion();
+    } else {
+      finished = true;
+      saveProgress();
+      renderFinished();
+    }
+  });
+
+  renderSidebar();
+  updateCounts();
+}
+  
+// =====================================
+// סרגל השאלות בצד
+// =====================================
+
+function renderSidebar() {
+  sideList.innerHTML = QUESTIONS.map((question, index) => {
+    const answered = hasAnswer(question);
+    const active = !finished && index === currentIndex;
+    const answer = getAnswer(question);
+
+    return `
+      <button
+        type="button"
+        class="side-item
+          ${active ? "active" : ""}
+          ${answered ? "answered" : ""}"
+        data-index="${index}"
+      >
+        <span class="side-dot">
+          ${answered ? "✓" : index + 1}
+        </span>
+
+        <span class="side-text">
+          <span class="side-q">
+            ${escapeHTML(question.question)}
+          </span>
+
+          <span class="side-a ${answered ? "" : "empty"}">
+            ${answered ? escapeHTML(answer) : "טרם נענתה"}
+          </span>
+        </span>
+      </button>
+    `;
+  }).join("");
+
+  sideList.querySelectorAll("[data-index]").forEach(button => {
+    button.addEventListener("click", () => {
+      currentIndex = Number(button.dataset.index);
+      customMode = false;
+      finished = false;
+
+      renderQuestion();
+      closeSidebar();
+    });
+  });
+}
+
+// =====================================
+// עדכון מונה השאלות
+// =====================================
+
+function updateCounts() {
+  answeredCount.textContent = countAnswered();
+  totalCount.textContent = QUESTIONS.length;
+}
+document.getElementById("sendWhatsApp").addEventListener("click", function () {
+  if (!finished) {
+    document.getElementById("whatsappBanner").style.display = "flex";
+    return;
+  }
+
+  const lines = [
+    "תוצאות שאלון אתר השידוכים",
+    "========================",
+    ""
+  ];
+
+  QUESTIONS.forEach((q, index) => {
+    const answer = answers[q.id];
+
+    lines.push(`${index + 1}. ${q.question}`);
+
+    if (Array.isArray(answer)) {
+      lines.push(
+        "תשובה: " + (answer.length ? answer.join(", ") : "לא נבחרה")
+      );
+    } else {
+      lines.push(
+        "תשובה: " +
+        (answer !== undefined && answer !== null && answer !== ""
+          ? answer
+          : "לא נבחרה")
+      );
+    }
+
+    lines.push("");
+  });
+
+  const message = lines.join("\n");
+  const url = "https://wa.me/?text=" + encodeURIComponent(message);
+
+  window.open(url, "_blank");
+});
+
+document.getElementById("closeWhatsAppBanner").addEventListener("click", function () {
+  document.getElementById("whatsappBanner").style.display = "none";
+});
+// =====================================
+// מסך סיום
+// =====================================
+
+function renderFinished() {
+  const results = QUESTIONS.map(question => {
+    const answer = getAnswer(question) || "לא נענתה";
+
+    return `
+      <div style="
+        text-align:right;
+        padding:16px 0;
+        border-bottom:1px solid var(--border);
+      ">
+        <div style="font-size:14px;color:var(--muted-fg);margin-bottom:6px">
+          ${escapeHTML(question.question)}
+        </div>
+        <div style="font-size:17px;font-weight:600">
+          ${escapeHTML(answer)}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  mainArea.innerHTML = `
+    <div class="done">
+      <div class="badge">
+        <svg width="36" height="36" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="m5 12 4 4L19 6"/>
+        </svg>
+      </div>
+
+      <h2>סיימת את השאלון</h2>
+
+      <p>
+        ענית על ${countAnswered()} מתוך ${QUESTIONS.length} שאלות.
+      </p>
+    </div>
+
+    <div style="margin-top:24px">
+      ${results}
+    </div>
+  `;
+
+  renderSidebar();
+  updateCounts();
+}
+
+// =====================================
+// פתיחה וסגירה של הסרגל בנייד
+// =====================================
+
+sidebarToggle.addEventListener("click", openSidebar);
+sideClose.addEventListener("click", closeSidebar);
+overlay.addEventListener("click", closeSidebar);
+
+// =====================================
+// הפעלה
+// =====================================
+
+function initQuiz() {
+  totalCount.textContent = QUESTIONS.length;
+
+  if (saveNote) {
+    saveNote.textContent =
+      "השאלון פועל מקומית בדפדפן. התשובות אינן נשלחות לשרת.";
+  }
+
+  renderQuestion();
+}
+loadProgress();
+initQuiz();
+</script>
+</body>
+</html>

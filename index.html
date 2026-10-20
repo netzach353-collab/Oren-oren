@@ -2421,106 +2421,100 @@ async function loginWithGoogle() {
   }
 }
   
-  async function finishRegistration() {
+  
+async function finishRegistration() {
   collectRegisterStep();
 
-  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error: userError
+  } = await db.auth.getUser();
+
   if (userError || !user) {
-    alert('יש להתחבר מחדש');
+    alert('פג תוקף ההתחברות. יש להתחבר מחדש.');
     renderLogin();
     return;
   }
 
-  const { data, error } = await supabase
+  const profileData = {
+    id: user.id,
+    phone: registerData.phone || null,
+    email: user.email || registerData.email,
+    name: registerData.name,
+    birth_date: registerData.birthDate || null,
+    city: registerData.city || null,
+    occupation: registerData.occupation || null,
+    status: registerData.status || null,
+    children: registerData.children || null,
+    religious_view: registerData.religiousView || null,
+    height: registerData.height || null,
+    service: registerData.service || null,
+    relationship_goal: registerData.relationshipGoal || null,
+    languages: registerData.languages || [],
+    smoker: registerData.smoker || null,
+    health: registerData.health || null,
+    kosher: registerData.kosher || null,
+    about: registerData.about || null,
+    registered: true
+  };
+
+  const { data, error } = await db
     .from('profiles')
-    .upsert({
-      id: user.id,
-      phone: registerData.phone || null,
-      email: registerData.email || user.email,
-      name: registerData.name,
-      birth_date: registerData.birthDate || null,
-      city: registerData.city,
-      occupation: registerData.occupation,
-      status: registerData.status,
-      children: registerData.children,
-      religious_view: registerData.religiousView,
-      height: registerData.height,
-      service: registerData.service,
-      relationship_goal: registerData.relationshipGoal,
-      languages: registerData.languages,
-      smoker: registerData.smoker,
-      health: registerData.health,
-      kosher: registerData.kosher,
-      about: registerData.about,
-      registered: true,
-    })
+    .upsert(profileData, { onConflict: 'id' })
     .select()
     .single();
 
   if (error) {
-    alert('שגיאה בשמירה: ' + error.message);
-    console.error('upsert error:', error);
+    console.error('Profile save error:', error);
+    alert('שגיאה בשמירת הפרופיל: ' + error.message);
     return;
   }
-    
-if (error) {
-  console.error('upsert error:', error);
-  alert('שגיאה בשמירה: ' + error.message + '\n(code: ' + error.code + ')');
-  return;
-}
-    
-  console.log('profile saved:', data);
 
+  console.log('Profile saved:', data);
+
+  document.body.classList.remove('auth-only');
   registerStep = 1;
+
   alert('ההרשמה הושלמה בהצלחה');
   showPage('home');
 }
+
   
-  async function afterAuthSuccess(user) {
+  
+async function afterAuthSuccess(user) {
   if (!user) {
     renderLogin();
     return;
   }
-    
 
-  const { data: profile, error } = await supabase
+  const { data: profile, error } = await db
     .from('profiles')
     .select('*')
     .eq('id', user.id)
     .maybeSingle();
 
   if (error) {
-    console.error('profile load error:', error);
+    console.error('Profile load error:', error);
+    alert('לא הצלחנו לטעון את הפרופיל. בדוק את הגדרות Supabase.');
+    return;
   }
 
   document.body.classList.remove('auth-only');
 
-  // אם אין פרופיל בכלל — ננסה ליצור שורה בסיסית
-  if (!profile) {
-    const { error: insertError } = await supabase
-      .from('profiles')
-      .insert({
-        id: user.id,
-        email: user.email,
-        name: user.user_metadata?.full_name || user.user_metadata?.name || '',
-      });
+  if (!profile || !profile.registered || !profile.name) {
+    prepareRegistrationFromProfile(profile, user);
 
-    if (insertError) {
-      console.error('profile insert error:', insertError);
-    }
+    // למשתמש Google יש כבר אימייל מאומת,
+    // ולכן מתחילים בפרטים הבסיסיים.
+    registerStep = 2;
 
-    prepareRegistrationFromProfile(null, user);
-    showPage('register');
+    renderRegister();
     return;
   }
 
-  if (!profile.registered || !profile.name || !profile.email) {
-    prepareRegistrationFromProfile(profile, user);
-    showPage('register');
-  } else {
-    showPage('home');
-  }
+  showPage('home');
 }
+
   
   
 function renderLogin() {

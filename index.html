@@ -2592,12 +2592,32 @@ console.log('Supabase initialized:', !!db);
   <script>
   let swipeProfiles = [];
   
-  async function loadSwipeProfiles() {
+  
+async function loadSwipeProfiles() {
   if (!currentUser) return;
 
   const { data, error } = await db
     .from('profiles')
-    .select('id, name, gender, birth_date, city, occupation, status, about')
+    .select(`
+      id,
+      name,
+      gender,
+      birth_date,
+      city,
+      occupation,
+      status,
+      children,
+      religious_view,
+      height,
+      service,
+      relationship_goal,
+      languages,
+      smoker,
+      health,
+      kosher,
+      about,
+      registered
+    `)
     .eq('registered', true)
     .neq('id', currentUser.id);
 
@@ -2618,6 +2638,7 @@ console.log('Supabase initialized:', !!db);
 
   console.log('פרופילים שנטענו מ־Supabase:', swipeProfiles);
 }
+
   
 async function loginWithGoogle() {
   const { error } = await db.auth.signInWithOAuth({
@@ -2733,7 +2754,7 @@ document.body.classList.remove('registration-mode');
   }
 
   await loadSwipeProfiles();
-showPage('home');
+showPage('profiles');
 }
 
   
@@ -4049,6 +4070,7 @@ function resetProfileFilters() {
   renderProfiles();
 }
 
+
 function openProfileDetail(id) {
   const profile = getProfileById(id);
   if (!profile) return;
@@ -4058,7 +4080,63 @@ function openProfileDetail(id) {
 
   const image = getProfileImage(profile);
   const sent = readMatchData('lev_sent_interests', []);
-  const alreadySent = sent.some(item => String(item.profileId) === String(profile.id));
+  const alreadySent = sent.some(
+    item => String(item.profileId) === String(profile.id)
+  );
+
+  const age = getProfileAge(profile);
+
+  // מציג רק ערכים קיימים ולא ריקים
+  const hasValue = value => {
+    if (value === null || value === undefined) return false;
+    if (Array.isArray(value)) {
+      return value.some(item => String(item ?? '').trim() !== '');
+    }
+    return String(value).trim() !== '';
+  };
+
+  const displayValue = value => {
+    if (Array.isArray(value)) {
+      return value
+        .filter(item => hasValue(item))
+        .map(item => escapeHTML(String(item)))
+        .join(' · ');
+    }
+
+    if (typeof value === 'boolean') {
+      return value ? 'כן' : 'לא';
+    }
+
+    return escapeHTML(String(value));
+  };
+
+  const fields = [
+    ['עיר', profile.city],
+    ['עיסוק', profile.occupation],
+    ['מצב משפחתי', profile.status],
+    ['ילדים', profile.children],
+    ['השקפה דתית', profile.religious_view],
+    ['גובה', profile.height],
+    ['שירות', profile.service],
+    ['מטרת הקשר', profile.relationship_goal],
+    ['שפות', profile.languages],
+    ['עישון', profile.smoker],
+    ['בריאות', profile.health],
+    ['כשרות', profile.kosher],
+    ['תחומי עניין', profile.interests]
+  ];
+
+  const detailsHTML = fields
+    .filter(([, value]) => hasValue(value))
+    .map(([label, value]) => `
+      <div class="profile-detail-section">
+        <h3>${escapeHTML(label)}</h3>
+        <p>${displayValue(value)}</p>
+      </div>
+    `)
+    .join('');
+
+  const about = getProfileAbout(profile);
 
   content.innerHTML = `
     <section class="profile-detail">
@@ -4067,34 +4145,25 @@ function openProfileDetail(id) {
         alt="${escapeHTML(getProfileName(profile))}">
 
       <div class="profile-detail-body">
-        <h2>${escapeHTML(getProfileName(profile))}${getProfileAge(profile) ? ', ' + getProfileAge(profile) : ''}</h2>
+        <h2>
+          ${escapeHTML(getProfileName(profile))}
+          ${age ? ', ' + age : ''}
+        </h2>
 
-        <div class="profile-detail-meta">
-          ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
-        </div>
-
-        <div class="profile-detail-section">
-          <h3>קצת עליי</h3>
-          <p>${escapeHTML(getProfileAbout(profile))}</p>
-        </div>
-
-        ${profile.occupation ? `
+        ${hasValue(about) ? `
           <div class="profile-detail-section">
-            <h3>עיסוק</h3>
-            <p>${escapeHTML(profile.occupation)}</p>
+            <h3>קצת עליי</h3>
+            <p>${escapeHTML(about)}</p>
           </div>
         ` : ''}
 
-        ${profile.interests ? `
-          <div class="profile-detail-section">
-            <h3>תחומי עניין</h3>
-            <p>${escapeHTML(Array.isArray(profile.interests) ? profile.interests.join(' · ') : profile.interests)}</p>
-          </div>
-        ` : ''}
+        ${detailsHTML}
 
         <div class="profile-detail-actions">
           <button class="profile-back-btn" type="button"
-            onclick="renderProfiles()">חזרה</button>
+            onclick="renderProfiles()">
+            חזרה
+          </button>
 
           <button class="profile-interest-btn" type="button"
             ${alreadySent ? 'disabled' : ''}
@@ -4106,6 +4175,7 @@ function openProfileDetail(id) {
     </section>
   `;
 }
+
 
 function sendProfileInterest(id) {
   const profile = getProfileById(id);
@@ -4783,6 +4853,7 @@ const citySuggestions = [
   'קריית שמונה'
 ];
   
+
 async function loadPersonalDetailsFromSupabase() {
   if (!currentUser) {
     throw new Error('אין משתמש מחובר');
@@ -4825,10 +4896,36 @@ async function loadPersonalDetailsFromSupabase() {
 
   details.age = calculateAge(details.birthDate);
 
+  // טעינת הגדרות הפרטיות שנשמרו ב-Supabase
+  const savedPrivacy = profile.privacy &&
+    typeof profile.privacy === 'object' &&
+    !Array.isArray(profile.privacy)
+      ? profile.privacy
+      : {};
+
+  const privacy = {};
+
+  Object.keys(personalFieldLabels).forEach(key => {
+    const value = savedPrivacy[key];
+
+    privacy[key] = ['public', 'matched', 'private'].includes(value)
+      ? value
+      : 'public';
+  });
+
+  // שמירה מקומית לצורך שימוש במסך ההגדרות
+  saveMatchData(PERSONAL_PRIVACY_KEY, privacy);
+
+  localStorage.setItem(
+    PERSONAL_PRIVACY_MODE_KEY,
+    savedPrivacy._fullPrivacyMode === true ? 'yes' : 'no'
+  );
+
   savePersonalDetails(details);
 
   return true;
 }
+
 
 function getPersonalDetails() {
   const saved = readMatchData(PERSONAL_KEY, {});
@@ -4857,16 +4954,84 @@ function savePersonalDetails(details) {
   saveMatchData(PERSONAL_KEY, details);
 }
 
+
 function getPersonalPrivacy() {
   const saved = readMatchData(PERSONAL_PRIVACY_KEY, {});
   const privacy = {};
 
   Object.keys(personalFieldLabels).forEach(key => {
-    privacy[key] = saved[key] || 'public';
+    privacy[key] = ['public', 'matched', 'private'].includes(saved[key])
+      ? saved[key]
+      : 'public';
   });
 
   return privacy;
 }
+
+async function savePersonalPrivacy(privacy) {
+  saveMatchData(PERSONAL_PRIVACY_KEY, privacy);
+
+  if (!currentUser) return false;
+
+  const { error } = await db
+    .from('profiles')
+    .update({
+      privacy: {
+        ...privacy,
+        _fullPrivacyMode: isFullPrivacyMode()
+      }
+    })
+    .eq('id', currentUser.id);
+
+  if (error) {
+    console.error('שגיאה בשמירת הגדרות הפרטיות:', error);
+    alert('הגדרות הפרטיות לא נשמרו בשרת: ' + error.message);
+    return false;
+  }
+
+  return true;
+}
+
+function updatePersonalPrivacy(key, value) {
+  if (!Object.prototype.hasOwnProperty.call(personalFieldLabels, key)) return;
+  if (!['public', 'matched', 'private'].includes(value)) return;
+
+  const privacy = getPersonalPrivacy();
+  privacy[key] = value;
+
+  savePersonalPrivacy(privacy).then(success => {
+    if (success) renderPersonal();
+  });
+}
+
+function isFullPrivacyMode() {
+  return localStorage.getItem(PERSONAL_PRIVACY_MODE_KEY) === 'yes';
+}
+
+async function toggleFullPrivacyMode() {
+  const enable = !isFullPrivacyMode();
+
+  localStorage.setItem(PERSONAL_PRIVACY_MODE_KEY, enable ? 'yes' : 'no');
+
+  const privacy = getPersonalPrivacy();
+
+  if (enable) {
+    Object.keys(personalFieldLabels).forEach(key => {
+      privacy[key] = key === 'name' || key === 'about'
+        ? 'public'
+        : 'matched';
+    });
+  }
+
+  const success = await savePersonalPrivacy(privacy);
+
+  renderPersonal();
+
+  if (!success) {
+    alert('שינוי מצב הפרטיות לא נשמר בשרת. בדוק את החיבור ואת הרשאות Supabase.');
+  }
+}
+
   
   function calculateAge(birthDate) {
   if (!birthDate) return '';
@@ -5371,6 +5536,7 @@ async function saveAllPersonalDetails() {
 
   alert('הפרטים נשמרו בהצלחה.');
 }
+  
 function renderPersonalPrivacy() {
   const privacy = getPersonalPrivacy();
 

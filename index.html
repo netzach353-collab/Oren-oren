@@ -2769,7 +2769,7 @@ function renderLogin() {
     <section class="auth-page">
       <div class="auth-card">
         <div class="auth-heading">
-          <h1>כניסה ללב אל לב</h1>
+          <h1>כניסה/הרשמה לאתר השדכן</h1>
           <p>היכנס עם חשבון Google כדי להמשיך</p>
         </div>
 
@@ -4177,25 +4177,83 @@ function openProfileDetail(id) {
 }
 
 
-function sendProfileInterest(id) {
+
+async function sendProfileInterest(id) {
+  if (!currentUser) {
+    alert('צריך להתחבר כדי להביע עניין.');
+    return;
+  }
+
+  if (String(id) === String(currentUser.id)) return;
+
   const profile = getProfileById(id);
-  if (!profile) return;
+  if (!profile) {
+    alert('לא מצאנו את הפרופיל.');
+    return;
+  }
 
+  // בדיקה אם כבר שלחת עניין לאותו משתמש
+  const { data: existing, error: existingError } = await db
+    .from('profile_interests')
+    .select('id')
+    .eq('sender_id', currentUser.id)
+    .eq('receiver_id', id)
+    .maybeSingle();
+
+  if (existingError) {
+    console.error('שגיאה בבדיקת בקשת העניין:', existingError);
+    alert('לא הצלחנו לבדוק אם כבר שלחת עניין: ' + existingError.message);
+    return;
+  }
+
+  if (!existing) {
+    const { error: insertError } = await db
+      .from('profile_interests')
+      .insert({
+        sender_id: currentUser.id,
+        receiver_id: id
+      });
+
+    if (insertError && insertError.code !== '23505') {
+      console.error('שגיאה בשליחת עניין:', insertError);
+      alert('לא הצלחנו לשלוח עניין: ' + insertError.message);
+      return;
+    }
+  }
+
+  // בדיקה אם המשתמש השני הביע עניין בחזרה
+  const { data: reciprocal, error: reciprocalError } = await db
+    .from('profile_interests')
+    .select('id')
+    .eq('sender_id', id)
+    .eq('receiver_id', currentUser.id)
+    .maybeSingle();
+
+  if (reciprocalError) {
+    console.error('שגיאה בבדיקת עניין הדדי:', reciprocalError);
+    alert('העניין נשמר, אך לא הצלחנו לבדוק אם הוא הדדי.');
+  }
+
+  // עדכון המטמון המקומי לצורך תאימות לקוד הקיים
   const sent = readMatchData('lev_sent_interests', []);
-  const alreadySent = sent.some(item => String(item.profileId) === String(id));
-
-  if (!alreadySent) {
+  if (!sent.some(item => String(item.profileId) === String(id))) {
     sent.push({
       profileId: id,
-      status: 'pending',
+      status: reciprocal ? 'matched' : 'pending',
       createdAt: new Date().toISOString()
     });
-
     saveMatchData('lev_sent_interests', sent);
+  }
+
+  if (reciprocal) {
+    alert('יש עניין הדדי! עכשיו אפשר לחבר את חשיפת הפרטים המוגנים.');
+  } else {
+    alert('בקשת העניין נשלחה בהצלחה.');
   }
 
   openProfileDetail(id);
 }
+
 
 function readMatchData(key, fallback) {
   try {

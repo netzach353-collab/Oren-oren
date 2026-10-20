@@ -2597,7 +2597,7 @@ console.log('Supabase initialized:', !!db);
 
   const { data, error } = await db
     .from('profiles')
-    .select('id, name, birth_date, city, occupation, status, about')
+    .select('id, name, gender, birth_date, city, occupation, status, about')
     .eq('registered', true)
     .neq('id', currentUser.id);
 
@@ -2659,6 +2659,7 @@ currentUser = user;
     phone: registerData.phone || null,
     email: user.email || registerData.email,
     name: registerData.name,
+    gender: registerData.gender || null,
     birth_date: registerData.birthDate || null,
     city: registerData.city || null,
     occupation: registerData.occupation || null,
@@ -2773,6 +2774,7 @@ function prepareRegistrationFromProfile(profile, user) {
   registerData.phone = (profile && profile.phone) || user.phone || '';
   registerData.email = (profile && profile.email) || user.email || '';
   registerData.name = (profile && profile.name) || '';
+  registerData.gender = (profile && profile.gender) || '';
   registerData.birthDate = (profile && profile.birth_date) || '';
   registerData.city = (profile && profile.city) || '';
   registerData.occupation = (profile && profile.occupation) || '';
@@ -3047,6 +3049,29 @@ function renderRegisterStep(step) {
         >
       </div>
 
+    <div class="auth-form-group ${isLocked('gender') ? 'auth-locked-field' : ''}">
+  <label for="reg-gender">
+    ${required('אני', 'gender')}
+  </label>
+
+  <select
+    id="reg-gender"
+    name="gender"
+    required
+    ${lockAttrs('gender')}
+  >
+    <option value="">בחירה</option>
+    <option value="male"
+      ${registerData.gender === 'male' ? 'selected' : ''}>
+      גבר
+    </option>
+    <option value="female"
+      ${registerData.gender === 'female' ? 'selected' : ''}>
+      אישה
+    </option>
+  </select>
+</div>
+    
       <div class="auth-form-group ${isLocked('birthDate') ? 'auth-locked-field' : ''}">
         <label for="reg-birth">
           ${required('תאריך לידה', 'birthDate')}
@@ -3478,7 +3503,8 @@ function collectRegisterStep() {
 
   if (registerStep === 2) {
     registerData.name = getValue('name');
-
+registerData.gender = getValue('gender');
+    
     const birthInput = getValue('birthDate');
     const match = birthInput.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
 
@@ -3872,6 +3898,38 @@ function renderProfiles() {
   `;
 }
   
+  function getGenderedStatus(profile) {
+  const status = String(profile.status || '').trim();
+  const gender = profile.gender;
+
+  const statusMap = {
+    'רווק/ה': {
+      male: 'רווק',
+      female: 'רווקה'
+    },
+    'נשוי/אה': {
+      male: 'נשוי',
+      female: 'נשואה'
+    },
+    'גרוש/ה': {
+      male: 'גרוש',
+      female: 'גרושה'
+    },
+    'אלמן/ה': {
+      male: 'אלמן',
+      female: 'אלמנה'
+    }
+  };
+
+  if (statusMap[status] && statusMap[status][gender]) {
+    return statusMap[status][gender];
+  }
+
+  // אם המגדר או המצב האישי עדיין לא הוגדרו,
+  // מציגים את הערך המקורי במקום לנחש.
+  return status;
+}
+  
 function renderMyInterests() {
   const content = document.getElementById('app-content');
   if (!content) return;
@@ -4137,8 +4195,11 @@ function renderFavorites() {
             </div>
 
             <div class="profile-tile-meta">
-              ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
-            </div>
+  ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
+  ${getGenderedStatus(profile)
+    ? ' · ' + escapeHTML(getGenderedStatus(profile))
+    : ''}
+</div>
 
             <div class="profile-tile-about">
               ${escapeHTML(getProfileAbout(profile))}

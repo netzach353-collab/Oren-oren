@@ -5445,10 +5445,12 @@ function showPage(page) {
   }
 
   // אם המשתמש עדיין לא מחובר, לא מציגים את תוכן האתר
-  if (!db.auth.getSession) {
-    renderLogin();
-    return;
-  }
+  // showPage לא מאפשר גישה למי שלא עבר אימות.
+// בדיקה זו מסתמכת על המשתמש שכבר אומת ונבדק באתחול.
+if (!currentUser) {
+  renderLogin();
+  return;
+}
 
   // הסרת מצבי התחברות והרשמה
   document.body.classList.remove('auth-only');
@@ -5515,20 +5517,28 @@ async function initApp() {
       throw new Error('קליינט Supabase לא אותחל');
     }
 
-    const { data: { session }, error } = await db.auth.getSession();
+    console.log('מתחילים בדיקת session...');
 
-    console.log('SESSION:', session);
-console.log('SESSION ERROR:', error);
-    
+    const { data, error } = await db.auth.getSession();
+
+    if (error) {
+      console.error('שגיאה בקריאת session:', error);
+      renderLogin();
+      return;
+    }
+
+    const session = data?.session;
+
     if (!session) {
-  console.error('אין סשן שמור בדפדפן');
-  renderLogin();
-  return;
-}
+      console.warn('לא נמצא session בדפדפן');
+      renderLogin();
+      return;
+    }
 
-console.log('יש סשן למשתמש:', session.user.id);
+    console.log('נמצא session:', session.user?.id);
+    console.log('אימייל:', session.user?.email);
 
-await afterAuthSuccess(session.user);
+    await afterAuthSuccess(session.user);
   } catch (err) {
     console.error('שגיאת אתחול:', err);
     renderLogin();
@@ -5536,6 +5546,7 @@ await afterAuthSuccess(session.user);
 }
 
 initApp();
+
 </script>
 
 </body>

@@ -2590,6 +2590,34 @@ console.log('Supabase initialized:', !!db);
 </script>
   
   <script>
+  let swipeProfiles = [];
+  
+  async function loadSwipeProfiles() {
+  if (!currentUser) return;
+
+  const { data, error } = await db
+    .from('profiles')
+    .select('id, name, birth_date, city, occupation, status, about')
+    .eq('registered', true)
+    .neq('id', currentUser.id);
+
+  if (error) {
+    console.error('שגיאה בטעינת פרופילים:', error);
+    alert('לא הצלחנו לטעון פרופילים: ' + error.message);
+    return;
+  }
+
+  swipeProfiles = (data || []).map(profile => ({
+    ...profile,
+    age: profile.birth_date
+      ? calculateAge(profile.birth_date)
+      : null,
+    bio: profile.about || '',
+    photo: ''
+  }));
+
+  console.log('פרופילים שנטענו מ־Supabase:', swipeProfiles);
+}
   
 async function loginWithGoogle() {
   const { error } = await db.auth.signInWithOAuth({
@@ -2703,12 +2731,39 @@ document.body.classList.remove('registration-mode');
     return;
   }
 
-  showPage('home');
+  await loadSwipeProfiles();
+showPage('home');
 }
 
   
   
+function renderLogin() {
+  const content = document.getElementById('app-content');
+  if (!content) return;
 
+  document.body.classList.add('auth-only');
+
+  content.innerHTML = `
+    <section class="auth-page">
+      <div class="auth-card">
+        <div class="auth-heading">
+          <h1>כניסה ללב אל לב</h1>
+          <p>היכנס עם חשבון Google כדי להמשיך</p>
+        </div>
+
+        <button type="button" class="login-google-btn" onclick="loginWithGoogle()">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          כניסה עם Google
+        </button>
+      </div>
+    </section>
+  `;
+}
   
 let lockedRegisterFields = {};
 
@@ -4666,7 +4721,53 @@ const citySuggestions = [
   'קריית גת',
   'קריית שמונה'
 ];
+  
+async function loadPersonalDetailsFromSupabase() {
+  if (!currentUser) {
+    throw new Error('אין משתמש מחובר');
+  }
 
+  const { data: profile, error } = await db
+    .from('profiles')
+    .select('*')
+    .eq('id', currentUser.id)
+    .single();
+
+  if (error) {
+    console.error('שגיאה בטעינת הפרטים האישיים:', error);
+    alert('לא הצלחנו לטעון את הפרטים: ' + error.message);
+    return false;
+  }
+
+  const details = {
+    ...personalDefaultDetails,
+    name: profile.name || '',
+    phone: profile.phone || '',
+    email: profile.email || currentUser.email || '',
+    birthDate: profile.birth_date || '',
+    city: profile.city || '',
+    occupation: profile.occupation || '',
+    status: profile.status || '',
+    children: profile.children || '',
+    religiousView: profile.religious_view || '',
+    height: profile.height || '',
+    relationshipGoal: profile.relationship_goal || '',
+    service: profile.service || '',
+    languages: Array.isArray(profile.languages)
+      ? profile.languages
+      : [],
+    smoker: profile.smoker || '',
+    health: profile.health || '',
+    kosher: profile.kosher || '',
+    about: profile.about || ''
+  };
+
+  details.age = calculateAge(details.birthDate);
+
+  savePersonalDetails(details);
+
+  return true;
+}
 
 function getPersonalDetails() {
   const saved = readMatchData(PERSONAL_KEY, {});
@@ -4676,10 +4777,8 @@ function getPersonalDetails() {
     ...saved
   };
 
-  // הגיל מחושב מתאריך הלידה ולא נערך ידנית
   details.age = calculateAge(details.birthDate);
 
-  // תמיכה בנתוני שפות ישנים
   if (!Array.isArray(details.languages)) {
     details.languages = details.languages
       ? String(details.languages)
@@ -5151,13 +5250,12 @@ function renderPersonalDetails(details) {
 `;
 }
 
-function saveAllPersonalDetails() {
+async function saveAllPersonalDetails() {
   const form = document.getElementById('personal-details-form');
-  if (!form) return;
+  if (!form || !currentUser) return;
 
   const formData = new FormData(form);
   const details = getPersonalDetails();
-
 
   const textFields = [
     'city',
@@ -5181,14 +5279,37 @@ function saveAllPersonalDetails() {
     .map(value => String(value).trim())
     .filter(Boolean);
 
-  savePersonalDetails(details);
+  const profileUpdate = {
+    city: details.city || null,
+    occupation: details.occupation || null,
+    status: details.status || null,
+    children: details.children || null,
+    religious_view: details.religiousView || null,
+    height: details.height || null,
+    relationship_goal: details.relationshipGoal || null,
+    service: details.service || null,
+    languages: details.languages,
+    smoker: details.smoker || null,
+    health: details.health || null,
+    kosher: details.kosher || null
+  };
 
-  // מרעננים את הטופס עם הנתונים שנשמרו.
+  const { error } = await db
+    .from('profiles')
+    .update(profileUpdate)
+    .eq('id', currentUser.id);
+
+  if (error) {
+    console.error('שגיאה בשמירת הפרטים:', error);
+    alert('לא הצלחנו לשמור את הפרטים: ' + error.message);
+    return;
+  }
+
+  savePersonalDetails(details);
   renderPersonal();
 
   alert('הפרטים נשמרו בהצלחה.');
 }
-
 function renderPersonalPrivacy() {
   const privacy = getPersonalPrivacy();
 
@@ -5470,9 +5591,12 @@ if (!currentUser) {
       break;
 
     case 'personal':
+  loadPersonalDetailsFromSupabase().then(success => {
+    if (success) {
       renderPersonal();
-      break;
-
+    }
+  });
+  break;
     case 'notifications':
       renderNotifications();
       break;
@@ -5485,7 +5609,32 @@ if (!currentUser) {
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
- 
+ async function debugAuth() {
+  const { data, error } = await db.auth.getSession();
+
+  console.log('SESSION:', data?.session);
+  console.log('AUTH ERROR:', error);
+
+  const { data: userData, error: userError } =
+    await db.auth.getUser();
+
+  console.log('USER:', userData?.user);
+  console.log('USER ERROR:', userError);
+
+  if (userData?.user) {
+    const { data: profile, error: profileError } =
+      await db
+        .from('profiles')
+        .select('*')
+        .eq('id', userData.user.id)
+        .maybeSingle();
+
+    console.log('MY PROFILE:', profile);
+    console.log('PROFILE ERROR:', profileError);
+  }
+}
+
+debugAuth();
 async function initApp() {
   try {
     if (!db || !db.auth) {

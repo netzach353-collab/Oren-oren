@@ -2402,6 +2402,34 @@ body.registration-mode .bottom-menu {
 }
 
 
+/* כותרת בזמן הרשמה — רק השדכן והאייקון */
+body.registration-mode .topbar-inner {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+body.registration-mode .topbar-inner > .brand {
+  display: none !important;
+}
+
+body.registration-mode .topbar-inner > .icon-button {
+  display: none !important;
+}
+
+body.registration-mode .topbar-inner > .brand-title {
+  display: flex !important;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  margin: 0;
+}
+
 </style>
 </head>
 
@@ -5406,6 +5434,78 @@ function renderNotifications() {
   `;
 }
 
+  
+  
+function showPage(page) {
+  const content = document.getElementById('app-content');
+  document.body.classList.remove('registration-mode');
+  if (!content) {
+    console.error('לא נמצא האלמנט app-content');
+    return;
+  }
+
+  // אם המשתמש עדיין לא מחובר, לא מציגים את תוכן האתר
+  if (!db.auth.getSession) {
+    renderLogin();
+    return;
+  }
+
+  // הסרת מצבי התחברות והרשמה
+  document.body.classList.remove('auth-only');
+  document.body.classList.remove('registration-mode');
+
+  // עדכון הסרגל התחתון
+  document.querySelectorAll('.bottom-item').forEach(item => {
+    item.classList.remove('active');
+  });
+
+  const navItems = {
+    swipe: 0,
+    profiles: 1,
+    favorites: 2,
+    personal: 3
+  };
+
+  if (Object.prototype.hasOwnProperty.call(navItems, page)) {
+    const items = document.querySelectorAll('.bottom-item');
+    items[navItems[page]]?.classList.add('active');
+  }
+
+  // הצגת המסך המבוקש
+  switch (page) {
+    case 'home':
+    case 'swipe':
+      renderSwipe();
+      break;
+
+    case 'profiles':
+      renderProfiles();
+      break;
+
+    case 'favorites':
+      renderFavorites();
+      break;
+
+    case 'my-interests':
+      renderMyInterests();
+      break;
+
+    case 'personal':
+      renderPersonal();
+      break;
+
+    case 'notifications':
+      renderNotifications();
+      break;
+
+    default:
+      console.warn('מסך לא מוכר:', page);
+      renderSwipe();
+  }
+
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
  
  // בסוף ה־script, במקום: showPage('home');
 
@@ -5417,15 +5517,18 @@ async function initApp() {
 
     const { data: { session }, error } = await db.auth.getSession();
 
-    if (error) throw error;
-
+    console.log('SESSION:', session);
+console.log('SESSION ERROR:', error);
+    
     if (!session) {
-      renderLogin();
-      return;
-    }
+  console.error('אין סשן שמור בדפדפן');
+  renderLogin();
+  return;
+}
 
-    await afterAuthSuccess(session.user);
+console.log('יש סשן למשתמש:', session.user.id);
 
+await afterAuthSuccess(session.user);
   } catch (err) {
     console.error('שגיאת אתחול:', err);
     renderLogin();

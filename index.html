@@ -2390,42 +2390,36 @@ body.auth-only {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  const SUPABASE_URL = 'https://kxttoscdrdyckbhhhyvl.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_XbYvk8WDbZOSeZvtP4IDkg_r0TwmNrs';
+const SUPABASE_URL = 'https://kxttoscdrdyckbhhhyvl.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_XbYvk8WDbZOSeZvtP4IDkg_r0TwmNrs';
 
-  let supabase = null;
-  try {
-    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-      throw new Error('ספריית Supabase לא נטענה');
-    }
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    console.log('Supabase client initialized successfully');
-  } catch (e) {
-    console.error('Supabase init failed:', e);
-  }
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+console.log('Supabase initialized:', !!db);
 </script>
   
-<script>
+  <script>
+  
 async function loginWithGoogle() {
-  if (!supabase || !supabase.auth) {
-    alert('שגיאה: קליינט Supabase לא אותחל. בדוק את הטעינה של ה-CDN ואת המפתח.');
-    return;
-  }
-  try {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: window.location.origin + window.location.pathname,
-                 queryParams: { prompt: 'select_account' } }
-    });
-    if (error) { alert('שגיאה: ' + error.message); return; }
-    if (data?.url) window.location.href = data.url;
-  } catch (e) { alert('שגיאה: ' + e.message); }
-}
-</script>
-  
-<script>
-  
+  const { error } = await db.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo:
+        window.location.origin + window.location.pathname,
+      queryParams: {
+        prompt: 'select_account'
+      }
+    }
+  });
 
+  if (error) {
+    console.error('Google login error:', error);
+    alert('שגיאה בהתחברות עם Google: ' + error.message);
+  }
+}
   
   async function finishRegistration() {
   collectRegisterStep();
@@ -2487,10 +2481,7 @@ if (error) {
     renderLogin();
     return;
   }
-    if (insertError) {
-  console.error('profile insert error:', insertError);
-  alert('שגיאה ביצירת פרופיל: ' + insertError.message);
-}
+    
 
   const { data: profile, error } = await supabase
     .from('profiles')
@@ -4790,7 +4781,13 @@ function renderNotifications() {
 
 async function initApp() {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    if (!db || !db.auth) {
+      throw new Error('קליינט Supabase לא אותחל');
+    }
+
+    const { data: { session }, error } = await db.auth.getSession();
+
+    if (error) throw error;
 
     if (!session) {
       renderLogin();
@@ -4798,8 +4795,9 @@ async function initApp() {
     }
 
     await afterAuthSuccess(session.user);
+
   } catch (err) {
-    console.error(err);
+    console.error('שגיאת אתחול:', err);
     renderLogin();
   }
 }

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
@@ -2242,6 +2241,22 @@ body.auth-only {
   cursor: pointer;
   text-decoration: underline;
 }
+  
+  /* הסתרת הסרגל התחתון בזמן התחברות והרשמה */
+body.auth-only .bottom-nav,
+body.auth-only .bottom-navigation,
+body.auth-only .bottom-bar,
+body.auth-only .bottom-menu {
+  display: none !important;
+}
+
+/* בזמן ההרשמה מסתירים גם את הסרגל התחתון */
+body.registration-mode .bottom-nav,
+body.registration-mode .bottom-navigation,
+body.registration-mode .bottom-bar,
+body.registration-mode .bottom-menu {
+  display: none !important;
+}
 </style>
 </head>
 
@@ -2474,7 +2489,7 @@ async function finishRegistration() {
 
   document.body.classList.remove('auth-only');
   registerStep = 1;
-
+document.body.classList.remove('registration-mode');
   alert('ההרשמה הושלמה בהצלחה');
   showPage('home');
 }
@@ -2500,7 +2515,7 @@ async function afterAuthSuccess(user) {
   }
 
   document.body.classList.remove('auth-only');
-
+document.body.classList.remove('registration-mode');
   if (!profile || !profile.registered || !profile.name) {
     prepareRegistrationFromProfile(profile, user);
 
@@ -2707,7 +2722,7 @@ const registerData = {
 function renderRegister() {
   const content = document.getElementById('app-content');
   if (!content) return;
-
+document.body.classList.add('registration-mode');
   const stepTitles = {
     1: 'יצירת חשבון',
     2: 'פרטים בסיסיים',
@@ -2750,11 +2765,6 @@ function renderRegister() {
             onclick="registerNextStep()">
             ${registerStep === REGISTER_TOTAL_STEPS ? 'סיום הרשמה' : 'המשך'}
           </button>
-        </div>
-
-        <div class="auth-switch">
-          כבר יש לך חשבון?
-          <button type="button" onclick="alert('מסך התחברות יתווסף בהמשך')">התחברות</button>
         </div>
       </div>
     </section>
@@ -2805,14 +2815,30 @@ function renderRegisterStep(step) {
       </div>
 
       <div class="auth-form-group ${isLocked('birthDate') ? 'auth-locked-field' : ''}">
-        <label for="reg-birth">
-          ${labelWithLock('תאריך לידה', 'birthDate')}
-        </label>
-        <input id="reg-birth" name="birthDate" type="date" required
-          value="${escapeHTML(registerData.birthDate)}"
-          ${lockAttrs('birthDate')}>
-        <div class="auth-hint">הגיל יחושב אוטומטית מתאריך הלידה.</div>
-      </div>
+  <label for="reg-birth">
+    ${labelWithLock('תאריך לידה', 'birthDate')}
+  </label>
+
+  <input
+    id="reg-birth"
+    name="birthDate"
+    type="text"
+    inputmode="numeric"
+    autocomplete="bday"
+    placeholder="DD/MM/YYYY"
+    maxlength="10"
+    required
+    dir="ltr"
+    value="${escapeHTML(registerData.birthDate ? registerData.birthDate.split('-').reverse().join('/') : '')}"
+    oninput="formatBirthDateInput(this)"
+    ${lockAttrs('birthDate')}
+  >
+
+  <div class="auth-hint">
+    אפשר להקליד תאריך באמצעות המספרים, למשל 15/08/1998.
+    הגיל יחושב אוטומטית.
+  </div>
+</div>
     
 <div class="auth-form-group ${isLocked('phone') ? 'auth-locked-field' : ''}">
   <label for="reg-phone">
@@ -3012,6 +3038,21 @@ function renderRegisterStep(step) {
     </div>
   `;
 }
+  
+  function formatBirthDateInput(input) {
+  let digits = input.value.replace(/\D/g, '').slice(0, 8);
+
+  if (digits.length > 4) {
+    digits = digits.slice(0, 2) + '/' +
+             digits.slice(2, 4) + '/' +
+             digits.slice(4);
+  } else if (digits.length > 2) {
+    digits = digits.slice(0, 2) + '/' +
+             digits.slice(2);
+  }
+
+  input.value = digits;
+}
 
 function collectRegisterStep() {
   const form = document.getElementById('register-form');
@@ -3027,7 +3068,12 @@ function collectRegisterStep() {
 
   if (registerStep === 2) {
     registerData.name = String(fd.get('name') || '').trim();
-    registerData.birthDate = String(fd.get('birthDate') || '');
+    const birthInput = String(fd.get('birthDate') || '').trim();
+const match = birthInput.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+
+registerData.birthDate = match
+  ? `${match[3]}-${match[2]}-${match[1]}`
+  : birthInput;
     registerData.phone = String(fd.get('phone') || '').trim();
     registerData.city = String(fd.get('city') || '').trim();
   }
@@ -3051,35 +3097,60 @@ function collectRegisterStep() {
   }
 }
 
+
 function validateRegisterStep() {
   if (registerStep === 1) {
     if (!registerData.email || !registerData.email.includes('@')) {
       alert('יש להזין אימייל תקין.');
       return false;
     }
-    if (registerData.password.length < 6) {
-      alert('הסיסמה חייבת להכיל לפחות 6 תווים.');
-      return false;
-    }
-    if (registerData.password !== registerData.passwordConfirm) {
-      alert('הסיסמאות אינן תואמות.');
-      return false;
-    }
+
+    // אין בדיקת סיסמה כי ההתחברות מתבצעת באמצעות Google.
   }
 
   if (registerStep === 2) {
-    if (!registerData.name) {
+    if (!registerData.name || !registerData.name.trim()) {
       alert('יש להזין שם.');
       return false;
     }
+
     if (!registerData.birthDate) {
       alert('יש להזין תאריך לידה.');
+      return false;
+    }
+
+    const match = registerData.birthDate.match(
+      /^(\d{4})-(\d{2})-(\d{2})$/
+    );
+
+    if (!match) {
+      alert('יש להזין תאריך לידה תקין.');
+      return false;
+    }
+
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+
+    const birth = new Date(year, month - 1, day);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (
+      year < 1900 ||
+      birth.getFullYear() !== year ||
+      birth.getMonth() !== month - 1 ||
+      birth.getDate() !== day ||
+      birth > today
+    ) {
+      alert('יש להזין תאריך לידה תקין.');
       return false;
     }
   }
 
   return true;
 }
+
 
 function registerNextStep() {
   collectRegisterStep();

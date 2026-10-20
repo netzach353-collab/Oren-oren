@@ -3395,50 +3395,63 @@ function showRegistrationErrors(missingFields) {
   input.value = digits;
 }
 
+
 function collectRegisterStep() {
   const form = document.getElementById('register-form');
   if (!form) return;
 
   const fd = new FormData(form);
 
+  const getValue = (key) => {
+    if (lockedRegisterFields[key]) {
+      return registerData[key] ?? '';
+    }
+
+    return String(fd.get(key) || '').trim();
+  };
+
   if (registerStep === 1) {
-    registerData.email = String(fd.get('email') || '').trim();
-    registerData.password = String(fd.get('password') || '');
-    registerData.passwordConfirm = String(fd.get('passwordConfirm') || '');
+    registerData.email = getValue('email');
+    registerData.password = getValue('password');
+    registerData.passwordConfirm = getValue('passwordConfirm');
   }
 
   if (registerStep === 2) {
-    registerData.name = String(fd.get('name') || '').trim();
-    const birthInput = String(fd.get('birthDate') || '').trim();
-const match = birthInput.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    registerData.name = getValue('name');
 
-registerData.birthDate = match
-  ? `${match[3]}-${match[2]}-${match[1]}`
-  : birthInput;
-    registerData.phone = String(fd.get('phone') || '').trim();
-    registerData.city = String(fd.get('city') || '').trim();
+    const birthInput = getValue('birthDate');
+    const match = birthInput.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+
+    registerData.birthDate = match
+      ? `${match[3]}-${match[2]}-${match[1]}`
+      : birthInput;
+
+    registerData.phone = getValue('phone');
+    registerData.city = getValue('city');
   }
 
   if (registerStep === 3) {
-    registerData.occupation = String(fd.get('occupation') || '').trim();
-    registerData.status = String(fd.get('status') || '');
-    registerData.children = String(fd.get('children') || '');
-    registerData.religiousView = String(fd.get('religiousView') || '');
-    registerData.height = String(fd.get('height') || '');
-    registerData.service = String(fd.get('service') || '');
+    registerData.occupation = getValue('occupation');
+    registerData.status = getValue('status');
+    registerData.children = getValue('children');
+    registerData.religiousView = getValue('religiousView');
+    registerData.height = getValue('height');
+    registerData.service = getValue('service');
   }
 
   if (registerStep === 4) {
-    registerData.relationshipGoal = String(fd.get('relationshipGoal') || '');
-    registerData.languages = fd.getAll('languages').map(String);
-    registerData.smoker = String(fd.get('smoker') || '');
-    registerData.health = String(fd.get('health') || '');
-    registerData.kosher = String(fd.get('kosher') || '');
-    registerData.about = String(fd.get('about') || '').trim();
+    registerData.relationshipGoal = getValue('relationshipGoal');
+
+    registerData.languages = lockedRegisterFields.languages
+      ? registerData.languages
+      : fd.getAll('languages').map(String);
+
+    registerData.smoker = getValue('smoker');
+    registerData.health = getValue('health');
+    registerData.kosher = getValue('kosher');
+    registerData.about = getValue('about');
   }
 }
-
-
 
 
 function validateRegisterStep() {

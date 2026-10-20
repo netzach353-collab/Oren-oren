@@ -2596,30 +2596,7 @@ console.log('Supabase initialized:', !!db);
 async function loadSwipeProfiles() {
   if (!currentUser) return;
 
-  const { data, error } = await db
-    .from('profiles')
-    .select(`
-      id,
-      name,
-      gender,
-      birth_date,
-      city,
-      occupation,
-      status,
-      children,
-      religious_view,
-      height,
-      service,
-      relationship_goal,
-      languages,
-      smoker,
-      health,
-      kosher,
-      about,
-      registered
-    `)
-    .eq('registered', true)
-    .neq('id', currentUser.id);
+  const { data, error } = await db.rpc('get_swipe_profiles');
 
   if (error) {
     console.error('שגיאה בטעינת פרופילים:', error);

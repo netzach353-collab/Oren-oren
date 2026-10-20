@@ -2617,7 +2617,9 @@ async function finishRegistration() {
     data: { user },
     error: userError
   } = await db.auth.getUser();
-
+  
+currentUser = user;
+  
   if (userError || !user) {
     alert('פג תוקף ההתחברות. יש להתחבר מחדש.');
     renderLogin();
@@ -2674,6 +2676,7 @@ async function afterAuthSuccess(user) {
     renderLogin();
     return;
   }
+  currentUser = user;
 
   const { data: profile, error } = await db
     .from('profiles')

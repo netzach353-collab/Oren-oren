@@ -125,10 +125,6 @@ body {
   right: 8px;
 }
 
-
-
-
-
 /* תוכן */
 .container {
   max-width: 1100px;
@@ -193,13 +189,7 @@ body {
   
 }
 
-@media (max-width: 390px) {
-  .brand-name {
-    display: none;
-  }
 
-  
-}
  
  
 /* סרגל ניווט תחתון */
@@ -3046,6 +3036,49 @@ body.registration-mode .topbar-inner > .brand-title {
   cursor: pointer;
 }
 
+
+
+.profile-interest-btn.interest-mutual {
+  background: linear-gradient(135deg, #176b52, #20866a);
+  color: #ffffff;
+  border: 1px solid rgba(130, 255, 207, 0.35);
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: default;
+  opacity: 1;
+  box-shadow: 0 4px 14px rgba(23, 107, 82, 0.2);
+}
+
+.profile-interest-btn.interest-mutual:disabled {
+  opacity: 1;
+  cursor: default;
+}
+
+/* מונה התראות בסרגל העליון */
+.icon-button {
+  position: relative;
+}
+
+.notification-dot {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 19px;
+  height: 19px;
+  padding: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
 </style>
 </head>
 
@@ -3065,7 +3098,6 @@ body.registration-mode .topbar-inner > .brand-title {
           <path d="M12 20s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6.5-8 11-8 11Z"/>
         </svg>
       </div>
-      <span class="brand-name">לב אל לב</span>
     </div>
 <div class="brand-title">
   <span>השדכן</span>
@@ -3123,8 +3155,8 @@ body.registration-mode .topbar-inner > .brand-title {
         <path d="M10 21h4"/>
       </svg>
 
-      <span class="notification-dot"></span>
-    </button>
+<span class="notification-dot" id="notification-count">0</span> 
+   </button>
 
   </div>
 </header>
@@ -4576,53 +4608,83 @@ function renderProfiles() {
   return status;
 }
   
-function renderMyInterests() {
+
+async function renderMyInterests() {
   const content = document.getElementById('app-content');
   if (!content) return;
 
-  // הפרופילים שבהם המשתמש הביע עניין
-  const sent = readMatchData('lev_sent_interests', []);
-
-  const interestedProfiles = sent
-    .map(item => getProfileById(item.profileId))
-    .filter(Boolean);
+  if (!currentUser || !db) {
+    content.innerHTML = `
+      <div class="profiles-empty">
+        <strong>צריך להתחבר לאתר</strong>
+      </div>
+    `;
+    return;
+  }
 
   content.innerHTML = `
-  <div class="interested-page-toolbar">
-  <button
-    type="button"
-    class="my-interests-link"
-    onclick="showPage('favorites')">
+    <div class="interested-page-toolbar">
+      <button
+        type="button"
+        class="my-interests-link"
+        onclick="showPage('favorites')">
+        ♥ יתעניינו בי
+      </button>
+    </div>
 
-    <svg viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linecap="round"
-      stroke-linejoin="round">
-      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>
-    </svg>
-
-    יתעניינו בי
-  </button>
-</div>
     <section class="interested-heading">
-
-     
-
       <h2>הפרופילים שהתעניינתי בהם</h2>
-
-      <p>
-        כאן מרוכזים כל הפרופילים שסימנת בהם עניין.
-      </p>
-
+      <p>כאן מרוכזים כל הפרופילים שסימנת בהם עניין.</p>
     </section>
 
     <div class="profiles-grid interested-grid">
+      <div class="profiles-empty">טוען התעניינויות...</div>
+    </div>
+  `;
 
-      ${interestedProfiles.length
-        ? interestedProfiles.map(profile => `
-          <article class="profile-tile interested-card"
+  try {
+    // טעינת ההתעניינויות שנשלחו על ידי המשתמש מ-Supabase
+    const { data: interests, error: interestsError } = await db
+      .from('profile_interests')
+      .select('id, receiver_id, created_at')
+      .eq('sender_id', currentUser.id)
+      .order('created_at', { ascending: false });
+
+    if (interestsError) throw interestsError;
+
+    const profileIds = [
+      ...new Set((interests || []).map(item => item.receiver_id))
+    ];
+
+    let profiles = [];
+
+    if (profileIds.length) {
+      const { data, error: profilesError } = await db
+        .from('profiles')
+        .select('*')
+        .in('id', profileIds);
+
+      if (profilesError) throw profilesError;
+
+      profiles = data || [];
+    }
+
+    const profilesById = new Map(
+      profiles.map(profile => [String(profile.id), profile])
+    );
+
+    // שומרים על סדר ההתעניינויות לפי תאריך השליחה
+    const interestedProfiles = profileIds
+      .map(id => profilesById.get(String(id)))
+      .filter(Boolean);
+
+    const grid = content.querySelector('.interested-grid');
+    if (!grid) return;
+
+    grid.innerHTML = interestedProfiles.length
+      ? interestedProfiles.map(profile => `
+          <article
+            class="profile-tile interested-card"
             onclick="openProfileDetailFromMyInterests('${escapeHTML(profile.id)}')">
 
             <img
@@ -4631,9 +4693,11 @@ function renderMyInterests() {
               loading="lazy">
 
             <div class="profile-tile-info interested-card-info">
-
               <div class="profile-tile-name">
-                ${escapeHTML(getProfileName(profile))}${getProfileAge(profile) ? ', ' + getProfileAge(profile) : ''}
+                ${escapeHTML(getProfileName(profile))}
+                ${getProfileAge(profile)
+                  ? ', ' + getProfileAge(profile)
+                  : ''}
               </div>
 
               <div class="profile-tile-meta">
@@ -4649,24 +4713,31 @@ function renderMyInterests() {
                   לצפייה בפרופיל ←
                 </span>
               </div>
-
             </div>
           </article>
         `).join('')
-        : `
+      : `
           <div class="profiles-empty">
             <strong>עדיין לא סימנת פרופילים</strong>
-            <p>
-              כשתביע עניין בפרופיל באמצעות ההחלקה
-              או כפתור ההתעניינות, הוא יופיע כאן.
-            </p>
+            <p>כשתביע עניין בפרופיל, הוא יופיע כאן.</p>
           </div>
-        `
-      }
+        `;
 
-    </div>
-  `;
+  } catch (error) {
+    console.error('שגיאה בטעינת ההתעניינויות:', error);
+
+    const grid = content.querySelector('.interested-grid');
+    if (grid) {
+      grid.innerHTML = `
+        <div class="profiles-empty">
+          <strong>לא הצלחנו לטעון את ההתעניינויות</strong>
+          <p>נסה שוב בעוד רגע.</p>
+        </div>
+      `;
+    }
+  }
 }
+
 
 function openProfileDetailFromMyInterests(id) {
   openProfileDetail(id);
@@ -4696,7 +4767,6 @@ function resetProfileFilters() {
 }
 
 
-
 async function openProfileDetail(id) {
   const profile = getProfileById(id);
   if (!profile) return;
@@ -4705,23 +4775,40 @@ async function openProfileDetail(id) {
   if (!content) return;
 
   const image = getProfileImage(profile);
-  let alreadySent = false;
+let alreadySent = false;
+let mutualInterest = false;
+let receivedInterest = false;
 
   if (currentUser && String(id) !== String(currentUser.id)) {
-    const { data, error } = await db
+    const { data: outgoing, error: outgoingError } = await db
       .from('profile_interests')
       .select('id')
       .eq('sender_id', currentUser.id)
       .eq('receiver_id', id)
       .maybeSingle();
 
-    if (error) {
-      console.error('שגיאה בבדיקת מצב ההתעניינות:', error);
+    if (outgoingError) {
+      console.error('שגיאה בבדיקת התעניינות יוצאת:', outgoingError);
       alert('לא הצלחנו לבדוק את מצב ההתעניינות. נסה שוב.');
       return;
     }
 
-    alreadySent = !!data;
+    const { data: incoming, error: incomingError } = await db
+      .from('profile_interests')
+      .select('id')
+      .eq('sender_id', id)
+      .eq('receiver_id', currentUser.id)
+      .maybeSingle();
+
+    if (incomingError) {
+      console.error('שגיאה בבדיקת התעניינות נכנסת:', incomingError);
+      alert('לא הצלחנו לבדוק אם קיימת התאמה הדדית. נסה שוב.');
+      return;
+    }
+
+  alreadySent = !!outgoing;
+mutualInterest = alreadySent && !!incoming;
+receivedInterest = !!incoming && !alreadySent;
   }
 
   const age = getProfileAge(profile);
@@ -4754,7 +4841,6 @@ async function openProfileDetail(id) {
     return escapeHTML(String(value));
   };
 
-  // אייקונים לכל סוג של פרט
   const icons = {
     'עיר': '<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
     'עיסוק': '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V4h8v3M3 12h18M10 12v2h4v-2"/>',
@@ -4807,9 +4893,40 @@ async function openProfileDetail(id) {
     `)
     .join('');
 
+  const interestButton = mutualInterest
+  ? `
+    <button
+      class="profile-interest-btn interest-mutual"
+      type="button"
+      onclick="sendProfileInterest('${escapeHTML(profile.id)}')"
+    >
+      יש התאמה הדדית · לחץ לביטול
+    </button>
+  `
+  : receivedInterest
+    ? `
+      <button
+        class="profile-interest-btn"
+        type="button"
+        onclick="sendProfileInterest('${escapeHTML(profile.id)}')"
+      >
+        ${escapeHTML(name)} מעוניין/ת בך · לאשר?
+      </button>
+    `
+    : currentUser && String(id) !== String(currentUser.id)
+      ? `
+        <button
+          class="profile-interest-btn ${alreadySent ? 'cancel-interest' : ''}"
+          type="button"
+          onclick="sendProfileInterest('${escapeHTML(profile.id)}')"
+        >
+          ${alreadySent ? 'ביטול' : 'אני מעוניין/ת'}
+        </button>
+      `
+      : '';
+
   content.innerHTML = `
     <section class="profile-detail profile-detail-luxury">
-
       <div class="profile-detail-hero">
         <img
           class="profile-detail-photo"
@@ -4820,6 +4937,7 @@ async function openProfileDetail(id) {
         <div class="profile-detail-hero-overlay">
           <div class="profile-detail-hero-name">
             <h2>${escapeHTML(name)}${age ? ', ' + age : ''}</h2>
+
             ${hasValue(city) ? `
               <div class="profile-detail-city">
                 <svg viewBox="0 0 24 24" width="17" height="17"
@@ -4836,7 +4954,6 @@ async function openProfileDetail(id) {
       </div>
 
       <div class="profile-detail-body">
-
         ${hasValue(about) ? `
           <section class="profile-detail-about">
             <h3>
@@ -4871,20 +4988,12 @@ async function openProfileDetail(id) {
             חזרה לפרופילים
           </button>
 
-          <button
-            class="profile-interest-btn ${alreadySent ? 'cancel-interest' : ''}"
-            type="button"
-            onclick="sendProfileInterest('${escapeHTML(profile.id)}')"
-          >
-            ${alreadySent ? 'ביטול' : 'אני מעוניין/ת'}
-          </button>
+          ${interestButton}
         </div>
-
       </div>
     </section>
   `;
 }
-
 
 
 async function sendProfileInterest(id) {
@@ -4915,6 +5024,15 @@ async function sendProfileInterest(id) {
 
     if (checkError) throw checkError;
 
+    const { data: reciprocal, error: reciprocalError } = await db
+      .from('profile_interests')
+      .select('id')
+      .eq('sender_id', profile.id)
+      .eq('receiver_id', currentUser.id)
+      .maybeSingle();
+
+    if (reciprocalError) throw reciprocalError;
+
     if (existing) {
       const { error: deleteError } = await db
         .from('profile_interests')
@@ -4929,7 +5047,11 @@ async function sendProfileInterest(id) {
 
       saveMatchData('lev_sent_interests', sent);
 
-      alert('בקשת ההתעניינות בוטלה.');
+      alert(
+        reciprocal
+          ? 'ההתעניינות שלך בוטלה. ההתאמה ההדדית הסתיימה.'
+          : 'בקשת ההתעניינות בוטלה.'
+      );
     } else {
       const { error: insertError } = await db
         .from('profile_interests')
@@ -4951,7 +5073,11 @@ async function sendProfileInterest(id) {
 
       saveMatchData('lev_sent_interests', sent);
 
-      alert('בקשת ההתעניינות נשלחה בהצלחה.');
+      alert(
+        reciprocal
+          ? 'יש התאמה הדדית! שניכם מעוניינים זה בזו.'
+          : 'בקשת ההתעניינות נשלחה בהצלחה.'
+      );
     }
 
     await openProfileDetail(profile.id);
@@ -4961,6 +5087,7 @@ async function sendProfileInterest(id) {
     alert('הפעולה נכשלה: ' + (error.message || 'שגיאה לא ידועה'));
   }
 }
+
 
 
 function readMatchData(key, fallback) {
@@ -5486,34 +5613,100 @@ function swipePointerCancel() {
   swipeCurrentY = 0;
 }
 
-function recordSwipe(profileId, decision) {
+
+async function recordSwipe(profileId, decision) {
+  const id = String(profileId);
   const decisions = readMatchData("lev_interest_decisions", []);
 
-  if (decisions.some(item => item.profileId === profileId)) {
+  if (decisions.some(item => String(item.profileId) === id)) {
     renderSwipe();
     return;
   }
 
-  decisions.push({
-    profileId,
-    decision,
-    date: new Date().toISOString()
-  });
+  // בדיקה שהפרופיל קיים
+  const profile = getProfileById(id);
 
-  saveMatchData("lev_interest_decisions", decisions);
+  if (!profile) {
+    alert("לא מצאנו את הפרופיל.");
+    renderSwipe();
+    return;
+  }
 
-  if (decision === "interested") {
+  // דילוג נשמר כהחלטה מקומית בלבד
+  if (decision === "no") {
+    decisions.push({
+      profileId: id,
+      decision: "no",
+      date: new Date().toISOString()
+    });
+
+    saveMatchData("lev_interest_decisions", decisions);
+    renderSwipe();
+    return;
+  }
+
+  // עניין מחייב משתמש מחובר וחיבור ל-Supabase
+  if (!currentUser || !db) {
+    alert("צריך להתחבר כדי להביע עניין.");
+    renderSwipe();
+    return;
+  }
+
+  if (String(currentUser.id) === id) {
+    renderSwipe();
+    return;
+  }
+
+  try {
+    // בדיקה אם כבר נשלח עניין
+    const { data: existing, error: checkError } = await db
+      .from("profile_interests")
+      .select("id")
+      .eq("sender_id", currentUser.id)
+      .eq("receiver_id", id)
+      .maybeSingle();
+
+    if (checkError) throw checkError;
+
+    // אם אין עניין קיים, שולחים אותו
+    if (!existing) {
+      const { error: insertError } = await db
+        .from("profile_interests")
+        .insert({
+          sender_id: currentUser.id,
+          receiver_id: id
+        });
+
+      if (insertError) throw insertError;
+    }
+
+    // מעדכנים את רשימת ההתעניינויות המקומית
     const sent = readMatchData("lev_sent_interests", []);
+    const alreadySaved = sent.some(
+      item => String(item.profileId) === id
+    );
 
-    if (!sent.some(item => item.profileId === profileId)) {
+    if (!alreadySaved) {
       sent.push({
-        profileId,
-        date: new Date().toISOString(),
-        status: "pending"
+        profileId: id,
+        status: "pending",
+        createdAt: new Date().toISOString()
       });
 
       saveMatchData("lev_sent_interests", sent);
     }
+
+    // שומרים החלטה רק לאחר הצלחה
+    decisions.push({
+      profileId: id,
+      decision: "interested",
+      date: new Date().toISOString()
+    });
+
+    saveMatchData("lev_interest_decisions", decisions);
+  } catch (error) {
+    console.error("שגיאה בשליחת התעניינות מהסוויפ:", error);
+    alert("לא הצלחנו לשלוח את ההתעניינות. אפשר לנסות שוב.");
   }
 
   renderSwipe();
@@ -5521,8 +5714,17 @@ function recordSwipe(profileId, decision) {
 
 function resetSwipeProfiles() {
   localStorage.removeItem("lev_interest_decisions");
+
+  // ערבוב Fisher–Yates בסדר אקראי חדש
+  for (let i = swipeProfiles.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [swipeProfiles[i], swipeProfiles[j]] =
+      [swipeProfiles[j], swipeProfiles[i]];
+  }
+
   renderSwipe();
 }
+
 
 const PERSONAL_KEY = 'lev_personal_details';
 const PERSONAL_PRIVACY_KEY = 'lev_personal_privacy';
@@ -6367,6 +6569,58 @@ function renderPersonalPrivacy() {
   `;
 }
 
+async function updateNotificationCount() {
+  const badge = document.getElementById('notification-count');
+  if (!badge) return;
+
+  try {
+    const { data: authData, error: authError } =
+      await db.auth.getUser();
+
+    if (authError) throw authError;
+
+    const user = authData?.user;
+
+    if (!user) {
+      badge.textContent = '0';
+      return;
+    }
+
+    const { data: interests, error: interestsError } = await db
+      .from('profile_interests')
+      .select('id, sender_id')
+      .eq('receiver_id', user.id);
+
+    if (interestsError) throw interestsError;
+
+    const { data: receipts, error: receiptsError } = await db
+      .from('interest_notifications_read')
+      .select('interest_id')
+      .eq('user_id', user.id);
+
+    if (receiptsError) throw receiptsError;
+
+    const readIds = new Set(
+      (receipts || []).map(item => String(item.interest_id))
+    );
+
+    const unreadSenders = new Set(
+      (interests || [])
+        .filter(item =>
+          item.sender_id &&
+          item.sender_id !== user.id &&
+          !readIds.has(String(item.id))
+        )
+        .map(item => String(item.sender_id))
+    );
+
+    badge.textContent = String(unreadSenders.size);
+  } catch (error) {
+    console.error('שגיאה בעדכון מונה ההתראות:', error);
+  }
+}
+
+
 function updatePersonalPrivacy(key, value) {
   if (!Object.prototype.hasOwnProperty.call(personalFieldLabels, key)) return;
   if (!['public', 'matched', 'private'].includes(value)) return;
@@ -6376,11 +6630,7 @@ function updatePersonalPrivacy(key, value) {
   savePersonalPrivacy(privacy);
 
   renderPersonal();
-}
-
-
- 
- 
+} 
 
 async function renderNotifications() {
   const content = document.getElementById('app-content');
@@ -6429,14 +6679,50 @@ async function renderNotifications() {
       return;
     }
 
+   
     const { data: interests, error: interestsError } = await db
       .from('profile_interests')
-      .select('sender_id')
+      .select('id, sender_id, created_at')
       .eq('receiver_id', user.id);
 
     if (interestsError) throw interestsError;
 
-    if (!interests || interests.length === 0) {
+    const { data: readReceipts, error: readError } = await db
+      .from('interest_notifications_read')
+      .select('interest_id')
+      .eq('user_id', user.id);
+
+    if (readError) throw readError;
+
+    const readIds = new Set(
+      (readReceipts || []).map(item => String(item.interest_id))
+    );
+
+    const unreadInterests = (interests || [])
+      .filter(item =>
+        item.sender_id &&
+        item.sender_id !== user.id &&
+        !readIds.has(String(item.id))
+      )
+      .sort((a, b) =>
+        new Date(b.created_at) - new Date(a.created_at)
+      );
+
+    // שומרים את בקשת ההתעניינות האחרונה שטרם נקראה
+    // מכל שולח, יחד עם ה-ID שלה לצורך סימון הקריאה.
+    const notificationInterestBySender = new Map();
+
+    unreadInterests.forEach(item => {
+      const senderId = String(item.sender_id);
+
+      if (!notificationInterestBySender.has(senderId)) {
+        notificationInterestBySender.set(senderId, item);
+      }
+    });
+
+    const senderIds = [...notificationInterestBySender.keys()];
+
+    if (!senderIds.length) {
       list.innerHTML = `
         <div class="notifications-empty">
           <div class="notifications-empty-icon">
@@ -6446,30 +6732,19 @@ async function renderNotifications() {
               <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/>
             </svg>
           </div>
-          <h3>עדיין אין בקשות התעניינות</h3>
+          <h3>אין התראות חדשות</h3>
           <p>כשמישהו או מישהי יתעניינו בך, הבקשה תופיע כאן.</p>
         </div>
       `;
       return;
     }
 
-    const senderIds = [
-      ...new Set(interests.map(item => item.sender_id))
-    ].filter(id => id && id !== user.id);
+const { data: profiles, error: profilesError } = await db
+  .from('profiles')
+  .select('*')
+  .in('id', senderIds);
 
-    if (!senderIds.length) {
-      list.innerHTML = `
-        <div class="notifications-empty">
-          אין בקשות התעניינות להצגה כרגע.
-        </div>
-      `;
-      return;
-    }
-
-    const { data: profiles, error: profilesError } = await db
-      .from('profiles')
-      .select('*')
-      .in('id', senderIds);
+if (profilesError) throw profilesError;
 
     if (profilesError) throw profilesError;
 
@@ -6510,6 +6785,9 @@ async function renderNotifications() {
           role="button"
           tabindex="0"
           data-profile-id="${escapeHTML(String(profile.id))}"
+          data-interest-id="${escapeHTML(
+  String(notificationInterestBySender.get(String(profile.id))?.id || '')
+)}"
           aria-label="${escapeHTML(message)}">
 
           <div class="notification-profile-photo">
@@ -6557,11 +6835,36 @@ async function renderNotifications() {
       `;
     }).join('');
 
-    // פתיחת הפרופיל בלחיצה או באמצעות מקלדת
+    
+    // פתיחת פרופיל וסימון ההתראה כנקראה ב-Supabase
     list.querySelectorAll('.interest-notification').forEach(item => {
-      const openProfile = () => {
+      const openProfile = async () => {
         const profileId = item.dataset.profileId;
-        if (profileId) openProfileDetail(profileId);
+        const interestId = item.dataset.interestId;
+
+        if (!profileId || !interestId) return;
+
+        try {
+          const { error } = await db
+            .from('interest_notifications_read')
+            .upsert(
+              {
+                user_id: user.id,
+                interest_id: interestId
+              },
+              {
+                onConflict: 'user_id,interest_id',
+                ignoreDuplicates: true
+              }
+            );
+
+          if (error) throw error;
+
+          await openProfileDetail(profileId);
+        } catch (error) {
+          console.error('שגיאה בסימון ההתראה כנקראה:', error);
+          alert('לא הצלחנו לשמור את קריאת ההתראה. נסה שוב.');
+        }
       };
 
       item.addEventListener('click', openProfile);
@@ -6573,6 +6876,7 @@ async function renderNotifications() {
         }
       });
     });
+
 
   } catch (error) {
     console.error('שגיאה בטעינת התראות:', error);
@@ -6589,6 +6893,8 @@ async function renderNotifications() {
       </div>
     `;
   }
+
+  await updateNotificationCount();
 }
 
 
@@ -6667,6 +6973,7 @@ if (!currentUser) {
   }
 
   window.scrollTo({ top: 0, behavior: 'auto' });
+  updateNotificationCount();
 }
 
  async function debugAuth() {

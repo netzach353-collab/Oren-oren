@@ -3557,11 +3557,7 @@ body.registration-mode .topbar-inner > .brand-title {
   cursor: pointer;
 }
 
-@media (max-width: 480px) {
-  .profile-photo-previews {
-    gap: 7px;
-  }
-}
+
 </style>
 </head>
 
@@ -3728,7 +3724,8 @@ async function loadSwipeProfiles() {
   if (!currentUser) return false;
 
   const { data, error } = await db.rpc('get_swipe_profiles');
-
+console.log('RPC error:', error);
+console.log('RPC data:', JSON.stringify(data, null, 2));
   if (error) {
     console.error('שגיאה בטעינת פרופילים:', error);
     alert('לא הצלחנו לטעון פרופילים: ' + error.message);
@@ -3742,21 +3739,23 @@ async function loadSwipeProfiles() {
 
     const photoKey = keys[0] || '';
 
-    return {
-      ...profile,
-      age: profile.birth_date
-        ? calculateAge(profile.birth_date)
-        : null,
-      bio: profile.about || '',
-      photo: photoKey
-        ? /^https?:\/\//i.test(photoKey)
-          ? photoKey
-          : `https://ucarecdn.com/${photoKey}/`
-        : ''
-    };
+return {
+  ...profile,
+  age: profile.birth_date
+    ? calculateAge(profile.birth_date)
+    : null,
+  bio: profile.about || '',
+  photo: photoKey
+  ? `https://2k0rhhtw53.ucarecd.net/${photoKey}/1000000444.jpg`
+  : ''
+};
   });
 
   console.log('פרופילים שנטענו מ־Supabase:', swipeProfiles);
+  console.log('נתוני התמונות שהתקבלו:', (data || []).map(profile => ({
+  id: profile.id,
+  photo_keys: profile.photo_keys
+})));
   return true;
 }
 
@@ -7115,7 +7114,7 @@ async function uploadProfilePhotos() {
   if (!selectedProfilePhotos.length) return [];
 
   const publicKey = '91c5b5a7261384ff5a8e';
-  const uploadedKeys = [];
+  const uploadedPhotos = [];
 
   for (const file of selectedProfilePhotos) {
     const formData = new FormData();
@@ -7147,12 +7146,17 @@ async function uploadProfilePhotos() {
       throw new Error('העלאת התמונה נכשלה.');
     }
 
-    uploadedKeys.push(result.file);
-    console.log('התמונה הועלתה:', result.file);
+    const photoUrl =
+      `https://2k0rhhtw53.ucarecd.net/${result.file}/${encodeURIComponent(file.name)}`;
+
+    uploadedPhotos.push(photoUrl);
+
+    console.log('כתובת התמונה שהועלתה:', photoUrl);
   }
 
-  return uploadedKeys;
+  return uploadedPhotos;
 }
+
 
 
 

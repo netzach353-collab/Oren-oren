@@ -4244,21 +4244,20 @@ function renderRegisterStep(step) {
     }
 
     return `
-      <div class="auth-form-group ${isLocked('occupation') ? 'auth-locked-field' : ''}">
-     <label for="reg-occupation">
-  ${required('עיסוק', 'occupation')}
-</label>
+      
+<div class="auth-form-group ${isLocked('occupation') ? 'auth-locked-field' : ''}">
+  <label for="reg-occupation">
+    ${required('עיסוק', 'occupation')}
+  </label>
 
-        <input
-          id="reg-occupation"
-          name="occupation"
-          type="text"
-          required
-          value="${escapeHTML(registerData.occupation)}"
-          placeholder="במה אתה עוסק?"
-          ${lockAttrs('occupation')}
-        >
-      </div>
+  ${renderOccupationPicker(
+    'reg-occupation',
+    'occupation',
+    registerData.occupation,
+    '',
+    lockAttrs('occupation')
+  )}
+</div>
 
       <div class="auth-form-group ${isLocked('status') ? 'auth-locked-field' : ''}">
         <label for="reg-status">
@@ -4620,18 +4619,20 @@ registerData.gender = getValue('gender');
     registerData.service = getValue('service');
   }
 
-  if (registerStep === 4) {
-    registerData.relationshipGoal = getValue('relationshipGoal');
+  
+if (registerStep === 4) {
+  registerData.relationshipGoal = getValue('relationshipGoal');
 
-    registerData.languages = lockedRegisterFields.languages
-      ? registerData.languages
-      : fd.getAll('languages').map(String);
+  registerData.languages = lockedRegisterFields.languages
+    ? registerData.languages
+    : fd.getAll('languages').map(String);
 
-    registerData.smoker = getValue('smoker');
-    registerData.health = getValue('health');
-    registerData.kosher = getValue('kosher');
-    registerData.about = getValue('about');
-  }
+  registerData.smoker = getValue('smoker');
+  registerData.health = getValue('health');
+  registerData.kosher = getValue('kosher');
+  registerData.about = getValue('about');
+}
+
 }
 
 
@@ -4752,6 +4753,13 @@ function validateRegisterStep() {
       addMissing('relationshipGoal', 'יש לבחור את מטרת הקשר.');
     }
 
+      if (
+    !Array.isArray(registerData.languages) ||
+    registerData.languages.length === 0
+  ) {
+    addMissing('languages', 'יש לבחור לפחות שפה אחת.');
+  }
+  
     if (!registerData.smoker) {
       addMissing('smoker', 'יש לבחור תשובה.');
     }
@@ -6217,6 +6225,212 @@ async function recordSwipe(profileId, decision) {
 
   renderSwipe();
 }
+
+
+const occupationSuggestions = [
+  'תכנות ופיתוח תוכנה',
+  'הייטק',
+  'פיתוח אתרים',
+  'פיתוח אפליקציות',
+  'סייבר ואבטחת מידע',
+  'בדיקות תוכנה QA',
+  'תמיכה טכנית',
+  'תיקון מחשבים',
+  'טכנאי מחשבים',
+  'ראיית חשבון',
+  'הנהלת חשבונות',
+  'ייעוץ מס',
+  'מכונאות רכב',
+  'מוסך ותיקון רכבים',
+  'חשמלאות',
+  'אינסטלציה',
+  'טכנאי מיזוג אוויר',
+  'בנייה ושיפוצים',
+  'אדריכלות',
+  'עיצוב פנים',
+  'עיצוב גרפי',
+  'שיווק ופרסום',
+  'ניהול מדיה חברתית',
+  'מכירות',
+  'ניהול עסק',
+  'עריכת דין',
+  'רפואה',
+  'סיעוד',
+  'רוקחות',
+  'פסיכולוגיה',
+  'עבודה סוציאלית',
+  'הוראה',
+  'חינוך',
+  'נהיגה ותחבורה',
+  'שליחויות',
+  'לוגיסטיקה',
+  'אבטחה',
+  'משטרה',
+  'צבא וביטחון',
+  'נדל״ן',
+  'תיווך',
+  'בנקאות',
+  'פיננסים',
+  'משאבי אנוש',
+  'גיוס עובדים',
+  'ספרות ועיצוב שיער',
+  'קוסמטיקה',
+  'איפור',
+  'אופנה',
+  'צילום',
+  'בישול וטבחות',
+  'מסעדנות',
+  'מלונאות',
+  'חקלאות',
+  'וטרינריה',
+  'מחקר ומדע',
+  'הנדסה',
+  'ייצור ותעשייה',
+  'עבודה משרדית',
+  'שירות לקוחות',
+  'עצמאי/ת',
+  'סטודנט/ית',
+  'אחר'
+];
+
+function getOccupationMatches(id) {
+  const input = document.getElementById(id);
+  if (!input) return [];
+
+  const query = input.value.trim();
+
+  if (!query) return occupationSuggestions.slice(0, 12);
+
+  return occupationSuggestions.filter(item =>
+    item.includes(query)
+  ).slice(0, 12);
+}
+
+function renderOccupationPicker(
+  id,
+  name,
+  value = '',
+  inputClass = '',
+  disabledAttrs = ''
+) {
+  return `
+    <div class="city-picker occupation-picker" id="${id}-picker">
+      <div class="city-picker-input-wrap">
+        <input
+          class="city-picker-input ${inputClass}"
+          id="${id}"
+          name="${name}"
+          type="text"
+          autocomplete="off"
+          value="${escapeHTML(value)}"
+          placeholder="הקלד/י תחום עיסוק"
+          ${disabledAttrs}
+          onfocus="openOccupationDropdown('${id}')"
+          oninput="filterOccupationDropdown('${id}')"
+          onkeydown="occupationDropdownKeydown(event, '${id}')"
+          aria-expanded="false"
+          aria-controls="${id}-dropdown"
+        >
+        <span class="city-picker-arrow">▾</span>
+      </div>
+
+      <div
+        class="city-picker-dropdown"
+        id="${id}-dropdown"
+        role="listbox"
+      ></div>
+    </div>
+  `;
+}
+
+function openOccupationDropdown(id) {
+  const picker = document.getElementById(id + '-picker');
+  const input = document.getElementById(id);
+
+  if (!picker || !input || input.disabled || input.readOnly) return;
+
+  picker.classList.add('open');
+  input.setAttribute('aria-expanded', 'true');
+  filterOccupationDropdown(id);
+}
+
+function filterOccupationDropdown(id) {
+  const input = document.getElementById(id);
+  const dropdown = document.getElementById(id + '-dropdown');
+  const picker = document.getElementById(id + '-picker');
+
+  if (!input || !dropdown || !picker) return;
+
+  const matches = getOccupationMatches(id);
+  const currentValue = input.value.trim();
+
+  dropdown.innerHTML =
+    matches.map(item => `
+      <button
+        type="button"
+        class="city-picker-option ${
+          item === currentValue ? 'selected' : ''
+        }"
+        role="option"
+        aria-selected="${item === currentValue}"
+        onmousedown="event.preventDefault()"
+        onclick="selectOccupation('${id}', '${escapeHTML(item).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')"
+      >${escapeHTML(item)}</button>
+    `).join('') +
+    `
+      <button
+        type="button"
+        class="city-picker-option city-manual-option"
+        role="option"
+        onmousedown="event.preventDefault()"
+        onclick="selectManualOccupation('${id}')"
+      >השארת הטקסט שהוקלד</button>
+    `;
+
+  picker.classList.add('open');
+  input.setAttribute('aria-expanded', 'true');
+}
+
+function selectOccupation(id, occupation) {
+  const input = document.getElementById(id);
+  const picker = document.getElementById(id + '-picker');
+
+  if (!input || !picker) return;
+
+  input.value = occupation;
+  picker.classList.remove('open');
+  input.setAttribute('aria-expanded', 'false');
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function selectManualOccupation(id) {
+  const input = document.getElementById(id);
+  const picker = document.getElementById(id + '-picker');
+
+  if (!input || !picker) return;
+
+  picker.classList.remove('open');
+  input.setAttribute('aria-expanded', 'false');
+  input.focus();
+}
+
+function occupationDropdownKeydown(event, id) {
+  const picker = document.getElementById(id + '-picker');
+
+  if (event.key === 'Escape') {
+    picker?.classList.remove('open');
+    event.target.setAttribute('aria-expanded', 'false');
+  }
+
+  if (event.key === 'ArrowDown') {
+    event.preventDefault();
+    openOccupationDropdown(id);
+
+    picker?.querySelector('.city-picker-option')?.focus();
+  }
+}
+
+
 
 function resetSwipeProfiles() {
   localStorage.removeItem("lev_interest_decisions");

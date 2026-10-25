@@ -3518,6 +3518,50 @@ body.registration-mode .topbar-inner > .brand-title {
     font-size: 14px;
   }
 }
+
+
+.profile-photo-previews {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.profile-photo-preview {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid #75415f;
+  background: #241525;
+}
+
+.profile-photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-photo-remove {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: #35152f;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .profile-photo-previews {
+    gap: 7px;
+  }
+}
 </style>
 </head>
 
@@ -4498,6 +4542,23 @@ function renderRegisterStep(step) {
       <div class="auth-hint">
         עד 500 תווים. זה מה שאחרים יראו בפרופיל.
       </div>
+    </div>
+        <div class="auth-form-group">
+      <label for="reg-profile-photos">תמונות הפרופיל</label>
+
+      <div class="auth-hint">
+        אפשר להוסיף עד 3 תמונות. בחר תמונות ברורות שלך.
+      </div>
+
+      <input
+        id="reg-profile-photos"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+        onchange="previewProfilePhotos(this)"
+      >
+
+      <div id="profile-photo-previews" class="profile-photo-previews"></div>
     </div>
   `;
 }
@@ -6942,6 +7003,109 @@ function personalSelectField(key, label, options, value) {
       </select>
     </div>
   `;
+}
+
+
+let selectedProfilePhotos = [];
+
+function previewProfilePhotos(input) {
+  const files = Array.from(input.files || []);
+  const preview = document.getElementById('profile-photo-previews');
+
+  if (!preview) return;
+
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp'
+  ];
+
+  const validFiles = files.filter(file =>
+    allowedTypes.includes(file.type) &&
+    file.size <= 5 * 1024 * 1024
+  );
+
+  if (validFiles.length !== files.length) {
+    alert('אפשר לבחור תמונות JPG, PNG או WebP עד 5MB לתמונה.');
+  }
+
+  if (validFiles.length > 3) {
+    alert('אפשר להעלות עד 3 תמונות בלבד.');
+  }
+
+  selectedProfilePhotos = validFiles.slice(0, 3);
+
+  preview.innerHTML = selectedProfilePhotos.map((file, index) => {
+    const url = URL.createObjectURL(file);
+
+    return `
+      <div class="profile-photo-preview">
+        <img
+          src="${url}"
+          alt="תצוגה מקדימה של תמונה ${index + 1}"
+        >
+        <button
+          type="button"
+          class="profile-photo-remove"
+          aria-label="הסרת תמונה ${index + 1}"
+          onclick="removeProfilePhoto(${index})"
+        >×</button>
+      </div>
+    `;
+  }).join('');
+
+  input.value = '';
+}
+
+function removeProfilePhoto(index) {
+  selectedProfilePhotos.splice(index, 1);
+
+  const input = document.getElementById('reg-profile-photos');
+
+  if (input) {
+    const transfer = new DataTransfer();
+
+    selectedProfilePhotos.forEach(file => transfer.items.add(file));
+    input.files = transfer.files;
+    previewProfilePhotos(input);
+  } else {
+    const preview = document.getElementById('profile-photo-previews');
+    if (preview) preview.innerHTML = '';
+  }
+}
+
+
+async function uploadProfilePhotos() {
+  if (!selectedProfilePhotos.length) return [];
+
+  const { data: { session }, error } = await db.auth.getSession();
+
+  if (error || !session?.access_token) {
+    throw new Error('צריך להתחבר מחדש כדי להעלות תמונות.');
+  }
+
+  const uploadedKeys = [];
+
+  for (const file of selectedProfilePhotos) {
+    const response = await fetch('WORKER_URL_HERE', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': file.type
+      },
+      body: file
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success || !result.key) {
+      throw new Error(result.error || 'העלאת תמונה נכשלה.');
+    }
+
+    uploadedKeys.push(result.key);
+  }
+
+  return uploadedKeys;
 }
 
 function personalYesNoField(key, label, value) {

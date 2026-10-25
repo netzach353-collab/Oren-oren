@@ -3489,6 +3489,35 @@ body.registration-mode .topbar-inner > .brand-title {
   font-size: 14px;
   color: #f3dce9;
 }
+
+@media (max-width: 600px) {
+  .profiles-toolbar {
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .profiles-toolbar-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .profiles-toolbar-info h2 {
+    font-size: 20px;
+  }
+
+  .profiles-count {
+    order: 3;
+    width: 100%;
+    font-size: 13px;
+  }
+
+  .filter-toggle {
+    flex-shrink: 0;
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+}
 </style>
 </head>
 
@@ -3754,7 +3783,7 @@ await loadSwipeProfiles();
 
 registerStep = 1;
 showSuccessBanner('ההרשמה הושלמה בהצלחה!');
-showPage('home');
+showPage('swipe');
 }
 
   
@@ -4125,7 +4154,7 @@ function renderRegisterStep(step) {
     return `
       <div class="auth-form-group ${isLocked('name') ? 'auth-locked-field' : ''}">
         <label for="reg-name">
-          ${required('השם שלך', 'name')}
+          ${required('השם המלא שלך', 'name')}
         </label>
 
         <input
@@ -4759,7 +4788,7 @@ function validateRegisterStep() {
   ) {
     addMissing('languages', 'יש לבחור לפחות שפה אחת.');
   }
-  
+
     if (!registerData.smoker) {
       addMissing('smoker', 'יש לבחור תשובה.');
     }

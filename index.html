@@ -3237,7 +3237,258 @@ body.registration-mode .topbar-inner > .brand-title {
   }
 }
 
+/* סרגל כל הפרופילים */
+.profiles-toolbar {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #211526, #351a30);
+  border: 1px solid #63304f;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
 
+.profiles-toolbar-info {
+  min-width: 0;
+}
+
+.profiles-toolbar-info h2 {
+  margin: 0;
+  color: #fff5fa;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+/* מספר הפרופילים במרכז */
+.profiles-toolbar .profiles-count {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  color: #ead4e1;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.profiles-toolbar .profiles-count-number {
+  color: #ff91c5;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+/* כפתור סינון */
+.profiles-toolbar .filter-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 15px;
+  color: #fff;
+  background: linear-gradient(135deg, #80365f, #632548);
+  border: 1px solid #c46a9c;
+  border-radius: 11px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.profiles-toolbar .filter-toggle:hover {
+  background: linear-gradient(135deg, #984575, #78305a);
+}
+
+.profiles-toolbar .filter-toggle:active {
+  transform: scale(0.97);
+}
+
+/* טאבלט */
+@media (max-width: 767px) {
+  .profiles-toolbar {
+    gap: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+    border-radius: 14px;
+  }
+
+  .profiles-toolbar-info h2 {
+    font-size: 19px;
+  }
+
+  .profiles-toolbar .profiles-count {
+    font-size: 12px;
+    gap: 4px;
+  }
+
+  .profiles-toolbar .profiles-count-number {
+    font-size: 16px;
+  }
+
+  .profiles-toolbar .filter-toggle {
+    min-height: 38px;
+    padding: 0 11px;
+    gap: 5px;
+    font-size: 13px;
+  }
+
+  .profiles-toolbar .filter-toggle svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* טלפונים קטנים */
+@media (max-width: 420px) {
+  .profiles-toolbar {
+    gap: 6px;
+    padding: 12px 10px;
+  }
+
+  .profiles-toolbar-info h2 {
+    font-size: 16px;
+  }
+
+  .profiles-toolbar .profiles-count {
+    font-size: 10px;
+    gap: 3px;
+  }
+
+  .profiles-toolbar .profiles-count-number {
+    font-size: 14px;
+  }
+
+  .profiles-toolbar .filter-toggle {
+    min-height: 35px;
+    padding: 0 8px;
+    gap: 4px;
+    font-size: 12px;
+    border-radius: 9px;
+  }
+
+  .profiles-toolbar .filter-toggle svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* טלפונים צרים במיוחד */
+@media (max-width: 350px) {
+  .profiles-toolbar {
+    padding: 10px 7px;
+  }
+
+  .profiles-toolbar-info h2 {
+    font-size: 14px;
+  }
+
+  .profiles-toolbar .profiles-count {
+    font-size: 9px;
+  }
+
+  .profiles-toolbar .profiles-count-number {
+    font-size: 13px;
+  }
+
+  .profiles-toolbar .filter-toggle {
+    padding: 0 6px;
+    font-size: 11px;
+  }
+}
+
+.auth-welcome-image {
+  width: 100%;
+  margin: 0 auto 18px;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.auth-welcome-image img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .auth-welcome-image {
+    max-width: 560px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 767px) {
+  .auth-welcome-image {
+    margin-bottom: 14px;
+    border-radius: 10px;
+  }
+}
+
+#success-banner {
+  position: fixed;
+  top: 24px;
+  left: 50%;
+  transform: translate(-50%, -20px);
+  width: calc(100% - 32px);
+  max-width: 380px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  background: linear-gradient(135deg, #35152f, #572044);
+  color: #fff;
+  border: 1px solid #b65b91;
+  border-radius: 18px;
+  box-shadow: 0 12px 35px #0005;
+  z-index: 99999;
+  opacity: 0;
+  transition: opacity .35s ease, transform .35s ease;
+  direction: rtl;
+  pointer-events: none;
+}
+
+#success-banner.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.success-banner-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #237a58;
+  border: 1px solid #56d6a0;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.success-banner-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.success-banner-text {
+  font-size: 14px;
+  color: #f3dce9;
+}
 </style>
 </head>
 
@@ -3401,14 +3652,14 @@ console.log('Supabase initialized:', !!db);
   
   
 async function loadSwipeProfiles() {
-  if (!currentUser) return;
+  if (!currentUser) return false;
 
   const { data, error } = await db.rpc('get_swipe_profiles');
 
   if (error) {
     console.error('שגיאה בטעינת פרופילים:', error);
     alert('לא הצלחנו לטעון פרופילים: ' + error.message);
-    return;
+    return false;
   }
 
   swipeProfiles = (data || []).map(profile => ({
@@ -3421,8 +3672,8 @@ async function loadSwipeProfiles() {
   }));
 
   console.log('פרופילים שנטענו מ־Supabase:', swipeProfiles);
+  return true;
 }
-
   
 async function loginWithGoogle() {
   const { error } = await db.auth.signInWithOAuth({
@@ -3494,16 +3745,44 @@ currentUser = user;
     return;
   }
 
-  console.log('Profile saved:', data);
+console.log('Profile saved:', data);
 
-  document.body.classList.remove('auth-only');
-  registerStep = 1;
+document.body.classList.remove('auth-only');
 document.body.classList.remove('registration-mode');
-  alert('ההרשמה הושלמה בהצלחה');
-  showPage('home');
+
+await loadSwipeProfiles();
+
+registerStep = 1;
+showSuccessBanner('ההרשמה הושלמה בהצלחה!');
+showPage('home');
 }
 
   
+function showSuccessBanner(message) {
+  document.getElementById('success-banner')?.remove();
+
+  const banner = document.createElement('div');
+  banner.id = 'success-banner';
+  banner.innerHTML = `
+    <span class="success-banner-icon">✓</span>
+    <div>
+      <div class="success-banner-title">איזה כיף! 🎉</div>
+      <div class="success-banner-text">${message}</div>
+    </div>
+  `;
+
+  document.body.appendChild(banner);
+
+  requestAnimationFrame(() => {
+    banner.classList.add('show');
+  });
+
+  setTimeout(() => {
+    banner.classList.remove('show');
+    setTimeout(() => banner.remove(), 350);
+  }, 3000);
+}
+
 async function afterAuthSuccess(user) {
   if (!user) {
     renderLogin();
@@ -3541,7 +3820,6 @@ showPage('profiles');
 }
 
   
-  
 function renderLogin() {
   const content = document.getElementById('app-content');
   if (!content) return;
@@ -3551,12 +3829,19 @@ function renderLogin() {
   content.innerHTML = `
     <section class="auth-page">
       <div class="auth-card">
-        <div class="auth-heading">
-          <h1>כניסה/הרשמה לאתר השדכן</h1>
-          <p>היכנס עם חשבון Google כדי להמשיך</p>
+
+        <div class="auth-welcome-image">
+          <img
+            src="./edited-image.jpg"
+            alt="ברוכים הבאים לשדכן — אתר המיועד לשידוכים והכרויות"
+          >
         </div>
 
-        <button type="button" class="login-google-btn" onclick="loginWithGoogle()">
+        <button
+          type="button"
+          class="login-google-btn"
+          onclick="loginWithGoogle()"
+        >
           <svg viewBox="0 0 24 24" width="20" height="20">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -3565,10 +3850,12 @@ function renderLogin() {
           </svg>
           כניסה עם Google
         </button>
+
       </div>
     </section>
   `;
 }
+
   
 let lockedRegisterFields = {};
 
@@ -3911,18 +4198,21 @@ function renderRegisterStep(step) {
           ${required('מספר טלפון', 'phone')}
         </label>
 
-        <input
-          id="reg-phone"
-          name="phone"
-          type="tel"
-          dir="ltr"
-          inputmode="tel"
-          autocomplete="tel"
-          required
-          value="${escapeHTML(registerData.phone)}"
-          placeholder="050-1234567"
-          ${lockAttrs('phone')}
-        >
+       <input
+  id="reg-phone"
+  name="phone"
+  type="tel"
+  dir="ltr"
+  inputmode="numeric"
+  autocomplete="tel"
+  required
+  maxlength="10"
+  pattern="[0-9]{10}"
+  oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)"
+  value="${escapeHTML(registerData.phone)}"
+  placeholder="0501234567"
+  ${lockAttrs('phone')}
+>
 
         <div class="auth-hint">
           המספר ישמש ליצירת קשר לאחר התאמה בלבד.
@@ -3955,14 +4245,15 @@ function renderRegisterStep(step) {
 
     return `
       <div class="auth-form-group ${isLocked('occupation') ? 'auth-locked-field' : ''}">
-        <label for="reg-occupation">
-          ${labelWithLock('עיסוק', 'occupation')}
-        </label>
+     <label for="reg-occupation">
+  ${required('עיסוק', 'occupation')}
+</label>
 
         <input
           id="reg-occupation"
           name="occupation"
           type="text"
+          required
           value="${escapeHTML(registerData.occupation)}"
           placeholder="במה אתה עוסק?"
           ${lockAttrs('occupation')}
@@ -3976,7 +4267,7 @@ function renderRegisterStep(step) {
 
         <select id="reg-status" name="status" ${lockAttrs('status')}>
           <option value="">בחירה</option>
-          ${['רווק/ה', 'נשוי/אה', 'גרוש/ה', 'אלמן/ה'].map(o =>
+          ${['רווק/ה', 'גרוש/ה', 'אלמן/ה'].map(o =>
             `<option value="${escapeHTML(o)}"
               ${registerData.status === o ? 'selected' : ''}>
               ${escapeHTML(o)}
@@ -4013,12 +4304,12 @@ function renderRegisterStep(step) {
 
         <select id="reg-religious" name="religiousView" ${lockAttrs('religiousView')}>
           <option value="">בחירה</option>
-          ${religiousOptions.map(o =>
-            `<option value="${escapeHTML(o)}"
-              ${registerData.religiousView === o ? 'selected' : ''}>
-              ${escapeHTML(o)}
-            </option>`
-          ).join('')}
+         ${religiousOptions.map(o =>
+  `<option value="${escapeHTML(o)}"
+    ${registerData.religiousView === o ? 'selected' : ''}>
+    ${escapeHTML(getReligiousLabel(o, registerData.gender))}
+  </option>`
+).join('')}
         </select>
       </div>
 
@@ -4431,6 +4722,10 @@ function validateRegisterStep() {
   }
 
   if (registerStep === 3) {
+    if (!registerData.occupation?.trim()) {
+  addMissing('occupation', 'יש להזין עיסוק.');
+}
+
     if (!registerData.status) {
       addMissing('status');
     }
@@ -4478,8 +4773,6 @@ function validateRegisterStep() {
   clearRegistrationErrors();
   return true;
 }
-
-
 
 
 function registerNextStep() {
@@ -4598,7 +4891,7 @@ function renderProfiles() {
 
   <div class="profiles-count">
     <span class="profiles-count-number">${filteredProfiles.length}</span>
-    <span>מספר האנשים שמתשמשים בשדכן</span>
+    <span>פרופילים זמינים באתר השדכן</span>
   </div>
 
   <button
@@ -4752,10 +5045,6 @@ function renderProfiles() {
       male: 'רווק',
       female: 'רווקה'
     },
-    'נשוי/אה': {
-      male: 'נשוי',
-      female: 'נשואה'
-    },
     'גרוש/ה': {
       male: 'גרוש',
       female: 'גרושה'
@@ -4773,6 +5062,33 @@ function renderProfiles() {
   // אם המגדר או המצב האישי עדיין לא הוגדרו,
   // מציגים את הערך המקורי במקום לנחש.
   return status;
+}
+
+function getGenderedReligiousView(profile) {
+  const view = String(
+    profile.religious_view || profile.religiousView || ''
+  ).trim();
+
+  const gender = profile.gender;
+
+  const viewMap = {
+    'דתי': { male: 'דתי', female: 'דתייה' },
+    'מסורתי': { male: 'מסורתי', female: 'מסורתית' },
+    'חילוני': { male: 'חילוני', female: 'חילונית' },
+    'דתי לאומי': { male: 'דתי לאומי', female: 'דתייה לאומית' },
+    'דתי לייט': { male: 'דתי לייט', female: 'דתייה לייט' },
+    'דתי לאומי תורני': {
+      male: 'דתי לאומי תורני',
+      female: 'דתייה לאומית תורנית'
+    },
+    'חרדי': { male: 'חרדי', female: 'חרדית' },
+    'חרדי מודרני': { male: 'חרדי מודרני', female: 'חרדית מודרנית' },
+    'ברסלב': { male: 'ברסלב', female: 'ברסלב' },
+    'חב"ד': { male: 'חב"ד', female: 'חב"ד' },
+    'דתי לייט': { male: 'דתי לייט', female: 'דתייה לייט' }
+  };
+
+  return viewMap[view]?.[gender] || view;
 }
   
 
@@ -5027,9 +5343,9 @@ receivedInterest = !!incoming && !alreadySent;
   const fields = [
     ['עיר', profile.city],
     ['עיסוק', profile.occupation],
-    ['מצב משפחתי', profile.status],
+    ['מצב משפחתי', getGenderedStatus(profile)],
     ['ילדים', profile.children],
-    ['השקפה דתית', profile.religious_view],
+['השקפה דתית', getGenderedReligiousView(profile)],
     ['גובה', profile.height],
     ['שירות', profile.service],
     ['מטרת הקשר', profile.relationship_goal],
@@ -5628,6 +5944,7 @@ function openCityDropdown(id) {
   filterCityDropdown(id);
 }
 
+
 function filterCityDropdown(id) {
   const input = document.getElementById(id);
   const dropdown = document.getElementById(id + '-dropdown');
@@ -5638,28 +5955,50 @@ function filterCityDropdown(id) {
   const matches = getCityPickerMatches(id);
   const currentValue = input.value.trim();
 
-  dropdown.innerHTML = matches.length
-    ? matches.map(city => `
-        <button
-          type="button"
-          class="city-picker-option ${
-            city === currentValue ? 'selected' : ''
-          }"
-          role="option"
-          aria-selected="${city === currentValue}"
-          onmousedown="event.preventDefault()"
-          onclick="selectCity('${id}', '${escapeHTML(city).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')"
-        >${escapeHTML(city)}</button>
-      `).join('')
-    : `
-        <div class="city-picker-empty">
-          לא נמצאו ערים תואמות. אפשר להשאיר את הטקסט שהקלדת.
-        </div>
-      `;
+  dropdown.innerHTML =
+    matches.map(city => `
+      <button
+        type="button"
+        class="city-picker-option ${
+          city === currentValue ? 'selected' : ''
+        }"
+        role="option"
+        aria-selected="${city === currentValue}"
+        onmousedown="event.preventDefault()"
+        onclick="selectCity('${id}', '${escapeHTML(city).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}')"
+      >${escapeHTML(city)}</button>
+    `).join('') +
+
+    `
+      <button
+        type="button"
+        class="city-picker-option city-manual-option"
+        role="option"
+        onmousedown="event.preventDefault()"
+        onclick="selectManualCity('${id}')"
+      > הקלידו ידנית</button>
+    `;
 
   picker.classList.add('open');
   input.setAttribute('aria-expanded', 'true');
 }
+
+function selectManualCity(id) {
+  const input = document.getElementById(id);
+  const picker = document.getElementById(id + '-picker');
+
+  if (!input || !picker) return;
+
+  input.dataset.manualCity = 'true';
+
+  picker.classList.remove('open');
+  input.setAttribute('aria-expanded', 'false');
+  input.readOnly = false;
+  input.disabled = false;
+  input.placeholder = 'הקלד את שם העיר';
+  input.focus();
+}
+
 
 function selectCity(id, city) {
   const input = document.getElementById(id);
@@ -5948,6 +6287,27 @@ const religiousOptions = [
   'חוזר בתשובה',
   'דתי'
 ];
+
+function getReligiousLabel(option, gender) {
+  if (gender !== 'female') return option;
+
+  const femaleLabels = {
+    'דתי לאומי': 'דתייה לאומית',
+    'מסורתי': 'מסורתית',
+    'דתי לייט': 'דתייה לייט',
+    'דתל"ש': 'דתל"שית',
+    'חילוני': 'חילונית',
+    'דתי לאומי תורני': 'דתייה לאומית תורנית',
+    'חרדי': 'חרדית',
+    'חרדי מודרני': 'חרדית מודרנית',
+    'ברסלב': 'ברסלב',
+    'חב"ד': 'חב"ד',
+    'חוזר בתשובה': 'חוזרת בתשובה',
+    'דתי': 'דתייה'
+  };
+
+  return femaleLabels[option] || option;
+}
 
 const languageOptions = [
   'עברית',
@@ -6503,13 +6863,13 @@ function renderPersonalDetails(details) {
         >
       </div>
 
-      <!-- מצב משפחתי -->
-      ${personalSelectField(
-        'status',
-        'מצב משפחתי',
-        ['רווק/ה', 'נשוי/אה', 'גרוש/ה', 'אלמן/ה'],
-        details.status
-      )}
+<!-- מצב משפחתי -->
+${personalSelectField(
+  'status',
+  'מצב משפחתי',
+  ['רווק/ה', 'גרוש/ה', 'אלמן/ה'],
+  details.status
+)}
 
       <!-- ילדים -->
       ${personalYesNoField(

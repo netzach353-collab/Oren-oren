@@ -2963,35 +2963,51 @@ body.registration-mode .topbar-inner > .brand-title {
   min-width: 0;
 }
 
+
 .interest-notification .notification-item-title {
-  color: #fff0f5;
+  color: #ffffff;
+  font-size: 17px;
   font-weight: 800;
+  line-height: 1.5;
 }
 
 .interest-notification .notification-item-label {
-  color: #f0c9d8;
-  font-size: 11px;
+  display: inline-block;
+  color: #ffffff;
+  background: #792b50;
+  border: 1px solid #e879ad;
+  border-radius: 7px;
+  padding: 5px 10px;
+  margin-top: 5px;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.5;
 }
 
 .interest-notification .notification-item-message {
-  margin: 7px 0;
-  color: #f0dce5;
-  font-size: 14px;
-  line-height: 1.6;
+  margin: 10px 0;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.8;
 }
 
 .interest-notification .notification-item-date {
-  color: #c9a6b5;
-  font-size: 12px;
+  color: #e2d5df;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
 }
 
 .notification-open-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 24px;
-  color: #e8b4c9;
+  flex: 0 0 28px;
+  color: #ff8fc5;
 }
+
+
 
 .notification-open-icon svg {
   width: 20px;
@@ -3078,6 +3094,149 @@ body.registration-mode .topbar-inner > .brand-title {
   box-sizing: border-box;
   font-family: inherit;
 }
+
+
+.profiles-toolbar {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 24px;
+  padding: 20px;
+  background: linear-gradient(135deg, #211526, #351a30);
+  border: 1px solid #63304f;
+  border-radius: 18px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+}
+
+.profiles-toolbar-info {
+  min-width: 0;
+}
+
+.profiles-toolbar-info h2 {
+  margin: 0 0 8px;
+  color: #fff5fa;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.profiles-toolbar .profiles-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ead4e1;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.profiles-toolbar .profiles-count-number {
+  color: #ff91c5;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.profiles-toolbar .filter-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  color: #fff;
+  background: linear-gradient(135deg, #80365f, #632548);
+  border: 1px solid #c46a9c;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.profiles-toolbar .filter-toggle:hover {
+  background: linear-gradient(135deg, #984575, #78305a);
+}
+
+.profiles-toolbar .filter-toggle:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 480px) {
+  .profiles-toolbar {
+    padding: 15px;
+    gap: 10px;
+    border-radius: 15px;
+  }
+
+  .profiles-toolbar-info h2 {
+    font-size: 20px;
+  }
+
+  .profiles-toolbar .profiles-count {
+    font-size: 12px;
+  }
+
+  .profiles-toolbar .filter-toggle {
+    min-height: 42px;
+    padding: 0 12px;
+    gap: 6px;
+    font-size: 14px;
+  }
+}
+
+
+.profiles-toolbar {
+  position: relative;
+}
+
+.profiles-toolbar .profiles-count {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  white-space: nowrap;
+  color: #ead4e1;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.profiles-toolbar .profiles-count-number {
+  color: #ff91c5;
+  font-size: 19px;
+  font-weight: 900;
+}
+
+@media (max-width: 380px) {
+  .profiles-toolbar {
+    gap: 6px;
+    padding: 12px;
+  }
+
+  .profiles-toolbar-info h2 {
+    font-size: 17px;
+  }
+
+  .profiles-toolbar .profiles-count {
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .profiles-toolbar .profiles-count-number {
+    font-size: 16px;
+  }
+
+  .profiles-toolbar .filter-toggle {
+    padding: 0 9px;
+    font-size: 12px;
+  }
+}
+
 
 </style>
 </head>
@@ -4431,26 +4590,34 @@ function renderProfiles() {
   });
 
   content.innerHTML = `
-    <div class="profiles-toolbar">
-      <div>
-        <h2>כל הפרופילים</h2>
-        <div class="profiles-count">${filteredProfiles.length} פרופילים נמצאו</div>
-      </div>
 
-      <button class="filter-toggle"
-        type="button"
-        onclick="toggleProfileFilters()"
-        aria-expanded="${profileFilterOpen}">
-        <svg width="18" height="18" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="1.8"
-          stroke-linecap="round">
-          <path d="M4 7h16M7 12h10M10 17h4"/>
-          <circle cx="8" cy="7" r="1.5" fill="currentColor"/>
-          <circle cx="15" cy="12" r="1.5" fill="currentColor"/>
-        </svg>
-        סינון
-      </button>
-    </div>
+<div class="profiles-toolbar">
+  <div class="profiles-toolbar-info">
+    <h2>כל הפרופילים</h2>
+  </div>
+
+  <div class="profiles-count">
+    <span class="profiles-count-number">${filteredProfiles.length}</span>
+    <span>מספר האנשים שמתשמשים בשדכן</span>
+  </div>
+
+  <button
+    class="filter-toggle"
+    type="button"
+    onclick="toggleProfileFilters()"
+    aria-expanded="${profileFilterOpen}">
+    <svg width="18" height="18" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" stroke-width="1.8"
+      stroke-linecap="round">
+      <path d="M4 7h16M7 12h10M10 17h4"/>
+      <circle cx="8" cy="7" r="1.5" fill="currentColor"/>
+      <circle cx="15" cy="12" r="1.5" fill="currentColor"/>
+    </svg>
+    סינון
+  </button>
+</div>
+
+
 
     ${profileFilterOpen ? `
       <section class="filter-panel">
@@ -6765,17 +6932,18 @@ if (profilesError) throw profilesError;
       return;
     }
 
-    list.innerHTML = senders.map(profile => {
-      const name = getProfileName(profile) || 'משתמש/ת';
-      const gender = String(profile.gender || '').toLowerCase();
 
-      const isFemale = [
-        'female', 'woman', 'נקבה', 'אישה', 'female_user'
-      ].includes(gender);
+list.innerHTML = senders.map(profile => {
+  const name = getProfileName(profile) || 'משתמש/ת';
+  const gender = String(profile.gender || '').toLowerCase();
 
-      const message = isFemale
-        ? `${name} מעוניינת בך`
-        : `${name} מעוניין בך`;
+  const isFemale = [
+    'female', 'woman', 'נקבה', 'אישה', 'female_user'
+  ].includes(gender);
+
+  const message = isFemale
+    ? `${name} מעוניינת לדעת עליך יותר`
+    : `${name} מעוניין לדעת עליך יותר`;
 
       const photo = getProfileImage(profile);
 

@@ -394,6 +394,7 @@ body {
   color: white;
 }
 
+
 .instruction-content {
   position: absolute;
   inset: 0;
@@ -3558,6 +3559,29 @@ body.registration-mode .topbar-inner > .brand-title {
 }
 
 
+@media (max-width: 600px) {
+  .profiles-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .profiles-toolbar-info {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+
+  .profiles-count {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 5px;
+    width: auto;
+    white-space: nowrap;
+  }
+}
+
 </style>
 </head>
 
@@ -5023,7 +5047,7 @@ function renderProfiles() {
 
   <div class="profiles-count">
     <span class="profiles-count-number">${filteredProfiles.length}</span>
-    <span>פרופילים זמינים באתר השדכן</span>
+    <span>פרופילים באתר השדכן</span>
   </div>
 
   <button
@@ -7156,8 +7180,6 @@ async function uploadProfilePhotos() {
 
   return uploadedPhotos;
 }
-
-
 
 
 function personalYesNoField(key, label, value) {

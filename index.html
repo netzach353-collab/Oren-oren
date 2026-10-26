@@ -3829,6 +3829,38 @@ console.log('Supabase initialized:', !!db);
   
   <script>
  
+let profileInterestRealtimeChannel = null;
+let currentProfileDetailId = null;
+
+function setupProfileInterestRealtime() {
+  if (!db || profileInterestRealtimeChannel) return;
+
+  profileInterestRealtimeChannel = db
+    .channel('profile-interest-live-updates')
+    .on(
+      'postgres_changes',
+      {
+        event: '*',
+        schema: 'public',
+        table: 'profile_interests'
+      },
+      async () => {
+        if (!currentUser || !currentProfileDetailId) return;
+
+        const content = document.getElementById('app-content');
+
+        // מעדכנים רק אם עמוד הפרופיל עדיין פתוח
+        if (!content?.querySelector('.profile-detail-luxury')) return;
+
+        await openProfileDetail(currentProfileDetailId);
+      }
+    )
+    .subscribe((status) => {
+      console.log('Profile interest realtime:', status);
+    });
+}
+
+
 let swipeProfiles = [];
 
 async function loadSwipeProfiles() {
@@ -5099,6 +5131,8 @@ function renderProfiles() {
   const content = document.getElementById('app-content');
   if (!content) return;
 
+  currentProfileDetailId = null;
+
   const filteredProfiles = swipeProfiles.filter(profile => {
     const name = getProfileName(profile).toLowerCase();
     const city = getProfileCity(profile).toLowerCase();
@@ -5505,6 +5539,9 @@ async function openProfileDetail(id) {
   const content = document.getElementById('app-content');
   if (!content) return;
 
+  currentProfileDetailId = String(id);
+setupProfileInterestRealtime();
+
   const image = getProfileImage(profile);
 let alreadySent = false;
 let mutualInterest = false;
@@ -5635,12 +5672,12 @@ const phone = profile.phone || '';
       >
         ${
           mutualInterest
-            ? 'אישור החלפת מספרים'
+            ? 'החלפתם מספרים'
             : receivedInterest
               ? `${escapeHTML(name)} ביקש/ה ממך את מספר הטלפון · לאשר?`
               : alreadySent
-                ? 'ביטול בקשה למספר טלפון'
-                : 'שלח בקשה למספר'
+                ? 'ביטול בקשה למספר הטלפון'
+                : 'החליפו מספרים..'
         }
       </button>
     `
@@ -5692,7 +5729,6 @@ const phone = profile.phone || '';
 
   ${interestButton}
 </div>
-
         <div class="profile-detail-actions">
   <button
     class="profile-back-btn"

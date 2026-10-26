@@ -3582,6 +3582,93 @@ body.registration-mode .topbar-inner > .brand-title {
   }
 }
 
+
+.profile-interest-btn:disabled {
+  opacity: 0.8;
+  cursor: wait;
+}
+
+.interest-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.interest-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-left-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  animation: interest-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes interest-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.profile-phone-box {
+  margin-top: 22px;
+  padding: 18px;
+  border-radius: 16px;
+  background: #171525;
+  border: 1px solid #393149;
+  text-align: center;
+}
+
+.profile-phone-label {
+  color: #c9bfdc;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.profile-phone-value {
+  direction: ltr;
+  font-size: 23px;
+  font-weight: 700;
+  color: #e9ddff;
+  margin: 8px 0;
+}
+
+.profile-phone-value.phone-blurred {
+  filter: blur(7px);
+  user-select: none;
+}
+
+.profile-phone-value.phone-revealed {
+  filter: none;
+  user-select: text;
+}
+
+.profile-phone-hint {
+  color: #a9a0b9;
+  font-size: 12px;
+  margin: 10px 0;
+}
+
+.profile-phone-request-btn {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  color: #c4a5ff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.profile-phone-request-btn:hover {
+  color: #e0ceff;
+}
+
 </style>
 </head>
 
@@ -3947,7 +4034,7 @@ document.body.classList.remove('registration-mode');
   }
 
   await loadSwipeProfiles();
-showPage('profiles');
+showPage('swipe');
 }
 
   
@@ -4998,7 +5085,12 @@ function getProfileAbout(profile) {
 
 const DEFAULT_PROFILE_PHOTO = "20261016_163405.jpg";
 
+
 function getProfileImage(profile) {
+  if (profile.photo_keys && profile.photo_keys.length > 0) {
+    return profile.photo_keys[0];
+  }
+
   return profile.photo || "";
 }
 
@@ -5154,7 +5246,7 @@ function renderProfiles() {
         <circle cx="12" cy="8" r="5"/>
         <path d="M20 21a8 8 0 0 0-16 0"/>
       </svg>
-      ${escapeHTML(profile.status || 'לא צוין')}
+${escapeHTML(getGenderedStatus(profile) || 'לא צוין')}
     </span>
   </div>
 
@@ -5164,7 +5256,7 @@ function renderProfiles() {
         <path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4Z"/>
         <path d="M9 12h6M12 9v6"/>
       </svg>
-      ${escapeHTML(profile.religious_view || 'לא צוין')}
+${escapeHTML(getGenderedReligiousView(profile) || 'לא צוין')}
     </span>
 
     <span class="profile-detail-chip">
@@ -5454,6 +5546,7 @@ receivedInterest = !!incoming && !alreadySent;
   const name = getProfileName(profile);
   const city = getProfileCity(profile);
   const about = getProfileAbout(profile);
+const phone = profile.phone || '';
 
   const hasValue = value => {
     if (value === null || value === undefined) return false;
@@ -5532,37 +5625,26 @@ receivedInterest = !!incoming && !alreadySent;
     `)
     .join('');
 
-  const interestButton = mutualInterest
-  ? `
-    <button
-      class="profile-interest-btn interest-mutual"
-      type="button"
-      onclick="sendProfileInterest('${escapeHTML(profile.id)}')"
-    >
-      יש התאמה הדדית · לחץ לביטול
-    </button>
-  `
-  : receivedInterest
+  const interestButton = currentUser &&
+  String(id) !== String(currentUser.id)
     ? `
       <button
-        class="profile-interest-btn"
+        class="profile-phone-request-btn"
         type="button"
-        onclick="sendProfileInterest('${escapeHTML(profile.id)}')"
+        onclick="sendProfileInterest('${escapeHTML(profile.id)}', this)"
       >
-        ${escapeHTML(name)} מעוניין/ת בך · לאשר?
+        ${
+          mutualInterest
+            ? 'אישור החלפת מספרים'
+            : receivedInterest
+              ? `${escapeHTML(name)} ביקש/ה ממך את מספר הטלפון · לאשר?`
+              : alreadySent
+                ? 'ביטול בקשה למספר טלפון'
+                : 'שלח בקשה למספר'
+        }
       </button>
     `
-    : currentUser && String(id) !== String(currentUser.id)
-      ? `
-        <button
-          class="profile-interest-btn ${alreadySent ? 'cancel-interest' : ''}"
-          type="button"
-          onclick="sendProfileInterest('${escapeHTML(profile.id)}')"
-        >
-          ${alreadySent ? 'ביטול' : 'אני מעוניין/ת'}
-        </button>
-      `
-      : '';
+    : '';
 
   content.innerHTML = `
     <section class="profile-detail profile-detail-luxury">
@@ -5593,6 +5675,33 @@ receivedInterest = !!incoming && !alreadySent;
       </div>
 
       <div class="profile-detail-body">
+         <div class="profile-phone-box">
+  <div class="profile-phone-label">מספר טלפון</div>
+
+  <div class="profile-phone-value ${mutualInterest ? 'phone-revealed' : 'phone-blurred'}">
+    ${mutualInterest && phone
+      ? escapeHTML(phone)
+      : '050-000-0000'}
+  </div>
+
+  ${!mutualInterest ? `
+    <div class="profile-phone-hint">
+      המספר ייחשף לאחר אישור הבקשה
+    </div>
+  ` : ''}
+
+  ${interestButton}
+</div>
+
+        <div class="profile-detail-actions">
+  <button
+    class="profile-back-btn"
+    type="button"
+    onclick="renderProfiles()"
+  >
+    חזרה לפרופילים
+  </button>
+</div>
         ${hasValue(about) ? `
           <section class="profile-detail-about">
             <h3>
@@ -5618,24 +5727,14 @@ receivedInterest = !!incoming && !alreadySent;
           </section>
         ` : ''}
 
-        <div class="profile-detail-actions">
-          <button
-            class="profile-back-btn"
-            type="button"
-            onclick="renderProfiles()"
-          >
-            חזרה לפרופילים
-          </button>
-
-          ${interestButton}
-        </div>
+       
       </div>
     </section>
   `;
 }
 
 
-async function sendProfileInterest(id) {
+async function sendProfileInterest(id, button) {
   if (!currentUser || !db) {
     alert('צריך להתחבר כדי להביע עניין.');
     return;
@@ -5653,6 +5752,20 @@ async function sendProfileInterest(id) {
     return;
   }
 
+  // טעינה בתוך הכפתור
+  const originalText = button ? button.innerHTML : '';
+  const originalDisabled = button ? button.disabled : false;
+
+  if (button) {
+    button.disabled = true;
+    button.innerHTML = `
+      <span class="interest-loading">
+        <span class="interest-spinner"></span>
+        טוען...
+      </span>
+    `;
+  }
+
   try {
     const { data: existing, error: checkError } = await db
       .from('profile_interests')
@@ -5663,7 +5776,7 @@ async function sendProfileInterest(id) {
 
     if (checkError) throw checkError;
 
-    const { data: reciprocal, error: reciprocalError } = await db
+    const { error: reciprocalError } = await db
       .from('profile_interests')
       .select('id')
       .eq('sender_id', profile.id)
@@ -5685,12 +5798,6 @@ async function sendProfileInterest(id) {
         .filter(item => String(item.profileId) !== String(profile.id));
 
       saveMatchData('lev_sent_interests', sent);
-
-      alert(
-        reciprocal
-          ? 'ההתעניינות שלך בוטלה. ההתאמה ההדדית הסתיימה.'
-          : 'בקשת ההתעניינות בוטלה.'
-      );
     } else {
       const { error: insertError } = await db
         .from('profile_interests')
@@ -5711,12 +5818,6 @@ async function sendProfileInterest(id) {
       });
 
       saveMatchData('lev_sent_interests', sent);
-
-      alert(
-        reciprocal
-          ? 'יש התאמה הדדית! שניכם מעוניינים זה בזו.'
-          : 'בקשת ההתעניינות נשלחה בהצלחה.'
-      );
     }
 
     await openProfileDetail(profile.id);
@@ -5724,8 +5825,14 @@ async function sendProfileInterest(id) {
   } catch (error) {
     console.error('שגיאה בשליחת או בביטול עניין:', error);
     alert('הפעולה נכשלה: ' + (error.message || 'שגיאה לא ידועה'));
+
+    if (button && button.isConnected) {
+      button.innerHTML = originalText;
+      button.disabled = originalDisabled;
+    }
   }
 }
+
 
 
 
@@ -5965,10 +6072,15 @@ function renderSwipe() {
             <div class="swipe-name">
               ${escapeHTML(profile.name)}, ${escapeHTML(profile.age)}
             </div>
-            <div class="swipe-meta">
-              ${escapeHTML(profile.city)} · ${escapeHTML(profile.occupation)}
-              <br>${escapeHTML(profile.status)}
-            </div>
+           
+<div class="swipe-meta">
+  ${escapeHTML(profile.city)} · ${escapeHTML(profile.occupation)}
+  <br>${escapeHTML(getGenderedStatus(profile))}
+  ${profile.religious_view
+    ? ' · ' + escapeHTML(getGenderedReligiousView(profile))
+    : ''}
+</div>
+
             <div class="swipe-bio">
               ${escapeHTML(profile.bio)}
             </div>

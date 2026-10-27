@@ -3928,38 +3928,8 @@ body.registration-mode .topbar-inner > .brand-title {
 }
 
 @media (max-width: 600px) {
-  .profile-tile-details {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 12px;
-    border-radius: 14px;
-    background: #241525;
-    border: 1px solid #75415f;
-  }
-
-  .profile-tile-meta-grid {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: stretch;
-    gap: 10px;
-    width: 100%;
-  }
-
-  .profile-detail-chip {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    hyphens: none;
-    line-height: 1.5;
-  }
-
-  .profile-detail-chip svg {
-    flex: 0 0 20px;
-    width: 20px;
-    height: 20px;
+  .profile-tile-meta-grid .profile-detail-chip {
+    display: none;
   }
 }
 </style>
@@ -5474,8 +5444,7 @@ function renderProfiles() {
   </div>
 
   <div class="profiles-count">
-    <span class="profiles-count-number">${filteredProfiles.length}</span>
-    <span>פרופילים באתר השדכן</span>
+    <span>כל הפרופילים באתר השדכן</span>
   </div>
 
   <button

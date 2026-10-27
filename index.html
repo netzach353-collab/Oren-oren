@@ -3917,19 +3917,116 @@ body.registration-mode .topbar-inner > .brand-title {
   color: #fff;
 }
 
-@media (max-width: 380px) {
-  .photo-crop-card {
-    padding: 16px;
-  }
-
-  .photo-crop-card h2 {
-    font-size: 19px;
+@media (max-width: 600px) {
+  .desktop-only {
+    display: none !important;
   }
 }
 
-@media (max-width: 600px) {
-  .profile-tile-meta-grid .profile-detail-chip {
-    display: none;
+
+
+/* הפרדה ברורה בין שדות בעמוד הפרטים שלי */
+.personal-form-group {
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 3px solid rgba(190, 150, 180, 0.22);
+}
+
+/* תווית השדה */
+.personal-form-group label {
+  display: block;
+  margin-bottom: 9px;
+  font-weight: 600;
+}
+
+/* שדות קלט ופלייסהולדרים */
+.personal-form-group input,
+.personal-form-group select,
+.personal-form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* צבע פלייסהולדר */
+.personal-form-group input::placeholder,
+.personal-form-group textarea::placeholder {
+  color: #aaa3b5;
+  opacity: 1;
+}
+
+/* בלי קו מיותר אחרי השדה האחרון */
+.personal-form-group:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+/* באנר הודעות במרכז המסך */
+.site-notice {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: calc(100% - 36px);
+  max-width: 400px;
+  box-sizing: border-box;
+
+  padding: 28px 24px;
+background: linear-gradient(145deg, #35243F, #5A315A);
+  color: #ffffff;
+
+  border-radius: 20px;
+
+  z-index: 999999;
+  direction: rtl;
+  text-align: center;
+
+  animation: noticePop 0.25s ease-out;
+}
+
+/* טקסט ההודעה */
+.site-notice-message {
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.8;
+  margin-bottom: 22px;
+}
+
+
+
+
+.site-notice-actions button:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+/* כניסה חלקה למרכז */
+@keyframes noticePop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -46%) scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* התאמה לטלפון */
+@media (max-width: 480px) {
+  .site-notice {
+    width: calc(100% - 32px);
+    padding: 24px 18px;
+  }
+
+  .site-notice-message {
+    font-size: 16px;
+  }
+
+  .site-notice-actions button {
+    flex: 1;
   }
 }
 </style>
@@ -4057,7 +4154,7 @@ body.registration-mode .topbar-inner > .brand-title {
         stroke-linecap="round" stroke-linejoin="round">
         <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>
       </svg>
-     <span>התעניינו בי</span>
+     <span>התעניינתי</span>
     </button>
     
 
@@ -4076,6 +4173,12 @@ body.registration-mode .topbar-inner > .brand-title {
   </div>
 </nav>
   
+<!-- באנר הודעות -->
+<div id="siteNotice" class="site-notice" role="status" aria-live="polite">
+  <div id="siteNoticeMessage" class="site-notice-message"></div>
+  <div id="siteNoticeActions" class="site-notice-actions"></div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
@@ -5538,7 +5641,7 @@ function renderProfiles() {
 <div class="profile-tile-details">
 
   <div class="profile-tile-meta profile-tile-meta-grid">
-    <span class="profile-detail-chip">
+<span class="profile-detail-chip desktop-only">  
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
         <circle cx="12" cy="10" r="2.5"/>
@@ -5546,8 +5649,8 @@ function renderProfiles() {
       ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
     </span>
 
-    <span class="profile-detail-chip">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
+<span class="profile-detail-chip desktop-only">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
         <circle cx="12" cy="8" r="5"/>
         <path d="M20 21a8 8 0 0 0-16 0"/>
       </svg>
@@ -6257,86 +6360,157 @@ function saveMatchData(key, value) {
 
 
 
-function renderFavorites() {
+async function renderFavorites() {
   const content = document.getElementById('app-content');
   if (!content) return;
 
-  const interestedProfiles = [
-    getProfileById('p103'),
-    getProfileById('p105')
-  ].filter(Boolean);
+  if (!currentUser || !db) {
+    content.innerHTML = `
+      <div class="profiles-empty">
+        יש להתחבר כדי לראות את הפרופילים.
+      </div>
+    `;
+    return;
+  }
 
   content.innerHTML = `
-    <div class="interested-page-toolbar">
-      <button
-        type="button"
-        class="my-interests-link"
-        onclick="showPage('my-interests')">
-
-        <svg viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round">
-          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"/>
-        </svg>
-
-        התעניינתי
-      </button>
+    <div class="profiles-toolbar">
+      <div class="profiles-toolbar-info">
+        <h2>התעניינתי</h2>
+      </div>
+      <div class="profiles-count">
+        <span>פרופילים עם התעניינות הדדית</span>
+      </div>
     </div>
 
-    <section class="interested-heading">
-        <h2>רוצים להכיר אותך</h2>
-      <p>הפרופילים שהביעו בך עניין מחכים שתכיר אותם קצת יותר.</p>
-    </section>
-
-    
-    </div>
-
-    <div class="profiles-grid interested-grid">
-      ${interestedProfiles.length ? interestedProfiles.map(profile => `
-        <article class="profile-tile interested-card"
-          onclick="openProfileDetail('${escapeHTML(profile.id)}')">
-
-          <img
-            src="${escapeHTML(getProfileImage(profile))}"
-            alt="${escapeHTML(getProfileName(profile))}"
-            loading="lazy">
-
-          <div class="profile-tile-info interested-card-info">
-            <div class="profile-tile-name">
-              ${escapeHTML(getProfileName(profile))}${getProfileAge(profile) ? ', ' + getProfileAge(profile) : ''}
-            </div>
-
-            <div class="profile-tile-meta">
-  ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
-  ${getGenderedStatus(profile)
-    ? ' · ' + escapeHTML(getGenderedStatus(profile))
-    : ''}
-</div>
-
-            <div class="profile-tile-about">
-              ${escapeHTML(getProfileAbout(profile))}
-            </div>
-
-            <div class="interested-actions">
-              <span class="profile-tile-open">
-                צפייה בפרופיל ←
-              </span>
-            </div>
-          </div>
-        </article>
-      `).join('') : `
-        <div class="profiles-empty">
-          <strong>עדיין אין התעניינויות</strong>
-          <p>כשמישהו יביע בך עניין, הפרופיל שלו יופיע כאן.</p>
-        </div>
-      `}
-    </div>
+    <div class="profiles-empty">טוען פרופילים...</div>
   `;
-}
 
+  try {
+    const { data: outgoing, error: outgoingError } = await db
+      .from('profile_interests')
+      .select('receiver_id')
+      .eq('sender_id', currentUser.id);
+
+    if (outgoingError) throw outgoingError;
+
+    const { data: incoming, error: incomingError } = await db
+      .from('profile_interests')
+      .select('sender_id')
+      .eq('receiver_id', currentUser.id);
+
+    if (incomingError) throw incomingError;
+
+    const outgoingIds = new Set(
+      (outgoing || []).map(item => String(item.receiver_id))
+    );
+
+    const mutualIds = [
+      ...new Set(
+        (incoming || [])
+          .map(item => String(item.sender_id))
+          .filter(id => outgoingIds.has(id))
+      )
+    ];
+
+    const interestedProfiles = mutualIds
+      .map(id => getProfileById(id))
+      .filter(Boolean);
+
+    content.innerHTML = `
+      <div class="profiles-toolbar">
+        <div class="profiles-toolbar-info">
+          <h2>התעניינתי</h2>
+        </div>
+
+        <div class="profiles-count">
+          <span>${interestedProfiles.length} פרופילים עם התעניינות הדדית</span>
+        </div>
+      </div>
+
+      <div class="profiles-grid interested-grid">
+        ${
+          interestedProfiles.length
+            ? interestedProfiles.map(profile => `
+              <article
+                class="profile-tile interested-card"
+                onclick="openProfileDetail('${escapeHTML(profile.id)}')">
+
+                <img
+                  src="${escapeHTML(getProfileImage(profile))}"
+                  alt="${escapeHTML(getProfileName(profile))}"
+                  loading="lazy">
+
+                <div class="profile-tile-info interested-card-info">
+
+                  <div class="profile-tile-name">
+                    ${escapeHTML(getProfileName(profile))}${getProfileAge(profile) ? ', ' + getProfileAge(profile) : ''}
+                  </div>
+
+                  <div class="profile-tile-details">
+
+                    <div class="profile-tile-meta profile-tile-meta-grid">
+                      <span class="profile-detail-chip desktop-only">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
+                          <circle cx="12" cy="10" r="2.5"/>
+                        </svg>
+                        ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
+                      </span>
+
+                      <span class="profile-detail-chip desktop-only">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <circle cx="12" cy="8" r="5"/>
+                          <path d="M20 21a8 8 0 0 0-16 0"/>
+                        </svg>
+                        ${escapeHTML(getGenderedStatus(profile) || 'לא צוין')}
+                      </span>
+                    </div>
+
+                    <div class="profile-tile-meta profile-tile-meta-grid">
+                      <span class="profile-detail-chip">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4Z"/>
+                          <path d="M9 12h6M12 9v6"/>
+                        </svg>
+                        ${escapeHTML(getGenderedReligiousView(profile) || 'לא צוין')}
+                      </span>
+
+                      <span class="profile-detail-chip">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"/>
+                        </svg>
+                        ${escapeHTML(profile.relationship_goal || 'לא צוין')}
+                      </span>
+                    </div>
+
+                  </div>
+
+                </div>
+              </article>
+            `).join('')
+            : `
+              <div class="profiles-empty">
+                <strong>עדיין אין פרופילים להצגה</strong>
+                <br><br>
+                כאן יופיעו פרופילים לאחר ששניכם תביעו עניין זה בזה.
+              </div>
+            `
+        }
+      </div>
+    `;
+  } catch (error) {
+    console.error('שגיאה בטעינת פרופילי התעניינתי:', error);
+
+    content.innerHTML = `
+      <div class="profiles-empty">
+        לא הצלחנו לטעון את הפרופילים כרגע.
+        <br><br>
+        נסה לרענן את העמוד.
+      </div>
+    `;
+  }
+}
 
 
 function renderSwipe() {
@@ -7436,7 +7610,13 @@ async function toggleFullPrivacyMode() {
   return age;
 }
 
-function editPersonalName() {
+
+async function editPersonalName() {
+  if (!currentUser || !db) {
+    alert('יש להתחבר לאתר כדי לעדכן את השם.');
+    return;
+  }
+
   const details = getPersonalDetails();
 
   const newName = prompt(
@@ -7458,14 +7638,39 @@ function editPersonalName() {
     return;
   }
 
+  const { data, error } = await db
+    .from('profiles')
+    .update({ name })
+    .eq('id', currentUser.id)
+    .select('id');
+
+  if (error) {
+    console.error('שגיאה בעדכון השם:', error);
+    alert('לא הצלחנו לשמור את השם: ' + error.message);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    alert('השם לא נשמר. בדוק את הרשאות המשתמש ואת קיום הפרופיל.');
+    return;
+  }
+
   details.name = name;
   savePersonalDetails(details);
-
   renderPersonal();
+
+  alert('השם עודכן בהצלחה.');
 }
 
+
   
-  function editPersonalPhone() {
+  
+async function editPersonalPhone() {
+  if (!currentUser || !db) {
+    alert('יש להתחבר לאתר כדי לעדכן את מספר הטלפון.');
+    return;
+  }
+
   const details = getPersonalDetails();
 
   const newPhone = prompt(
@@ -7487,17 +7692,34 @@ function editPersonalName() {
     return;
   }
 
+  const { data, error } = await db
+    .from('profiles')
+    .update({ phone: phone || null })
+    .eq('id', currentUser.id)
+    .select('id');
+
+  if (error) {
+    console.error('שגיאה בעדכון מספר הטלפון:', error);
+    alert('לא הצלחנו לשמור את מספר הטלפון: ' + error.message);
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    alert('מספר הטלפון לא נשמר. בדוק את הרשאות המשתמש ואת קיום הפרופיל.');
+    return;
+  }
+
   details.phone = phone;
   savePersonalDetails(details);
   renderPersonal();
-}
-  
-  
-function savePersonalPrivacy(privacy) {
-  saveMatchData(PERSONAL_PRIVACY_KEY, privacy);
+
+  alert('מספר הטלפון עודכן בהצלחה.');
 }
 
+
 let personalActiveTab = 'details';
+let personalEditMode = false;
+
 
 function renderPersonal() {
   const content = document.getElementById('app-content');
@@ -7544,16 +7766,39 @@ function renderPersonal() {
       ${personalActiveTab === 'details' ? `
         <div class="personal-save-dock">
           <div class="personal-save-dock-inner">
-            <button type="button"
-              class="personal-save-btn"
-              onclick="saveAllPersonalDetails()">
-              שמירת כל השינויים
-            </button>
+
+            ${personalEditMode ? `
+              <button type="button"
+                class="personal-save-btn"
+                onclick="saveAllPersonalDetails()">
+                שמירת כל השינויים
+              </button>
+            ` : `
+              <button type="button"
+                class="personal-save-btn"
+                onclick="startPersonalEdit()">
+                עריכת פרטי פרופיל
+              </button>
+            `}
+
           </div>
         </div>
       ` : ''}
     </section>
   `;
+}
+
+
+async function cancelPersonalEdit() {
+  personalEditMode = false;
+
+  try {
+    await loadPersonalDetailsFromSupabase();
+  } catch (error) {
+    console.error('שגיאה בטעינת הפרטים מחדש:', error);
+  }
+
+  renderPersonal();
 }
 
 function switchPersonalTab(tab) {
@@ -7627,6 +7872,11 @@ function previewProfilePhotos(input) {
   if (!primaryPhotoCropped && selectedProfilePhotos.length) {
     openPrimaryPhotoCropper();
   }
+}
+
+function startPersonalEdit() {
+  personalEditMode = true;
+  renderPersonal();
 }
 
 function openPrimaryPhotoCropper() {
@@ -8069,54 +8319,91 @@ function renderPersonalDetails(details) {
     heightOptions.push(`${height} ס"מ`);
   }
 
+  const editMode = !!personalEditMode;
+
+  const field = (label, name, value, placeholder = '') => `
+    <div class="personal-form-group">
+      <label for="personal-${name}">${label}</label>
+      ${
+        editMode
+          ? `<input
+              class="personal-form-control"
+              id="personal-${name}"
+              name="${name}"
+              value="${escapeHTML(value || '')}"
+              placeholder="${escapeHTML(placeholder)}"
+            >`
+          : `<div class="personal-field-value">
+              ${escapeHTML(value || 'לא הוזן')}
+            </div>`
+      }
+    </div>
+  `;
+
+  const selectField = (name, label, options, value) => `
+    <div class="personal-form-group">
+      <label for="personal-${name}">${label}</label>
+      ${
+        editMode
+          ? `<select class="personal-form-control"
+                     id="personal-${name}" name="${name}">
+              <option value="">יש לבחור</option>
+              ${options.map(option => `
+                <option value="${escapeHTML(option)}"
+                  ${String(value || '') === option ? 'selected' : ''}>
+                  ${escapeHTML(option)}
+                </option>
+              `).join('')}
+            </select>`
+          : `<div class="personal-field-value">
+              ${escapeHTML(value || 'לא הוזן')}
+            </div>`
+      }
+    </div>
+  `;
+
+  const yesNoField = (name, label, value) =>
+    selectField(name, label, ['כן', 'לא'], value);
+
+  const radioField = (name, label, options, value) => `
+    <div class="personal-form-group">
+      <div class="personal-form-label">${label}</div>
+      ${
+        editMode
+          ? `<div class="personal-choice-list">
+              ${options.map(option => `
+                <label class="personal-choice">
+                  <input type="radio" name="${name}"
+                    value="${escapeHTML(option)}"
+                    ${String(value || '') === option ? 'checked' : ''}>
+                  ${escapeHTML(option)}
+                </label>
+              `).join('')}
+            </div>`
+          : `<div class="personal-field-value">
+              ${escapeHTML(value || 'לא הוזן')}
+            </div>`
+      }
+    </div>
+  `;
+
   return `
-  <form id="personal-details-form" onsubmit="return false;">
-    <section class="personal-panel">
+    <form id="personal-details-form" onsubmit="return false;">
+      <section class="personal-panel">
 
-      <div class="personal-panel-title">
-        <div>
-          <h2>הפרטים שלך</h2>
-          <p>אפשר לשנות כמה פרטים ולשמור את כולם יחד.</p>
-        </div>
-      </div>
-
-      <!-- שם: מוצג כנתון עם אפשרות עריכה -->
-      <div class="personal-field">
-        <div class="personal-field-info">
-          <span class="personal-field-label">השם שלי</span>
-
-          <div class="personal-field-value">
-            ${escapeHTML(details.name || 'לא הוזן שם')}
+        <div class="personal-panel-title">
+          <div>
+            <h2>הפרטים שלך</h2>
+            <p>${editMode
+              ? 'אפשר לערוך את הפרטים ולשמור את כולם יחד.'
+              : 'פרטי הפרופיל שלך.'}</p>
           </div>
         </div>
 
-        <button
-          type="button"
-          class="personal-edit-btn"
-          onclick="editPersonalName()"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M12 20h9"/>
-            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
-          </svg>
+        ${field('השם שלי', 'name', details.name, 'השם שיוצג בפרופיל')}
 
-          עריכת שם
-        </button>
-      </div>
-
-      <!-- גיל: נתון לקריאה בלבד -->
-      <div class="personal-field">
-        <div class="personal-field-info">
-          <span class="personal-field-label">הגיל שלי</span>
-
+        <div class="personal-form-group">
+          <label>הגיל שלי</label>
           <div class="personal-field-value">
             ${
               details.age !== '' &&
@@ -8126,182 +8413,134 @@ function renderPersonalDetails(details) {
                 : 'תאריך הלידה עדיין לא הוגדר'
             }
           </div>
-        </div>
-      </div>
-
-      <!-- מספר טלפון: נתון עם כפתור עריכה -->
-      <div class="personal-field">
-        <div class="personal-field-info">
-          <span class="personal-field-label">מספר טלפון</span>
-          <div class="personal-field-value" dir="ltr" style="text-align: right;">
-            ${escapeHTML(details.phone || 'אין עדיין מספר טלפון')}
+          <div class="personal-form-hint">
+            הגיל מחושב מתאריך הלידה ואינו ניתן לעריכה כאן.
           </div>
         </div>
 
-        <button
-          type="button"
-          class="personal-edit-btn"
-          onclick="editPersonalPhone()"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.8"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M12 20h9"/>
-            <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/>
-          </svg>
-          עידכון המספר
-        </button>
-      </div>
-<!-- עיר מגורים -->
-<div class="personal-form-group" style="margin-top: 28px;">
-  <label for="personal-city">עיר מגורים</label>
+        ${field('מספר טלפון', 'phone', details.phone, 'מספר טלפון')}
 
-  ${renderCityPicker(
-    'personal-city',
-    'city',
-    details.city,
-    'personal-form-control'
-  )}
-
-  <div class="personal-form-hint">
-    אפשר לבחור עיר מהרשימה או להקליד עיר אחרת.
-  </div>
-</div>
-      <!-- עיסוק -->
-      <div class="personal-form-group">
-        <label for="personal-occupation">עיסוק</label>
-
-        <input
-          class="personal-form-control"
-          id="personal-occupation"
-          name="occupation"
-          value="${escapeHTML(details.occupation || '')}"
-          placeholder="במה אתה עוסק?"
-        >
-      </div>
-
-<!-- מצב משפחתי -->
-${personalSelectField(
-  'status',
-  'מצב משפחתי',
-  ['רווק/ה', 'גרוש/ה', 'אלמן/ה'],
-  details.status
-)}
-
-      <!-- ילדים -->
-      ${personalYesNoField(
-        'children',
-        'יש ילדים?',
-        details.children
-      )}
-
-      <!-- השקפה דתית -->
-      ${personalSelectField(
-        'religiousView',
-        'השקפה דתית',
-        religiousOptions,
-        details.religiousView
-      )}
-
-      <!-- גובה -->
-      ${personalSelectField(
-        'height',
-        'גובה',
-        heightOptions,
-        details.height
-      )}
-
-      <!-- מטרת הקשר -->
-      ${personalRadioField(
-        'relationshipGoal',
-        'מטרת הקשר',
-        ['קשר רציני', 'חתונה'],
-        details.relationshipGoal
-      )}
-
-      <!-- שירות צבאי או לאומי -->
-      ${personalSelectField(
-        'service',
-        'שירות צבאי/לאומי',
-        [
-          'שירות לאומי',
-          'שירות סדיר מלא',
-          'לא שרתתי',
-          'אחר'
-        ],
-        details.service
-      )}
-
-      <!-- שפות נוספות -->
-      <div class="personal-form-group">
-        <div class="personal-form-label">שפות נוספות</div>
-
-        <div class="personal-choice-list">
-          ${languageOptions.map(language => `
-            <label class="personal-choice">
-              <input
-                type="checkbox"
-                name="languages"
-                value="${escapeHTML(language)}"
-                ${
-                  Array.isArray(details.languages) &&
-                  details.languages.includes(language)
-                    ? 'checked'
-                    : ''
-                }
-              >
-
-              ${escapeHTML(language)}
-            </label>
-          `).join('')}
+        <div class="personal-form-group">
+          <label for="personal-city">עיר מגורים</label>
+          ${
+            editMode
+              ? renderCityPicker(
+                  'personal-city',
+                  'city',
+                  details.city,
+                  'personal-form-control'
+                )
+              : `<div class="personal-field-value">
+                  ${escapeHTML(details.city || 'לא הוזנה עיר')}
+                </div>`
+          }
+          ${editMode ? `
+            <div class="personal-form-hint">
+              אפשר לבחור עיר מהרשימה או להקליד עיר אחרת.
+            </div>
+          ` : ''}
         </div>
 
-        <div class="personal-form-hint">
-          אפשר לבחור כמה שפות.
+        ${field('עיסוק', 'occupation', details.occupation, 'במה אתה עוסק?')}
+
+        ${selectField(
+          'status',
+          'מצב משפחתי',
+          ['רווק/ה', 'נשוי/אה', 'גרוש/ה', 'אלמן/ה'],
+          details.status
+        )}
+
+        ${yesNoField('children', 'יש ילדים?', details.children)}
+
+        ${selectField(
+          'religiousView',
+          'השקפה דתית',
+          religiousOptions,
+          details.religiousView
+        )}
+
+        ${selectField('height', 'גובה', heightOptions, details.height)}
+
+        ${radioField(
+          'relationshipGoal',
+          'מטרת הקשר',
+          ['קשר רציני', 'חתונה'],
+          details.relationshipGoal
+        )}
+
+        ${selectField(
+          'service',
+          'שירות צבאי/לאומי',
+          ['שירות לאומי', 'שירות סדיר מלא', 'לא שרתתי', 'אחר'],
+          details.service
+        )}
+
+        <div class="personal-form-group">
+          <div class="personal-form-label">שפות נוספות</div>
+          ${
+            editMode
+              ? `<div class="personal-choice-list">
+                  ${languageOptions.map(language => `
+                    <label class="personal-choice">
+                      <input
+                        type="checkbox"
+                        name="languages"
+                        value="${escapeHTML(language)}"
+                        ${
+                          Array.isArray(details.languages) &&
+                          details.languages.includes(language)
+                            ? 'checked'
+                            : ''
+                        }>
+                      ${escapeHTML(language)}
+                    </label>
+                  `).join('')}
+                </div>
+                <div class="personal-form-hint">
+                  אפשר לבחור כמה שפות.
+                </div>`
+              : `<div class="personal-field-value">
+                  ${escapeHTML(
+                    Array.isArray(details.languages) &&
+                    details.languages.length
+                      ? details.languages.join(', ')
+                      : 'לא הוזנו שפות'
+                  )}
+                </div>`
+          }
         </div>
-      </div>
 
-      <!-- עישון -->
-      ${personalYesNoField(
-        'smoker',
-        'מעשן?',
-        details.smoker
-      )}
+        ${yesNoField('smoker', 'מעשן?', details.smoker)}
 
-      <!-- מצב בריאותי -->
-      ${personalRadioField(
-        'health',
-        'מצב בריאותי',
-        ['תקין', 'אספר בהמשך'],
-        details.health
-      )}
+        ${radioField(
+          'health',
+          'מצב בריאותי',
+          ['תקין', 'אספר בהמשך'],
+          details.health
+        )}
 
-      <!-- שמירת כשרות -->
-      ${personalYesNoField(
-        'kosher',
-        'שמירת כשרות',
-        details.kosher
-      )}
+        ${yesNoField('kosher', 'שמירת כשרות', details.kosher)}
 
-    </section>
-  </form>
-`;
+      </section>
+    </form>
+  `;
 }
 
+  
 async function saveAllPersonalDetails() {
   const form = document.getElementById('personal-details-form');
-  if (!form || !currentUser) return;
+
+  if (!form || !currentUser) {
+    alert('לא ניתן לשמור כרגע. יש להתחבר מחדש.');
+    return;
+  }
 
   const formData = new FormData(form);
   const details = getPersonalDetails();
 
-  const textFields = [
+  const fields = [
+    'name',
+    'phone',
     'city',
     'occupation',
     'status',
@@ -8315,7 +8554,7 @@ async function saveAllPersonalDetails() {
     'kosher'
   ];
 
-  textFields.forEach(key => {
+  fields.forEach(key => {
     details[key] = String(formData.get(key) || '').trim();
   });
 
@@ -8324,6 +8563,8 @@ async function saveAllPersonalDetails() {
     .filter(Boolean);
 
   const profileUpdate = {
+    name: details.name || null,
+    phone: details.phone || null,
     city: details.city || null,
     occupation: details.occupation || null,
     status: details.status || null,
@@ -8338,23 +8579,55 @@ async function saveAllPersonalDetails() {
     kosher: details.kosher || null
   };
 
-  const { error } = await db
+  const { data, error } = await db
     .from('profiles')
     .update(profileUpdate)
-    .eq('id', currentUser.id);
+    .eq('id', currentUser.id)
+    .select('id');
 
-  if (error) {
+  if (error || !data || data.length === 0) {
     console.error('שגיאה בשמירת הפרטים:', error);
-    alert('לא הצלחנו לשמור את הפרטים: ' + error.message);
+    alert(
+      error
+        ? 'לא הצלחנו לשמור את הפרטים: ' + error.message
+        : 'הפרטים לא נשמרו. בדוק את ההרשאות ואת החיבור לשרת.'
+    );
     return;
   }
 
   savePersonalDetails(details);
+
+  personalEditMode = false;
   renderPersonal();
 
-  alert('הפרטים נשמרו בהצלחה.');
+showSiteNotice('כל פרטי הפרופיל נשמרו בהצלחה.');
 }
-  
+
+function showSiteNotice(message, type = 'success') {
+  const notice = document.getElementById('siteNotice');
+  const messageEl = document.getElementById('siteNoticeMessage');
+  const actionsEl = document.getElementById('siteNoticeActions');
+
+  if (!notice || !messageEl || !actionsEl) {
+    console.error('אלמנט הבאנר לא נמצא');
+    return;
+  }
+
+  messageEl.textContent = message;
+  actionsEl.replaceChildren();
+
+  notice.style.borderColor =
+    type === 'success' ? '#22c55e' : '#ef4444';
+
+  notice.style.display = 'block';
+
+  clearTimeout(window.siteNoticeTimer);
+
+  window.siteNoticeTimer = setTimeout(() => {
+    notice.style.display = 'none';
+  }, 3500);
+}
+
 function renderPersonalPrivacy() {
   const privacy = getPersonalPrivacy();
 
@@ -8492,18 +8765,6 @@ async function updateNotificationCount() {
     console.error('שגיאה בעדכון מונה ההתראות:', error);
   }
 }
-
-
-function updatePersonalPrivacy(key, value) {
-  if (!Object.prototype.hasOwnProperty.call(personalFieldLabels, key)) return;
-  if (!['public', 'matched', 'private'].includes(value)) return;
-
-  const privacy = getPersonalPrivacy();
-  privacy[key] = value;
-  savePersonalPrivacy(privacy);
-
-  renderPersonal();
-} 
 
 async function renderNotifications() {
   const content = document.getElementById('app-content');

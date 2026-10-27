@@ -760,28 +760,6 @@ body {
   border-radius: 16px;
 }
 
-@media (max-width: 380px) {
-  .profiles-grid {
-    gap: 9px;
-  }
-
-  .profile-tile img {
-    height: 145px;
-  }
-
-  .profile-tile-info {
-    padding: 9px;
-  }
-
-  .profile-tile-name {
-    font-size: 14px;
-  }
-
-  .profiles-toolbar h2 {
-    font-size: 20px;
-  }
-}
- 
  /* מסך החלקה בגובה מלא בין הסרגלים */
 body:has(.swipe-screen) {
   overflow-x: hidden;
@@ -1087,8 +1065,6 @@ body.keyboard-open {
   padding-bottom: 0 !important;
 }
 
- 
- /* מצב פרטיות מלא */
 
 /* מתג פרטיות */
 .privacy-mode-button {
@@ -2714,8 +2690,7 @@ body.registration-mode .topbar-inner > .brand-title {
 
 
 
-
-/* ===== כרטיסים סגורים — בורדו יוקרתי ===== */
+/* ===== כרטיסים סגורים — תמונה מלאה עם פרטים מעליה ===== */
 
 .profiles-grid:not(.interested-grid) {
   display: grid;
@@ -2725,15 +2700,17 @@ body.registration-mode .topbar-inner > .brand-title {
 }
 
 .profiles-grid:not(.interested-grid) .profile-tile {
-  display: flex;
-  flex-direction: column;
+  position: relative;
+  display: block;
   min-width: 0;
-  min-height: 340px;
-  overflow: hidden;
+  height: 340px;
+  min-height: 0;
   padding: 0;
+  overflow: hidden;
+  isolation: isolate;
   cursor: pointer;
-  color: #fff0f5;
-  background: linear-gradient(155deg, #4b1930 0%, #29101e 100%);
+  color: #fff;
+  background: #29101e;
   border: 1px solid #79465c;
   border-radius: 19px;
   box-shadow: 0 7px 22px rgba(20, 4, 13, 0.24);
@@ -2749,26 +2726,57 @@ body.registration-mode .topbar-inner > .brand-title {
   transform: scale(0.985);
 }
 
-.profiles-grid:not(.interested-grid) .profile-tile img {
+/* התמונה מכסה את כל הכרטיס */
+.profiles-grid:not(.interested-grid) .profile-tile > img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   display: block;
   width: 100%;
-  height: 235px;
-  flex-shrink: 0;
+  height: 100%;
+  max-width: none;
   object-fit: cover;
   object-position: center;
-  background: #29101e;
-  border: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
   border-radius: 0;
+  background: #29101e;
 }
 
-.profiles-grid:not(.interested-grid) .profile-tile-info {
+/* הצללה הדרגתית מתחתית התמונה */
+.profiles-grid:not(.interested-grid) .profile-tile::after {
+  content: "";
+  position: absolute;
+  inset: 30% 0 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(41, 16, 30, 0.25) 35%,
+    rgba(25, 7, 17, 0.94) 100%
+  );
+  pointer-events: none;
+}
+
+/* פרטי הפרופיל יושבים על התמונה */
+.profiles-grid:not(.interested-grid) .profile-tile > .profile-tile-info {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
   display: flex;
-  flex: 1;
   flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
   min-width: 0;
-  padding: 14px;
+  margin: 0;
+  padding: 40px 12px 13px;
+  background: transparent;
 }
 
+/* שם וגיל */
 .profiles-grid:not(.interested-grid) .profile-tile-name {
   color: #fff0f5;
   font-size: 17px;
@@ -2777,88 +2785,26 @@ body.registration-mode .topbar-inner > .brand-title {
   overflow-wrap: anywhere;
 }
 
+/* עיר וסטטוס */
 .profiles-grid:not(.interested-grid) .profile-tile-meta {
-  margin-top: 6px;
-  color: #e6b8cb;
+  margin-top: 5px;
+  color: #ffe0ec;
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
+/* תיאור */
 .profiles-grid:not(.interested-grid) .profile-tile-about {
-  flex: 1;
-  min-height: 36px;
-  margin-top: 10px;
-  color: #f0dce5;
-  font-size: 13px;
-  line-height: 1.7;
+  flex: initial;
+  min-height: 0;
+  margin-top: 6px;
+  color: #fff0f5;
+  font-size: 12px;
+  line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
-.profiles-grid:not(.interested-grid) .profile-tile-open {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 15px;
-  padding: 11px 5px 2px;
-  border-top: 1px solid rgba(240, 201, 216, 0.25);
-  color: #f0c9d8;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-/* התאמה לנייד */
-
-@media (max-width: 600px) {
-  .profiles-grid:not(.interested-grid) {
-    gap: 11px;
-  }
-
-  .profiles-grid:not(.interested-grid) .profile-tile {
-    min-height: 300px;
-    border-radius: 15px;
-  }
-
-  .profiles-grid:not(.interested-grid) .profile-tile img {
-    height: 185px;
-  }
-
-  .profiles-grid:not(.interested-grid) .profile-tile-info {
-    padding: 10px;
-  }
-
-  .profiles-grid:not(.interested-grid) .profile-tile-name {
-    font-size: 15px;
-  }
-
-  .profiles-grid:not(.interested-grid) .profile-tile-meta,
-  .profiles-grid:not(.interested-grid) .profile-tile-about {
-    font-size: 12px;
-  }
-
-  .profiles-grid:not(.interested-grid) .profile-tile-open {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 380px) {
-  .profiles-grid:not(.interested-grid) {
-    gap: 8px;
-  }
-
-  .profiles-grid:not(.interested-grid) .profile-tile img {
-    height: 155px;
-  }
-
-  .profiles-grid:not(.interested-grid) .profile-tile-info {
-    padding: 8px;
-  }
-
-  .profiles-grid:not(.interested-grid) .profile-tile-name {
-    font-size: 14px;
-  }
-}
-
+/* נתונים נוספים */
 .profiles-grid:not(.interested-grid) .profile-tile-meta-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2869,16 +2815,30 @@ body.registration-mode .topbar-inner > .brand-title {
 .profiles-grid:not(.interested-grid) .profile-tile-meta-grid > div {
   min-width: 0;
   padding: 6px 4px;
-  border: 1px solid rgba(240, 201, 216, 0.25);
+  border: 1px solid rgba(255, 224, 236, 0.3);
   border-radius: 8px;
-  background: rgba(240, 201, 216, 0.08);
-  color: #f0c9d8;
+  background: rgba(41, 16, 30, 0.55);
+  color: #fff0f5;
   font-size: 12px;
   text-align: center;
   overflow-wrap: anywhere;
 }
 
+/* קישור לצפייה בפרופיל */
+.profiles-grid:not(.interested-grid) .profile-tile-open {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 9px;
+  padding: 8px 0 0;
+  border-top: 1px solid rgba(240, 201, 216, 0.3);
+  color: #ffd6e5;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+}
 
+/* פרטי מידע נוספים */
 .profiles-grid:not(.interested-grid) .profile-detail-chip {
   display: inline-flex;
   align-items: center;
@@ -2886,10 +2846,10 @@ body.registration-mode .topbar-inner > .brand-title {
   max-width: 100%;
   min-width: 0;
   padding: 6px 8px;
-  border: 1px solid rgba(240, 201, 216, 0.22);
+  border: 1px solid rgba(240, 201, 216, 0.25);
   border-radius: 8px;
-  background: rgba(240, 201, 216, 0.07);
-  color: #f0dce5;
+  background: rgba(41, 16, 30, 0.55);
+  color: #fff0f5;
   font-size: 11px;
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -2900,12 +2860,54 @@ body.registration-mode .topbar-inner > .brand-title {
   height: 15px;
   flex: 0 0 15px;
   fill: none;
-  stroke: #e8b4c9;
+  stroke: #ffd6e5;
   stroke-width: 1.6;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
+/* התאמה לנייד */
+@media (max-width: 600px) {
+  .profiles-grid:not(.interested-grid) {
+    gap: 11px;
+  }
+
+  .profiles-grid:not(.interested-grid) .profile-tile {
+    height: 300px;
+    border-radius: 15px;
+  }
+
+  .profiles-grid:not(.interested-grid) .profile-tile > .profile-tile-info {
+    padding: 35px 10px 11px;
+  }
+
+  .profiles-grid:not(.interested-grid) .profile-tile-name {
+    font-size: 15px;
+  }
+
+  .profiles-grid:not(.interested-grid) .profile-tile-meta,
+  .profiles-grid:not(.interested-grid) .profile-tile-about {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .profiles-grid:not(.interested-grid) {
+    gap: 8px;
+  }
+
+  .profiles-grid:not(.interested-grid) .profile-tile {
+    height: 280px;
+  }
+
+  .profiles-grid:not(.interested-grid) .profile-tile > .profile-tile-info {
+    padding: 30px 8px 9px;
+  }
+
+  .profiles-grid:not(.interested-grid) .profile-tile-name {
+    font-size: 14px;
+  }
+}
 
 
 /* ===== התראות התעניינות ===== */
@@ -3669,6 +3671,226 @@ body.registration-mode .topbar-inner > .brand-title {
   color: #e0ceff;
 }
 
+
+/* כרטיס פרופיל: התמונה ממלאת את כל הכרטיס */
+.profile-tile {
+  position: relative;
+  height: 340px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #17131b;
+  isolation: isolate;
+}
+
+/* התמונה מכסה את כל שטח הכרטיס */
+.profile-tile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+/* שכבת הצללה מאחורי הפרטים */
+.profile-tile::after {
+  content: "";
+  position: absolute;
+  inset: 40% 0 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 40%,
+    rgba(0, 0, 0, 0.85) 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* הפרטים יושבים מעל התמונה */
+.profile-tile-info {
+  position: absolute;
+  z-index: 2;
+  inset: auto 0 0;
+  padding: 16px 12px;
+  color: #fff;
+  background: transparent;
+}
+
+/* שם וגיל */
+.profile-tile-name {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+/* עיר ופרטים נוספים */
+.profile-tile-meta,
+.profile-tile-about {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 13px;
+}
+
+/* מבטל רווחים מיותרים */
+.profile-tile-about {
+  min-height: 0;
+  margin-top: 5px;
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 380px) {
+  .profile-tile {
+    height: 300px;
+  }
+
+  .profile-tile-info {
+    padding: 12px 9px;
+  }
+
+  .profile-tile-name {
+    font-size: 15px;
+  }
+}
+
+
+
+/* חלון חיתוך תמונה */
+.photo-crop-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(8, 5, 14, 0.88);
+  backdrop-filter: blur(8px);
+}
+
+.photo-crop-panel {
+  width: 100%;
+  max-width: 520px;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 22px;
+  border-radius: 22px;
+  background: #171321;
+  border: 1px solid #75415f;
+  color: #fff;
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.5);
+}
+
+.photo-crop-title {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.photo-crop-hint {
+  margin: 0 0 18px;
+  color: #c8b8d5;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.photo-crop-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #090710;
+  border: 1px solid #49304e;
+  touch-action: none;
+  cursor: grab;
+}
+
+.photo-crop-stage:active {
+  cursor: grabbing;
+}
+
+.photo-crop-stage img {
+  position: absolute;
+  max-width: none;
+  max-height: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.photo-crop-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.photo-crop-controls input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  accent-color: #c026d3;
+}
+
+.photo-crop-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.photo-crop-actions button {
+  flex: 1;
+  min-height: 46px;
+  border: 1px solid #75415f;
+  border-radius: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.photo-crop-confirm {
+  background: linear-gradient(135deg, #7c3aed, #c026d3);
+  color: #fff;
+}
+
+.photo-crop-cancel {
+  background: #292033;
+  color: #fff;
+}
+
+.profile-photo-preview {
+  position: relative;
+}
+
+.profile-photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-photo-cropped-label {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  padding: 4px 7px;
+  border-radius: 7px;
+  background: rgba(20, 12, 28, 0.88);
+  color: #fff;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .photo-crop-panel {
+    padding: 16px;
+  }
+
+  .photo-crop-actions button {
+    font-size: 13px;
+  }
+}
+
 </style>
 </head>
 
@@ -3829,14 +4051,29 @@ console.log('Supabase initialized:', !!db);
   
   <script>
  
+
 let swipeProfiles = [];
+
+function getProfilePhotoUrl(photoKey) {
+  if (!photoKey) return '';
+
+  // אם כבר נשמרה כתובת מלאה, משתמשים בה כמו שהיא.
+  if (/^https?:\/\//i.test(photoKey)) {
+    return photoKey;
+  }
+
+  // אחרת מתייחסים לערך כמזהה Uploadcare.
+  return `https://ucarecdn.com/${encodeURIComponent(photoKey)}/`;
+}
 
 async function loadSwipeProfiles() {
   if (!currentUser) return false;
 
   const { data, error } = await db.rpc('get_swipe_profiles');
-console.log('RPC error:', error);
-console.log('RPC data:', JSON.stringify(data, null, 2));
+
+  console.log('RPC error:', error);
+  console.log('RPC data:', JSON.stringify(data, null, 2));
+
   if (error) {
     console.error('שגיאה בטעינת פרופילים:', error);
     alert('לא הצלחנו לטעון פרופילים: ' + error.message);
@@ -3844,31 +4081,26 @@ console.log('RPC data:', JSON.stringify(data, null, 2));
   }
 
   swipeProfiles = (data || []).map(profile => {
-    const keys = Array.isArray(profile.photo_keys)
-      ? profile.photo_keys
+    const photoKeys = Array.isArray(profile.photo_keys)
+      ? profile.photo_keys.filter(Boolean)
       : [];
 
-    const photoKey = keys[0] || '';
-
-return {
-  ...profile,
-  age: profile.birth_date
-    ? calculateAge(profile.birth_date)
-    : null,
-  bio: profile.about || '',
-  photo: photoKey
-  ? `https://2k0rhhtw53.ucarecd.net/${photoKey}/1000000444.jpg`
-  : ''
-};
+    return {
+      ...profile,
+      photo_keys: photoKeys,
+      age: profile.birth_date
+        ? calculateAge(profile.birth_date)
+        : null,
+      bio: profile.about || '',
+      photo: getProfilePhotoUrl(photoKeys[0] || profile.photo || '')
+    };
   });
 
   console.log('פרופילים שנטענו מ־Supabase:', swipeProfiles);
-  console.log('נתוני התמונות שהתקבלו:', (data || []).map(profile => ({
-  id: profile.id,
-  photo_keys: profile.photo_keys
-})));
+
   return true;
 }
+
 
   
 async function loginWithGoogle() {
@@ -5268,9 +5500,6 @@ ${escapeHTML(getGenderedReligiousView(profile) || 'לא צוין')}
   </div>
 
 </div>
-
-
-            <span class="profile-tile-open">לצפייה בפרופיל ←</span>
           </div>
         </article>
       `).join('') : `

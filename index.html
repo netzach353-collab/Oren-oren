@@ -3277,40 +3277,77 @@ body.registration-mode .topbar-inner > .brand-title {
 
 
 .profile-photo-previews {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
   margin-top: 12px;
 }
 
+.profile-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  direction: rtl;
+}
+
+.profile-photo-empty,
 .profile-photo-preview {
   position: relative;
-  aspect-ratio: 1;
+  aspect-ratio: 1 / 1;
+  min-width: 0;
   overflow: hidden;
   border-radius: 14px;
-  border: 1px solid #75415f;
+}
+
+.profile-photo-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px dashed #b9a5d9;
+  color: #72529a;
+}
+
+.profile-photo-empty span {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.profile-photo-empty small {
+  font-size: 11px;
+}
+
+.profile-photo-preview {
   background: #241525;
+  border: 1px solid #75415f;
 }
 
 .profile-photo-preview img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  display: block;
 }
 
 .profile-photo-remove {
   position: absolute;
   top: 6px;
-  right: 6px;
+  inset-inline-end: 6px;
   width: 28px;
   height: 28px;
   border: 0;
   border-radius: 50%;
-  background: #35152f;
-  color: white;
-  font-size: 18px;
+  background: #fff;
+  color: #b4234d;
+  font-size: 20px;
   cursor: pointer;
+  box-shadow: 0 1px 5px #0002;
+}
+
+.profile-photo-counter {
+  margin-top: 8px;
+  color: #aaa;
+  font-size: 12px;
+  text-align: center;
 }
 
 
@@ -3682,17 +3719,20 @@ body.registration-mode .topbar-inner > .brand-title {
 }
 
 .auth-btn-primary.is-loading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
   position: relative;
-  padding-inline-start: 42px;
+  padding-inline: 18px;
 }
 
 .auth-btn-primary.is-loading::before {
   content: "";
-  position: absolute;
-  inset-inline-start: 16px;
-  top: 50%;
-  width: 15px;
-  height: 15px;
+  display: inline-block;
+  width: 17px;
+  height: 17px;
+  flex: 0 0 17px;
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-top-color: #fff;
   border-radius: 50%;
@@ -3705,153 +3745,6 @@ body.registration-mode .topbar-inner > .brand-title {
   }
 }
 
-
-
-.profile-upload-group {
-  margin-top: 26px;
-  padding: 18px;
-  border: 1px solid rgba(192, 38, 211, .25);
-  border-radius: 20px;
-  background: linear-gradient(145deg, #171326, #101321);
-}
-
-.profile-photo-previews {
-  margin-top: 16px;
-}
-
-.profile-photo-counter {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
-  color: #e8e4f4;
-  font-size: 14px;
-}
-
-.profile-photo-counter strong {
-  color: #e879f9;
-  font-size: 15px;
-}
-
-.profile-photo-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.profile-photo-preview,
-.profile-photo-add {
-  position: relative;
-  min-width: 0;
-  aspect-ratio: 3 / 4;
-  overflow: hidden;
-  border: 1px solid rgba(192, 132, 252, .3);
-  border-radius: 15px;
-  background: #211a32;
-}
-
-.profile-photo-preview img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.profile-photo-number {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  left: 0;
-  padding: 18px 5px 8px;
-  color: white;
-  font-size: 11px;
-  text-align: center;
-  background: linear-gradient(transparent, rgba(0, 0, 0, .75));
-}
-
-.profile-photo-remove {
-  position: absolute;
-  top: 7px;
-  left: 7px;
-  display: grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, .3);
-  border-radius: 50%;
-  color: white;
-  background: rgba(30, 12, 32, .85);
-  font-size: 22px;
-  cursor: pointer;
-}
-
-.profile-photo-add {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  padding: 10px;
-  color: #f3e8ff;
-  text-align: center;
-  cursor: pointer;
-  border-style: dashed;
-  border-color: rgba(217, 70, 239, .6);
-  transition: background .2s, border-color .2s;
-}
-
-.profile-photo-add:hover {
-  background: #30203e;
-  border-color: #e879f9;
-}
-
-.profile-photo-add-icon {
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  color: white;
-  background: linear-gradient(135deg, #7c3aed, #c026d3);
-  font-size: 26px;
-}
-
-.profile-photo-add small {
-  color: #b8aecb;
-  font-size: 10px;
-}
-
-.profile-photo-add input[type="file"] {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.profile-photo-first {
-  width: 100%;
-  max-width: 260px;
-  aspect-ratio: auto;
-  min-height: 125px;
-  margin-top: 12px;
-  padding: 18px;
-}
-
-@media (max-width: 380px) {
-  .profile-photo-grid {
-    gap: 6px;
-  }
-
-  .profile-photo-remove {
-    top: 4px;
-    left: 4px;
-    width: 26px;
-    height: 26px;
-  }
-}
 
 </style>
 </head>
@@ -4874,31 +4767,23 @@ function renderRegisterStep(step) {
         עד 500 תווים. זה מה שאחרים יראו בפרופיל.
       </div>
     </div>
-       
+        <div class="auth-form-group">
+      <label for="reg-profile-photos">תמונות הפרופיל</label>
 
-<div class="auth-form-group profile-upload-group">
-  <label>תמונות הפרופיל</label>
+      <div class="auth-hint">
+        אפשר להוסיף עד 3 תמונות. בחר/י תמונות ברורות שלך.
+      </div>
 
-  <div class="auth-hint">
-    אפשר להוסיף עד 3 תמונות. אפשר לבחור אותן גם בנפרד.
-  </div>
+      <input
+        id="reg-profile-photos"
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        multiple
+        onchange="previewProfilePhotos(this)"
+      >
 
-  <label class="profile-photo-add profile-photo-first">
-    <span class="profile-photo-add-icon">+</span>
-    <span>בחירת תמונות</span>
-    <small>JPG · PNG · WebP · עד 5MB לתמונה</small>
-
-    <input
-      id="reg-profile-photos"
-      type="file"
-      accept="image/jpeg,image/png,image/webp"
-      multiple
-      onchange="previewProfilePhotos(this)"
-    >
-  </label>
-
-  <div id="profile-photo-previews" class="profile-photo-previews"></div>
-</div>
+      <div id="profile-photo-previews" class="profile-photo-previews"></div>
+    </div>
   `;
 }
   
@@ -5361,7 +5246,8 @@ function renderProfiles() {
   </div>
 
   <div class="profiles-count">
-    <span>כל הפרופילים באתר השדכן</span>
+    <span class="profiles-count-number">${filteredProfiles.length}</span>
+    <span>פרופילים באתר השדכן</span>
   </div>
 
   <button
@@ -6556,7 +6442,7 @@ function filterCityDropdown(id) {
         role="option"
         onmousedown="event.preventDefault()"
         onclick="selectManualCity('${id}')"
-      > הקלידו ידנית</button>
+      > אין את העיר? הקלידו ידנית</button>
     `;
 
   picker.classList.add('open');
@@ -7524,18 +7410,25 @@ function previewProfilePhotos(input) {
   renderProfilePhotoPreviews();
 }
 
+
 function renderProfilePhotoPreviews() {
   const preview = document.getElementById('profile-photo-previews');
   if (!preview) return;
 
   preview.innerHTML = `
-    <div class="profile-photo-counter">
-      <span>התמונות שבחרת</span>
-      <strong>${selectedProfilePhotos.length}/3</strong>
-    </div>
-
     <div class="profile-photo-grid">
-      ${selectedProfilePhotos.map((file, index) => {
+      ${[0, 1, 2].map(index => {
+        const file = selectedProfilePhotos[index];
+
+        if (!file) {
+          return `
+            <div class="profile-photo-empty">
+              <span>+</span>
+              <small>תמונה ${index + 1}</small>
+            </div>
+          `;
+        }
+
         const url = URL.createObjectURL(file);
 
         return `
@@ -7545,11 +7438,6 @@ function renderProfilePhotoPreviews() {
               alt="תמונה ${index + 1}"
               onload="URL.revokeObjectURL(this.src)"
             >
-
-            <span class="profile-photo-number">
-              תמונה ${index + 1}
-            </span>
-
             <button
               type="button"
               class="profile-photo-remove"
@@ -7559,23 +7447,13 @@ function renderProfilePhotoPreviews() {
           </div>
         `;
       }).join('')}
-
-      ${selectedProfilePhotos.length < 3 ? `
-        <label class="profile-photo-add">
-          <span class="profile-photo-add-icon">+</span>
-          <span>הוספת תמונה</span>
-          <small>JPG · PNG · WebP</small>
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            multiple
-            onchange="previewProfilePhotos(this)"
-          >
-        </label>
-      ` : ''}
+    </div>
+    <div class="profile-photo-counter">
+      נבחרו ${selectedProfilePhotos.length} מתוך 3 תמונות
     </div>
   `;
 }
+
 
 function removeProfilePhoto(index) {
   if (index < 0 || index >= selectedProfilePhotos.length) return;

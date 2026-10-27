@@ -3532,7 +3532,7 @@ body.registration-mode .topbar-inner > .brand-title {
 
 .profile-photo-preview {
   position: relative;
-  aspect-ratio: 1;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: 14px;
   border: 1px solid #75415f;
@@ -3799,7 +3799,7 @@ body.registration-mode .topbar-inner > .brand-title {
 .photo-crop-stage {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: 16px;
   background: #090710;
@@ -7423,19 +7423,13 @@ function personalSelectField(key, label, options, value) {
 
 
 let selectedProfilePhotos = [];
+let profilePhotoCropInProgress = false;
 
 function previewProfilePhotos(input) {
   const files = Array.from(input.files || []);
-  const preview = document.getElementById('profile-photo-previews');
+  input.value = '';
 
-  if (!preview) return;
-
-  const allowedTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/webp'
-  ];
-
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
   const validFiles = files.filter(file =>
     allowedTypes.includes(file.type) &&
     file.size <= 5 * 1024 * 1024
@@ -7445,14 +7439,53 @@ function previewProfilePhotos(input) {
     alert('אפשר לבחור תמונות JPG, PNG או WebP עד 5MB לתמונה.');
   }
 
-  if (validFiles.length > 3) {
+  if (selectedProfilePhotos.length + validFiles.length > 3) {
     alert('אפשר להעלות עד 3 תמונות בלבד.');
   }
 
-  selectedProfilePhotos = validFiles.slice(0, 3);
+  const availableSlots = Math.max(0, 3 - selectedProfilePhotos.length);
+  const filesToCrop = validFiles.slice(0, availableSlots);
+
+  if (!filesToCrop.length) return;
+
+  if (profilePhotoCropInProgress) {
+    alert('יש לסיים את חיתוך התמונה הנוכחית לפני בחירת תמונות נוספות.');
+    return;
+  }
+
+  profilePhotoCropInProgress = true;
+  cropSelectedFiles(filesToCrop, 0);
+}
+
+function cropSelectedFiles(files, index) {
+  if (index >= files.length) {
+    profilePhotoCropInProgress = false;
+    renderProfilePhotoPreviews();
+    return;
+  }
+
+  const file = files[index];
+
+  openPhotoCropper(
+    file,
+    croppedFile => {
+      selectedProfilePhotos.push(file);
+      croppedProfilePhotos.push(croppedFile);
+      cropSelectedFiles(files, index + 1);
+    },
+    () => {
+      profilePhotoCropInProgress = false;
+      renderProfilePhotoPreviews();
+    }
+  );
+}
+
+function renderProfilePhotoPreviews() {
+  const preview = document.getElementById('profile-photo-previews');
+  if (!preview) return;
 
   preview.innerHTML = selectedProfilePhotos.map((file, index) => {
-    const url = URL.createObjectURL(file);
+    const url = URL.createObjectURL(croppedProfilePhotos[index] || file);
 
     return `
       <div class="profile-photo-preview">
@@ -7460,6 +7493,9 @@ function previewProfilePhotos(input) {
           src="${url}"
           alt="תצוגה מקדימה של תמונה ${index + 1}"
         >
+        <span class="profile-photo-cropped-label">
+          ${index < 2 ? `תמונה ראשית ${index + 1}` : 'תמונה נוספת'}
+        </span>
         <button
           type="button"
           class="profile-photo-remove"
@@ -7469,25 +7505,12 @@ function previewProfilePhotos(input) {
       </div>
     `;
   }).join('');
-
-  input.value = '';
 }
 
 function removeProfilePhoto(index) {
   selectedProfilePhotos.splice(index, 1);
-
-  const input = document.getElementById('reg-profile-photos');
-
-  if (input) {
-    const transfer = new DataTransfer();
-
-    selectedProfilePhotos.forEach(file => transfer.items.add(file));
-    input.files = transfer.files;
-    previewProfilePhotos(input);
-  } else {
-    const preview = document.getElementById('profile-photo-previews');
-    if (preview) preview.innerHTML = '';
-  }
+  croppedProfilePhotos.splice(index, 1);
+  renderProfilePhotoPreviews();
 }
 
 
@@ -8389,6 +8412,258 @@ if (!currentUser) {
 }
 
 debugAuth();
+
+
+
+let cropQueue = [];
+let cropQueueIndex = 0;
+let cropImage = null;
+let cropScale = 1;
+let cropMinScale = 1;
+let cropX = 0;
+let cropY = 0;
+let cropDragging = false;
+let cropPointerX = 0;
+let cropPointerY = 0;
+let cropResultCanvas = null;
+let croppedProfilePhotos = [];
+
+function openPhotoCropper(file, onConfirm, onCancel) {
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    const image = new Image();
+
+    image.onload = () => {
+      cropImage = image;
+      cropScale = 1;
+      cropX = 0;
+      cropY = 0;
+
+      const modal = document.createElement('div');
+      modal.className = 'photo-crop-modal';
+      modal.id = 'photo-crop-modal';
+
+      modal.innerHTML = `
+        <div class="photo-crop-panel" dir="rtl">
+          <h2 class="photo-crop-title">חיתוך תמונה</h2>
+          <p class="photo-crop-hint">
+            גרור את התמונה כדי למקם אותה. אפשר להגדיל או להקטין.
+          </p>
+
+          <div class="photo-crop-stage" id="photo-crop-stage">
+            <img id="photo-crop-image" alt="חיתוך תמונה">
+          </div>
+
+          <div class="photo-crop-controls">
+            <span>−</span>
+            <input
+              id="photo-crop-zoom"
+              type="range"
+              min="1"
+              max="3"
+              step="0.01"
+              value="1"
+              aria-label="הגדלת התמונה"
+            >
+            <span>+</span>
+          </div>
+
+          <div class="photo-crop-actions">
+            <button type="button" class="photo-crop-cancel"
+              id="photo-crop-cancel">ביטול</button>
+            <button type="button" class="photo-crop-confirm"
+              id="photo-crop-confirm">אישור חיתוך</button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      const stage = modal.querySelector('#photo-crop-stage');
+      const img = modal.querySelector('#photo-crop-image');
+      const zoom = modal.querySelector('#photo-crop-zoom');
+
+      img.src = image.src;
+
+      function layoutCropImage() {
+        const rect = stage.getBoundingClientRect();
+        const baseScale = Math.max(
+          rect.width / image.width,
+          rect.height / image.height
+        );
+
+        cropMinScale = baseScale;
+        cropScale = Math.max(cropScale, cropMinScale);
+
+        img.style.width = `${image.width * cropScale}px`;
+        img.style.height = `${image.height * cropScale}px`;
+
+        cropX = Math.min(0, Math.max(
+          rect.width - image.width * cropScale,
+          cropX
+        ));
+        cropY = Math.min(0, Math.max(
+          rect.height - image.height * cropScale,
+          cropY
+        ));
+
+        if (cropX === 0 && cropY === 0) {
+          cropX = (rect.width - image.width * cropScale) / 2;
+          cropY = (rect.height - image.height * cropScale) / 2;
+        }
+
+        img.style.left = `${cropX}px`;
+        img.style.top = `${cropY}px`;
+      }
+
+      function paintCrop() {
+        const rect = stage.getBoundingClientRect();
+        const scaleFactor = cropScale / cropMinScale;
+        const displayWidth = image.width * cropMinScale * scaleFactor;
+        const displayHeight = image.height * cropMinScale * scaleFactor;
+
+        img.style.width = `${displayWidth}px`;
+        img.style.height = `${displayHeight}px`;
+        img.style.left = `${cropX}px`;
+        img.style.top = `${cropY}px`;
+      }
+
+      requestAnimationFrame(() => {
+        const rect = stage.getBoundingClientRect();
+        cropScale = Math.max(
+          rect.width / image.width,
+          rect.height / image.height
+        );
+        cropMinScale = cropScale;
+
+        cropX = (rect.width - image.width * cropScale) / 2;
+        cropY = (rect.height - image.height * cropScale) / 2;
+
+        zoom.value = '1';
+        paintCrop();
+      });
+
+      zoom.addEventListener('input', () => {
+        const rect = stage.getBoundingClientRect();
+        const oldScale = cropScale;
+        const relativeZoom = Number(zoom.value);
+        const newScale = cropMinScale * relativeZoom;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        cropX = centerX - (centerX - cropX) * (newScale / oldScale);
+        cropY = centerY - (centerY - cropY) * (newScale / oldScale);
+        cropScale = newScale;
+
+        cropX = Math.min(0, Math.max(
+          rect.width - image.width * cropScale,
+          cropX
+        ));
+        cropY = Math.min(0, Math.max(
+          rect.height - image.height * cropScale,
+          cropY
+        ));
+
+        paintCrop();
+      });
+
+      stage.addEventListener('pointerdown', event => {
+        cropDragging = true;
+        cropPointerX = event.clientX - cropX;
+        cropPointerY = event.clientY - cropY;
+        stage.setPointerCapture(event.pointerId);
+      });
+
+      stage.addEventListener('pointermove', event => {
+        if (!cropDragging) return;
+
+        const rect = stage.getBoundingClientRect();
+
+        cropX = event.clientX - cropPointerX;
+        cropY = event.clientY - cropPointerY;
+
+        cropX = Math.min(0, Math.max(
+          rect.width - image.width * cropScale,
+          cropX
+        ));
+        cropY = Math.min(0, Math.max(
+          rect.height - image.height * cropScale,
+          cropY
+        ));
+
+        paintCrop();
+      });
+
+      stage.addEventListener('pointerup', () => {
+        cropDragging = false;
+      });
+
+      stage.addEventListener('pointercancel', () => {
+        cropDragging = false;
+      });
+
+      modal.querySelector('#photo-crop-cancel').onclick = () => {
+        modal.remove();
+        onCancel?.();
+      };
+
+      modal.querySelector('#photo-crop-confirm').onclick = () => {
+        const rect = stage.getBoundingClientRect();
+        const output = document.createElement('canvas');
+
+        output.width = 800;
+        output.height = 1000;
+
+        const context = output.getContext('2d');
+        const factor = output.width / rect.width;
+
+        context.drawImage(
+          image,
+          -cropX / cropScale,
+          -cropY / cropScale,
+          rect.width / cropScale,
+          rect.height / cropScale,
+          0,
+          0,
+          output.width,
+          output.height
+        );
+
+        output.toBlob(blob => {
+          if (!blob) {
+            alert('לא הצלחנו לחתוך את התמונה. נסה שוב.');
+            return;
+          }
+
+          const croppedFile = new File(
+            [blob],
+            `profile-cropped-${Date.now()}.jpg`,
+            { type: 'image/jpeg' }
+          );
+
+          modal.remove();
+          onConfirm(croppedFile);
+        }, 'image/jpeg', 0.92);
+      };
+    };
+
+    image.onerror = () => {
+      alert('לא הצלחנו לפתוח את התמונה.');
+      onCancel?.();
+    };
+
+    image.src = reader.result;
+  };
+
+  reader.onerror = () => {
+    alert('לא הצלחנו לקרוא את קובץ התמונה.');
+    onCancel?.();
+  };
+
+  reader.readAsDataURL(file);
+}
+
 
 async function initApp() {
   try {

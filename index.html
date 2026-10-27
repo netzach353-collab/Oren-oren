@@ -3746,6 +3746,188 @@ body.registration-mode .topbar-inner > .brand-title {
 }
 
 
+
+.registration-loading-page {
+  min-height: 75vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  direction: rtl;
+}
+
+.registration-loading-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 38px 24px;
+  text-align: center;
+  border: 1px solid #75415f;
+  border-radius: 22px;
+  background: linear-gradient(145deg, #241525, #35152f);
+  box-shadow: 0 18px 45px #0004;
+}
+
+.registration-spinner {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 24px;
+  border: 4px solid #75415f;
+  border-top-color: #f0a5d0;
+  border-radius: 50%;
+  animation: registration-loading-spin 0.8s linear infinite;
+}
+
+.registration-loading-card h2 {
+  margin: 0 0 12px;
+  color: #fff;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.registration-loading-card p {
+  margin: 0;
+  color: #f0dce9;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.registration-loading-note {
+  margin-top: 22px;
+  color: #c9a5bd;
+  font-size: 13px;
+}
+
+@keyframes registration-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+.photo-crop-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(10, 5, 18, 0.86);
+  backdrop-filter: blur(7px);
+}
+
+.photo-crop-card {
+  width: min(100%, 420px);
+  max-height: 95vh;
+  overflow-y: auto;
+  padding: 22px;
+  border: 1px solid #75415f;
+  border-radius: 22px;
+  background: #191323;
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 20px 70px #0008;
+}
+
+.photo-crop-card h2 {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.photo-crop-card p {
+  margin: 0 0 18px;
+  color: #c5b8d2;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.photo-crop-frame {
+  width: min(100%, 320px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 2px solid #b65c96;
+  border-radius: 14px;
+  background: #09070d;
+  touch-action: none;
+}
+
+#photo-crop-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+#photo-crop-canvas:active {
+  cursor: grabbing;
+}
+
+.photo-crop-zoom {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.photo-crop-zoom button {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border: 1px solid #75415f;
+  border-radius: 50%;
+  background: #302039;
+  color: #fff;
+  font-size: 25px;
+  cursor: pointer;
+}
+
+.photo-crop-zoom input {
+  width: 100%;
+  min-width: 0;
+  accent-color: #d45aa4;
+  cursor: pointer;
+}
+
+.photo-crop-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.photo-crop-actions button {
+  flex: 1;
+  min-height: 46px;
+  border: 0;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.photo-crop-cancel {
+  background: #302839;
+  color: #eee;
+}
+
+.photo-crop-confirm {
+  background: linear-gradient(135deg, #8d2e68, #c0448b);
+  color: #fff;
+}
+
+@media (max-width: 380px) {
+  .photo-crop-card {
+    padding: 16px;
+  }
+
+  .photo-crop-card h2 {
+    font-size: 19px;
+  }
+}
+
+
 </style>
 </head>
 
@@ -3970,21 +4152,23 @@ async function loginWithGoogle() {
 async function finishRegistration() {
   collectRegisterStep();
 
-  const {
-    data: { user },
-    error: userError
-  } = await db.auth.getUser();
-
-  currentUser = user;
-
-  if (userError || !user) {
-    alert('פג תוקף ההתחברות. יש להתחבר מחדש.');
-    renderLogin();
-    return;
-  }
+  showRegistrationLoading();
 
   try {
-    // העלאת התמונות ל-Uploadcare
+    const {
+      data: { user },
+      error: userError
+    } = await db.auth.getUser();
+
+    currentUser = user;
+
+    if (userError || !user) {
+      alert('פג תוקף ההתחברות. יש להתחבר מחדש.');
+      renderLogin();
+      return;
+    }
+
+    // העלאת התמונות
     const photoKeys = await uploadProfilePhotos();
 
     const profileData = {
@@ -4019,8 +4203,7 @@ async function finishRegistration() {
 
     if (error) {
       console.error('Profile save error:', error);
-      alert('שגיאה בשמירת הפרופיל: ' + error.message);
-      return;
+      throw new Error('שגיאה בשמירת הפרופיל: ' + error.message);
     }
 
     console.log('Profile saved:', data);
@@ -4036,9 +4219,20 @@ async function finishRegistration() {
 
   } catch (error) {
     console.error('Registration/photo upload error:', error);
-    alert('לא הצלחנו להעלות את התמונות או לשמור את ההרשמה: ' + error.message);
+
+    // החזרת מסך ההרשמה עם הפרטים הקיימים
+    document.body.classList.add('registration-mode');
+    document.body.classList.remove('auth-only');
+
+    renderRegister();
+
+    alert(
+      'לא הצלחנו להשלים את ההרשמה: ' +
+      (error.message || 'אירעה שגיאה לא צפויה.')
+    );
   }
 }
+
 
 
 function getProfilePhotoUrl(photoKey) {
@@ -7375,13 +7569,21 @@ function personalSelectField(key, label, options, value) {
 
 
 let selectedProfilePhotos = [];
+let primaryPhotoCropped = false;
+let cropperImage = null;
+let cropperZoom = 1;
+let cropperX = 0;
+let cropperY = 0;
+let cropperDragging = false;
+let cropperPointerX = 0;
+let cropperPointerY = 0;
+let cropperStartX = 0;
+let cropperStartY = 0;
 
 function previewProfilePhotos(input) {
-  const preview = document.getElementById('profile-photo-previews');
-  if (!preview) return;
-
   const files = Array.from(input.files || []);
   const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
   const validFiles = files.filter(file =>
     allowedTypes.includes(file.type) &&
     file.size <= 5 * 1024 * 1024
@@ -7404,10 +7606,228 @@ function previewProfilePhotos(input) {
     );
   }
 
-  // מאפשר לבחור שוב גם את אותו הקובץ
   input.value = '';
-
   renderProfilePhotoPreviews();
+
+  // אם זו התמונה הראשונה בפרופיל, פותחים את כלי החיתוך
+  if (!primaryPhotoCropped && selectedProfilePhotos.length) {
+    openPrimaryPhotoCropper();
+  }
+}
+
+function openPrimaryPhotoCropper() {
+  if (!selectedProfilePhotos.length || primaryPhotoCropped) return;
+
+  // מונע פתיחה כפולה של חלון החיתוך
+  if (document.getElementById('photo-crop-modal')) return;
+
+  const file = selectedProfilePhotos[0];
+  const reader = new FileReader();
+
+  reader.onload = function () {
+    const image = new Image();
+
+    image.onload = function () {
+      cropperImage = image;
+      cropperZoom = 1;
+      cropperX = 0;
+      cropperY = 0;
+
+      const modal = document.createElement('div');
+      modal.id = 'photo-crop-modal';
+      modal.className = 'photo-crop-modal';
+
+      modal.innerHTML = `
+        <div class="photo-crop-card" dir="rtl">
+          <h2>חיתוך תמונת הפרופיל</h2>
+          <p>התאם את התמונה לריבוע. אפשר להזיז אותה ולהגדיל או להקטין.</p>
+
+          <div class="photo-crop-frame">
+            <canvas id="photo-crop-canvas" width="600" height="600"></canvas>
+          </div>
+
+          <div class="photo-crop-zoom">
+            <button type="button" id="photo-zoom-out" aria-label="הקטנת התמונה">−</button>
+            <input
+              id="photo-crop-zoom"
+              type="range"
+              min="1"
+              max="3"
+              step="0.01"
+              value="1"
+              aria-label="הגדלה והקטנה של התמונה"
+            >
+            <button type="button" id="photo-zoom-in" aria-label="הגדלת התמונה">+</button>
+          </div>
+
+          <div class="photo-crop-actions">
+            <button type="button" id="photo-crop-cancel" class="photo-crop-cancel">
+              ביטול
+            </button>
+            <button type="button" id="photo-crop-confirm" class="photo-crop-confirm">
+              אישור חיתוך
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      const canvas = document.getElementById('photo-crop-canvas');
+      const zoomInput = document.getElementById('photo-crop-zoom');
+
+      // מציבים את התמונה במרכז ומתחילים בגודל שמכסה את כל הריבוע
+      const baseScale = Math.max(
+        canvas.width / image.width,
+        canvas.height / image.height
+      );
+
+      cropperX = (canvas.width - image.width * baseScale) / 2;
+      cropperY = (canvas.height - image.height * baseScale) / 2;
+
+      drawPrimaryPhotoCrop();
+
+      zoomInput.addEventListener('input', () => {
+        cropperZoom = Number(zoomInput.value);
+        drawPrimaryPhotoCrop();
+      });
+
+      document.getElementById('photo-zoom-in').addEventListener('click', () => {
+        cropperZoom = Math.min(3, cropperZoom + 0.1);
+        zoomInput.value = cropperZoom;
+        drawPrimaryPhotoCrop();
+      });
+
+      document.getElementById('photo-zoom-out').addEventListener('click', () => {
+        cropperZoom = Math.max(1, cropperZoom - 0.1);
+        zoomInput.value = cropperZoom;
+        drawPrimaryPhotoCrop();
+      });
+
+      canvas.addEventListener('pointerdown', event => {
+        cropperDragging = true;
+        cropperPointerX = event.clientX;
+        cropperPointerY = event.clientY;
+        cropperStartX = cropperX;
+        cropperStartY = cropperY;
+        canvas.setPointerCapture(event.pointerId);
+      });
+
+      canvas.addEventListener('pointermove', event => {
+        if (!cropperDragging) return;
+
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        cropperX = cropperStartX + (event.clientX - cropperPointerX) * scaleX;
+        cropperY = cropperStartY + (event.clientY - cropperPointerY) * scaleY;
+
+        drawPrimaryPhotoCrop();
+      });
+
+      const stopDragging = () => {
+        cropperDragging = false;
+      };
+
+      canvas.addEventListener('pointerup', stopDragging);
+      canvas.addEventListener('pointercancel', stopDragging);
+
+      document.getElementById('photo-crop-confirm').addEventListener('click', confirmPrimaryPhotoCrop);
+      document.getElementById('photo-crop-cancel').addEventListener('click', cancelPrimaryPhotoCrop);
+    };
+
+    image.onerror = function () {
+      alert('לא הצלחנו לפתוח את התמונה. נסה לבחור תמונה אחרת.');
+      selectedProfilePhotos.shift();
+      primaryPhotoCropped = false;
+      renderProfilePhotoPreviews();
+    };
+
+    image.src = reader.result;
+  };
+
+  reader.onerror = function () {
+    alert('לא הצלחנו לקרוא את קובץ התמונה.');
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function drawPrimaryPhotoCrop() {
+  const canvas = document.getElementById('photo-crop-canvas');
+  if (!canvas || !cropperImage) return;
+
+  const ctx = canvas.getContext('2d');
+  const baseScale = Math.max(
+    canvas.width / cropperImage.width,
+    canvas.height / cropperImage.height
+  );
+  const scale = baseScale * cropperZoom;
+  const imageWidth = cropperImage.width * scale;
+  const imageHeight = cropperImage.height * scale;
+
+  // מונע הופעת שטח ריק בתוך הריבוע
+  cropperX = Math.min(0, Math.max(canvas.width - imageWidth, cropperX));
+  cropperY = Math.min(0, Math.max(canvas.height - imageHeight, cropperY));
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(
+    cropperImage,
+    cropperX,
+    cropperY,
+    imageWidth,
+    imageHeight
+  );
+}
+
+function confirmPrimaryPhotoCrop() {
+  const canvas = document.getElementById('photo-crop-canvas');
+  if (!canvas || !selectedProfilePhotos.length) return;
+
+  canvas.toBlob(blob => {
+    if (!blob) {
+      alert('לא הצלחנו לחתוך את התמונה. נסה שוב.');
+      return;
+    }
+
+    const originalFile = selectedProfilePhotos[0];
+    const extension = originalFile.type === 'image/png' ? 'png' : 'jpg';
+    const croppedFile = new File(
+      [blob],
+      `profile-primary.${extension}`,
+      { type: originalFile.type === 'image/png' ? 'image/png' : 'image/jpeg' }
+    );
+
+    // שומרים את הגרסה החתוכה במקום הקובץ המקורי
+    selectedProfilePhotos[0] = croppedFile;
+    primaryPhotoCropped = true;
+
+    closePrimaryPhotoCropper();
+    renderProfilePhotoPreviews();
+  }, selectedProfilePhotos[0].type === 'image/png' ? 'image/png' : 'image/jpeg', 0.92);
+}
+
+function cancelPrimaryPhotoCrop() {
+  // לא משאירים את התמונה המקורית כאילו אושרה
+  selectedProfilePhotos.shift();
+  primaryPhotoCropped = false;
+
+  closePrimaryPhotoCropper();
+  renderProfilePhotoPreviews();
+
+  // אם נבחרו עוד תמונות יחד, הבאה בתור הופכת לראשית
+  if (selectedProfilePhotos.length) {
+    openPrimaryPhotoCropper();
+  }
+}
+
+function closePrimaryPhotoCropper() {
+  const modal = document.getElementById('photo-crop-modal');
+  if (modal) modal.remove();
+
+  cropperImage = null;
+  cropperDragging = false;
 }
 
 
@@ -7458,12 +7878,30 @@ function renderProfilePhotoPreviews() {
 function removeProfilePhoto(index) {
   if (index < 0 || index >= selectedProfilePhotos.length) return;
 
+  const removedPrimary = index === 0;
+
   selectedProfilePhotos.splice(index, 1);
+
+  if (removedPrimary) {
+    primaryPhotoCropped = false;
+  }
+
   renderProfilePhotoPreviews();
+
+  // התמונה הבאה הופכת לראשית וחייבת לעבור חיתוך
+  if (removedPrimary && selectedProfilePhotos.length) {
+    openPrimaryPhotoCropper();
+  }
 }
+
+
 
 async function uploadProfilePhotos() {
   if (!selectedProfilePhotos.length) return [];
+
+  if (!primaryPhotoCropped) {
+    throw new Error('צריך לאשר את חיתוך תמונת הפרופיל לפני ההעלאה.');
+  }
 
   const publicKey = '91c5b5a7261384ff5a8e';
   const uploadedPhotos = [];
@@ -7966,6 +8404,29 @@ function renderPersonalPrivacy() {
     </section>
   `;
 }
+
+
+function showRegistrationLoading() {
+  const app = document.getElementById('app-content');
+  if (!app) return;
+
+  app.innerHTML = `
+    <section class="auth-page registration-loading-page">
+      <div class="auth-card registration-loading-card">
+        <div class="registration-spinner"></div>
+        <h2>יוצרים את הפרופיל שלך</h2>
+        <p>
+          שומרים את הפרטים ומעלים את התמונות שלך.
+          זה ייקח רק רגע...
+        </p>
+        <div class="registration-loading-note">
+          נא להמתין לסיום התהליך
+        </div>
+      </div>
+    </section>
+  `;
+}
+
 
 async function updateNotificationCount() {
   const badge = document.getElementById('notification-count');

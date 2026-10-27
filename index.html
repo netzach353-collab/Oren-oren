@@ -4040,6 +4040,46 @@ background: linear-gradient(145deg, #35243F, #5A315A);
     box-sizing: border-box !important;
   }
 }
+
+@media (max-width: 767px) {
+  .profile-tile-meta-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .profile-detail-chip {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .profile-tile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 767px) {
+  .profile-tile-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .profile-tile-meta-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .profile-detail-chip {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
 </style>
 </head>
 
@@ -5669,7 +5709,7 @@ ${escapeHTML(getGenderedStatus(profile) || 'לא צוין')}
     </span>
   </div>
 
-  <div class="profile-tile-meta profile-tile-meta-grid desktop-only">
+  <div class="profile-tile-meta profile-tile-meta-grid">
     <span class="profile-detail-chip">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4Z"/>

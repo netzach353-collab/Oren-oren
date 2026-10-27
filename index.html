@@ -3070,98 +3070,6 @@ body.registration-mode .topbar-inner > .brand-title {
   transform: scale(0.97);
 }
 
-/* טאבלט */
-@media (max-width: 767px) {
-  .profiles-toolbar {
-    gap: 10px;
-    padding: 14px;
-    margin-bottom: 16px;
-    border-radius: 14px;
-  }
-
-  .profiles-toolbar-info h2 {
-    font-size: 19px;
-  }
-
-  .profiles-toolbar .profiles-count {
-    font-size: 12px;
-    gap: 4px;
-  }
-
-  .profiles-toolbar .profiles-count-number {
-    font-size: 16px;
-  }
-
-  .profiles-toolbar .filter-toggle {
-    min-height: 38px;
-    padding: 0 11px;
-    gap: 5px;
-    font-size: 13px;
-  }
-
-  .profiles-toolbar .filter-toggle svg {
-    width: 16px;
-    height: 16px;
-  }
-}
-
-/* טלפונים קטנים */
-@media (max-width: 420px) {
-  .profiles-toolbar {
-    gap: 6px;
-    padding: 12px 10px;
-  }
-
-  .profiles-toolbar-info h2 {
-    font-size: 16px;
-  }
-
-  .profiles-toolbar .profiles-count {
-    font-size: 10px;
-    gap: 3px;
-  }
-
-  .profiles-toolbar .profiles-count-number {
-    font-size: 14px;
-  }
-
-  .profiles-toolbar .filter-toggle {
-    min-height: 35px;
-    padding: 0 8px;
-    gap: 4px;
-    font-size: 12px;
-    border-radius: 9px;
-  }
-
-  .profiles-toolbar .filter-toggle svg {
-    width: 14px;
-    height: 14px;
-  }
-}
-
-/* טלפונים צרים במיוחד */
-@media (max-width: 350px) {
-  .profiles-toolbar {
-    padding: 10px 7px;
-  }
-
-  .profiles-toolbar-info h2 {
-    font-size: 14px;
-  }
-
-  .profiles-toolbar .profiles-count {
-    font-size: 9px;
-  }
-
-  .profiles-toolbar .profiles-count-number {
-    font-size: 13px;
-  }
-
-  .profiles-toolbar .filter-toggle {
-    padding: 0 6px;
-    font-size: 11px;
-  }
-}
 
 .auth-welcome-image {
   width: 100%;
@@ -3246,34 +3154,7 @@ body.registration-mode .topbar-inner > .brand-title {
   color: #f3dce9;
 }
 
-@media (max-width: 600px) {
-  .profiles-toolbar {
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: center;
-  }
 
-  .profiles-toolbar-info {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .profiles-toolbar-info h2 {
-    font-size: 20px;
-  }
-
-  .profiles-count {
-    order: 3;
-    width: 100%;
-    font-size: 13px;
-  }
-
-  .filter-toggle {
-    flex-shrink: 0;
-    padding: 10px 14px;
-    font-size: 14px;
-  }
-}
 
 
 .profile-photo-previews {
@@ -3351,28 +3232,7 @@ body.registration-mode .topbar-inner > .brand-title {
 }
 
 
-@media (max-width: 600px) {
-  .profiles-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 10px;
-  }
 
-  .profiles-toolbar-info {
-    flex: 0 0 100%;
-    width: 100%;
-  }
-
-  .profiles-count {
-    display: inline-flex;
-    flex: 0 0 auto;
-    align-items: center;
-    gap: 5px;
-    width: auto;
-    white-space: nowrap;
-  }
-}
 
 
 .profile-interest-btn:disabled {
@@ -4078,6 +3938,33 @@ background: linear-gradient(145deg, #35243F, #5A315A);
   .profile-detail-chip {
     width: 100%;
     box-sizing: border-box;
+  }
+}
+
+@media (max-width: 767px) {
+  .profiles-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "info filter"
+      "count filter";
+    align-items: center;
+    gap: 6px 12px;
+  }
+
+  .profiles-toolbar-info {
+    grid-area: info;
+  }
+
+  .profiles-count {
+    grid-area: count;
+    justify-self: start;
+  }
+
+  .filter-toggle {
+    grid-area: filter;
+    justify-self: start;
+    align-self: center;
   }
 }
 </style>
@@ -6501,7 +6388,7 @@ async function renderFavorites() {
                   <div class="profile-tile-details">
 
                     <div class="profile-tile-meta profile-tile-meta-grid">
-                      <span class="profile-detail-chip desktop-only">
+                      <span class="profile-detail-chip">
                         <svg viewBox="0 0 24 24" aria-hidden="true">
                           <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
                           <circle cx="12" cy="10" r="2.5"/>
@@ -6519,8 +6406,8 @@ async function renderFavorites() {
                     </div>
 
                     <div class="profile-tile-meta profile-tile-meta-grid">
-                      <span class="profile-detail-chip">
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                     <span class="profile-detail-chip desktop-only">   
+                       <svg viewBox="0 0 24 24" aria-hidden="true">
                           <path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4Z"/>
                           <path d="M9 12h6M12 9v6"/>
                         </svg>

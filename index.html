@@ -5641,7 +5641,7 @@ function renderProfiles() {
 <div class="profile-tile-details">
 
   <div class="profile-tile-meta profile-tile-meta-grid">
-<span class="profile-detail-chip desktop-only">  
+<span class="profile-detail-chip">  
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/>
         <circle cx="12" cy="10" r="2.5"/>
@@ -5658,7 +5658,7 @@ ${escapeHTML(getGenderedStatus(profile) || 'לא צוין')}
     </span>
   </div>
 
-  <div class="profile-tile-meta profile-tile-meta-grid">
+  <div class="profile-tile-meta profile-tile-meta-grid desktop-only">
     <span class="profile-detail-chip">
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 3 4 7v5c0 5 3.5 8 8 9 4.5-1 8-4 8-9V7l-8-4Z"/>
@@ -6141,7 +6141,7 @@ if (mutualInterest && db) {
       >
         ${
           mutualInterest
-            ? 'החלפתם מספרים'
+            ? 'המספר מוצג'
             : receivedInterest
               ? `${escapeHTML(name)} ביקש/ה ממך את מספר הטלפון · לאשר?`
               : alreadySent
@@ -7560,24 +7560,44 @@ function isFullPrivacyMode() {
 async function toggleFullPrivacyMode() {
   const enable = !isFullPrivacyMode();
 
-  localStorage.setItem(PERSONAL_PRIVACY_MODE_KEY, enable ? 'yes' : 'no');
+  localStorage.setItem(
+    PERSONAL_PRIVACY_MODE_KEY,
+    enable ? 'yes' : 'no'
+  );
 
   const privacy = getPersonalPrivacy();
 
   if (enable) {
+    const alwaysVisible = [
+      'name',
+      'birth_date',
+      'city',
+      'relationship_goal'
+    ];
+
     Object.keys(personalFieldLabels).forEach(key => {
-      privacy[key] = key === 'name' || key === 'about'
+      privacy[key] = alwaysVisible.includes(key)
         ? 'public'
         : 'matched';
     });
-  }
+  } else {
+  // כל הפרטים גלויים לכולם,
+  // למעט מספר הטלפון שגלוי רק להתאמות.
+  Object.keys(personalFieldLabels).forEach(key => {
+    privacy[key] = key === 'phone'
+      ? 'matched'
+      : 'public';
+  });
+}
 
   const success = await savePersonalPrivacy(privacy);
 
   renderPersonal();
 
   if (!success) {
-    alert('שינוי מצב הפרטיות לא נשמר בשרת. בדוק את החיבור ואת הרשאות Supabase.');
+    alert(
+      'שינוי מצב הפרטיות לא נשמר בשרת. בדוק את החיבור ואת הרשאות Supabase.'
+    );
   }
 }
 

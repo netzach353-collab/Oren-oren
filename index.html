@@ -224,40 +224,7 @@ body {
   }
 }
 
-/* טלפונים */
-@media (max-width: 767px) {
-  .bottom-nav-inner {
-    padding: 8px 12px;
-    column-gap: 6px;
-  }
 
-  .bottom-item {
-    padding: 6px 2px;
-    gap: 7px;
-    border-radius: 14px;
-  }
-
-  .bottom-item svg {
-    width: 24px;
-    height: 24px;
-  }
-}
-
-/* מחשב */
-@media (min-width: 768px) {
-
-  .bottom-item {
-    padding-bottom: 8px;
-    font-size: 14px;
-    gap: 8px;
-    cursor: pointer;
-  }
-
-  .bottom-item svg {
-    width: 26px;
-    height: 26px;
-  }
-}
 
 .bottom-item {
   border: 0;
@@ -4246,6 +4213,14 @@ select,
 .swipe-card.dragging {
   transition: none !important;
 }
+
+/* טלפונים */
+@media (max-width: 767px) {
+  .bottom-nav-inner {
+    min-height: 130px !important;
+  }
+}
+
 </style>
 </head>
 

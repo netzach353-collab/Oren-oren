@@ -202,30 +202,6 @@ body {
 }
 
 
-
-/* מחשב */
-@media (min-width: 768px) {
-  .bottom-nav-inner {
-    max-width: 900px;
-    grid-template-columns: repeat(5, 1fr);
-    padding: 8px 16px;
-  }
-
-  .bottom-item {
-    padding: 8px;
-    font-size: 14px;
-    gap: 8px;
-    cursor: pointer;
-  }
-
-  .bottom-item svg {
-    width: 26px;
-    height: 26px;
-  }
-}
-
-
-
 .bottom-item {
   border: 0;
   background: transparent;
@@ -4214,12 +4190,7 @@ select,
   transition: none !important;
 }
 
-/* טלפונים */
-@media (max-width: 767px) {
-  .bottom-nav-inner {
-    min-height: 130px !important;
-  }
-}
+
 
 </style>
 </head>
@@ -4230,17 +4201,30 @@ select,
 <header class="topbar">
   <div class="topbar-inner">
 
-    <div class="brand">
+    <div class="brand" id="adminMatchesNav"
+  style="display:none"
+  onclick="bottomNavigate('admin-matches', this)">
       <div class="brand-icon">
         <svg viewBox="0 0 24 24" fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linecap="round"
-          stroke-linejoin="round">
-          <path d="M12 20s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6.5-8 11-8 11Z"/>
-        </svg>
+    stroke="currentColor" stroke-width="1.8"
+    stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="8" cy="8" r="3"/>
+    <circle cx="16" cy="8" r="3"/>
+    <path d="M2 20v-2a6 6 0 0 1 12 0v2"/>
+    <path d="M14 14a6 6 0 0 1 8 5v1"/>
+    <path d="M11 12h2"/>
+  </svg>
+       <svg id="adminHeartIcon" viewBox="0 0 24 24" fill="none"
+  stroke="currentColor"
+  stroke-width="1.8"
+  stroke-linecap="round"
+  stroke-linejoin="round">
+  <path d="M12 20s-8-4.5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 9c0 6.5-8 11-8 11Z"/>
+</svg>
       </div>
     </div>
+
+
 <div class="brand-title">
   <span>השדכן</span>
 
@@ -4350,23 +4334,7 @@ select,
     </button>
     
 
-    <button class="bottom-item admin-bottom-item"
-  id="adminMatchesNav"
-  style="display:none"
-  onclick="bottomNavigate('admin-matches', this)">
-
-  <svg viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" stroke-width="1.8"
-    stroke-linecap="round" stroke-linejoin="round">
-    <circle cx="8" cy="8" r="3"/>
-    <circle cx="16" cy="8" r="3"/>
-    <path d="M2 20v-2a6 6 0 0 1 12 0v2"/>
-    <path d="M14 14a6 6 0 0 1 8 5v1"/>
-    <path d="M11 12h2"/>
-  </svg>
-
-  <span>מצב מנהל</span>
-</button>
+    
     <button class="bottom-item"
       onclick="bottomNavigate('personal', this)">
       <svg viewBox="0 0 24 24" fill="none"
@@ -9599,7 +9567,15 @@ async function refreshIncomingPhoneRequests() {
 
   
 function showPage(page) {
-document.body.classList.toggle('admin-mode', page === 'admin-matches');
+const heart = document.getElementById('adminHeartIcon');
+
+if (heart) {
+  heart.style.display =
+    ['o156ms@gmail.com', 'netzach353@gmail.com']
+      .includes(String(currentUser?.email || '').toLowerCase())
+      ? 'none'
+      : '';
+}
 
 
   const content = document.getElementById('app-content');

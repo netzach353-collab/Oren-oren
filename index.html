@@ -169,29 +169,12 @@ body {
     height: 35px;
   }
 
-  
-
-  
-
-  
-
   .icon-button {
     width: 37px;
     height: 37px;
   }
-
-  
-
-  
-
-  
-
-  
 }
 
-
- 
- 
 /* סרגל ניווט תחתון */
 body {
   padding-bottom: calc(82px + env(safe-area-inset-bottom));
@@ -215,8 +198,10 @@ body {
   margin: auto;
   padding: 4px 8px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr); 
 }
+
+
 
 .bottom-item {
   border: 0;
@@ -9583,6 +9568,9 @@ async function refreshIncomingPhoneRequests() {
 
   
 function showPage(page) {
+document.body.classList.toggle('admin-mode', page === 'admin-matches');
+
+
   const content = document.getElementById('app-content');
   document.body.classList.remove('registration-mode');
   if (!content) {

@@ -198,10 +198,66 @@ body {
   margin: auto;
   padding: 4px 8px;
   display: grid;
-  grid-template-columns: repeat(5, 1fr); 
+  grid-template-columns: repeat(4, 1fr);
 }
 
 
+
+/* מחשב */
+@media (min-width: 768px) {
+  .bottom-nav-inner {
+    max-width: 900px;
+    grid-template-columns: repeat(5, 1fr);
+    padding: 8px 16px;
+  }
+
+  .bottom-item {
+    padding: 8px;
+    font-size: 14px;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .bottom-item svg {
+    width: 26px;
+    height: 26px;
+  }
+}
+
+/* טלפונים */
+@media (max-width: 767px) {
+  .bottom-nav-inner {
+    padding: 8px 12px;
+    column-gap: 6px;
+  }
+
+  .bottom-item {
+    padding: 6px 2px;
+    gap: 7px;
+    border-radius: 14px;
+  }
+
+  .bottom-item svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* מחשב */
+@media (min-width: 768px) {
+
+  .bottom-item {
+    padding-bottom: 8px;
+    font-size: 14px;
+    gap: 8px;
+    cursor: pointer;
+  }
+
+  .bottom-item svg {
+    width: 26px;
+    height: 26px;
+  }
+}
 
 .bottom-item {
   border: 0;
@@ -4334,7 +4390,7 @@ select,
     <path d="M11 12h2"/>
   </svg>
 
-  <span>התאמות</span>
+  <span>מצב מנהל</span>
 </button>
     <button class="bottom-item"
       onclick="bottomNavigate('personal', this)">

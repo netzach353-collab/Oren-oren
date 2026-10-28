@@ -4582,6 +4582,24 @@ async function finishRegistration() {
 }
 
 
+async function checkRegistrationSession() {
+  const { data, error } = await db.auth.getUser();
+
+  if (error || !data?.user) {
+    alert('פג תוקף ההתחברות. יש להתחבר מחדש כדי להמשיך בהרשמה.');
+
+    document.body.classList.add('auth-only');
+    document.body.classList.remove('registration-mode');
+
+    renderLogin();
+    return false;
+  }
+
+  currentUser = data.user;
+  return true;
+}
+
+
 
 function getProfilePhotoUrl(photoKey) {
   if (!photoKey) return '';
@@ -5710,6 +5728,10 @@ function validateRegisterStep() {
 
 async function registerNextStep() {
   if (isFinishingRegistration) return;
+
+
+if (!(await checkRegistrationSession())) return;
+
 
   collectRegisterStep();
   if (!validateRegisterStep()) return;

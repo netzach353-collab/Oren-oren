@@ -626,6 +626,7 @@ body {
   transform: scale(.985);
 }
 
+
 .profile-tile img {
   display: block;
   width: 100%;
@@ -675,6 +676,15 @@ body {
   object-fit: cover;
   display: block;
   background: var(--primary-light);
+}
+
+
+@media (min-width: 768px) {
+  .profile-tile {
+    width: 220px !important;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 .profile-detail-body {
@@ -4549,12 +4559,11 @@ async function finishRegistration() {
     document.body.classList.remove('auth-only');
     document.body.classList.remove('registration-mode');
 
-   await loadSwipeProfiles();
-preloadMyInterests();
+    await loadSwipeProfiles();
 
-registerStep = 1;
-showSuccessBanner('ההרשמה הושלמה בהצלחה!');
-showPage('swipe');
+    registerStep = 1;
+    showSuccessBanner('ההרשמה הושלמה בהצלחה!');
+    showPage('swipe');
 
   } catch (error) {
     console.error('Registration/photo upload error:', error);
@@ -5340,7 +5349,6 @@ ${registerData.children === 'כן' ? `
     </div>
         <div class="auth-form-group">
 <label for="reg-profile-photos">${requiredLabel('תמונות הפרופיל')}</label>
-
       <div class="auth-hint">
         אפשר להוסיף עד 3 תמונות. בחר/י תמונות ברורות שלך.
       </div>
@@ -6136,63 +6144,6 @@ function getGenderedReligiousView(profile) {
 }
   
 
-async function loadMyInterestsData() {
-  if (myInterestsCache !== null) return myInterestsCache;
-  if (myInterestsLoading) return myInterestsLoading;
-
-  myInterestsLoading = (async () => {
-    const { data: interests, error: interestsError } = await db
-      .from('profile_interests')
-      .select('id, receiver_id, created_at')
-      .eq('sender_id', currentUser.id)
-      .order('created_at', { ascending: false });
-
-    if (interestsError) throw interestsError;
-
-    const profileIds = [
-      ...new Set((interests || []).map(item => item.receiver_id))
-    ];
-
-    let profiles = [];
-
-    if (profileIds.length) {
-      const { data, error } = await db
-        .from('profiles')
-        .select('*')
-        .in('id', profileIds);
-
-      if (error) throw error;
-      profiles = data || [];
-    }
-
-    const byId = new Map(
-      profiles.map(profile => [String(profile.id), profile])
-    );
-
-    myInterestsCache = profileIds
-      .map(id => byId.get(String(id)))
-      .filter(Boolean);
-
-    return myInterestsCache;
-  })();
-
-  try {
-    return await myInterestsLoading;
-  } finally {
-    myInterestsLoading = null;
-  }
-}
-
-
-
-function preloadMyInterests() {
-  if (!currentUser || !db || myInterestsCache !== null) return;
-
-  loadMyInterestsData().catch(error => {
-    console.error('שגיאה בטעינה מראש של התעניינויות:', error);
-  });
-}
-
 async function renderMyInterests() {
   const content = document.getElementById('app-content');
   if (!content) return;
@@ -6208,7 +6159,9 @@ async function renderMyInterests() {
 
   content.innerHTML = `
     <div class="interested-page-toolbar">
-      <button type="button" class="my-interests-link"
+      <button
+        type="button"
+        class="my-interests-link"
         onclick="showPage('favorites')">
         ♥ יתעניינו בי
       </button>
@@ -6224,19 +6177,56 @@ async function renderMyInterests() {
     </div>
   `;
 
-  const grid = content.querySelector('.interested-grid');
+  try {
+    // טעינת ההתעניינויות שנשלחו על ידי המשתמש מ-Supabase
+    const { data: interests, error: interestsError } = await db
+      .from('profile_interests')
+      .select('id, receiver_id, created_at')
+      .eq('sender_id', currentUser.id)
+      .order('created_at', { ascending: false });
 
-  function renderProfiles(profiles) {
-    if (!grid.isConnected) return;
+    if (interestsError) throw interestsError;
 
-    grid.innerHTML = profiles.length
-      ? profiles.map(profile => `
-          <article class="profile-tile interested-card"
+    const profileIds = [
+      ...new Set((interests || []).map(item => item.receiver_id))
+    ];
+
+    let profiles = [];
+
+    if (profileIds.length) {
+      const { data, error: profilesError } = await db
+        .from('profiles')
+        .select('*')
+        .in('id', profileIds);
+
+      if (profilesError) throw profilesError;
+
+      profiles = data || [];
+    }
+
+    const profilesById = new Map(
+      profiles.map(profile => [String(profile.id), profile])
+    );
+
+    // שומרים על סדר ההתעניינויות לפי תאריך השליחה
+    const interestedProfiles = profileIds
+      .map(id => profilesById.get(String(id)))
+      .filter(Boolean);
+
+    const grid = content.querySelector('.interested-grid');
+    if (!grid) return;
+
+    grid.innerHTML = interestedProfiles.length
+      ? interestedProfiles.map(profile => `
+          <article
+            class="profile-tile interested-card"
             onclick="openProfileDetailFromMyInterests('${escapeHTML(profile.id)}')">
+
             <img
               src="${escapeHTML(getProfileImage(profile))}"
               alt="${escapeHTML(getProfileName(profile))}"
               loading="lazy">
+
             <div class="profile-tile-info interested-card-info">
               <div class="profile-tile-name">
                 ${escapeHTML(getProfileName(profile))}
@@ -6244,14 +6234,19 @@ async function renderMyInterests() {
                   ? ', ' + getProfileAge(profile)
                   : ''}
               </div>
+
               <div class="profile-tile-meta">
                 ${escapeHTML(getProfileCity(profile) || 'מיקום לא צוין')}
               </div>
+
               <div class="profile-tile-about">
                 ${escapeHTML(getProfileAbout(profile))}
               </div>
+
               <div class="interested-actions">
-                <span class="profile-tile-open">לצפייה בפרופיל ←</span>
+                <span class="profile-tile-open">
+                  לצפייה בפרופיל ←
+                </span>
               </div>
             </div>
           </article>
@@ -6262,23 +6257,12 @@ async function renderMyInterests() {
             <p>כשתביע עניין בפרופיל, הוא יופיע כאן.</p>
           </div>
         `;
-  }
 
-  try {
-    // אם הנתונים כבר בזיכרון, מציגים אותם מיד.
-    if (myInterestsCache !== null) {
-      renderProfiles(myInterestsCache);
-      return;
-    }
-
-    const profiles = await loadMyInterestsData();
-
-    // לא מעדכנים אזור שכבר הוסר מהדף.
-    renderProfiles(profiles);
   } catch (error) {
     console.error('שגיאה בטעינת ההתעניינויות:', error);
 
-    if (grid.isConnected) {
+    const grid = content.querySelector('.interested-grid');
+    if (grid) {
       grid.innerHTML = `
         <div class="profiles-empty">
           <strong>לא הצלחנו לטעון את ההתעניינויות</strong>
@@ -6288,7 +6272,6 @@ async function renderMyInterests() {
     }
   }
 }
-
 
 
 function openProfileDetailFromMyInterests(id) {
@@ -9431,12 +9414,6 @@ async function updateNotificationCount() {
   }
 }
 
-let myInterestsCache = null;
-let myInterestsLoading = null;
-
-let notificationsCache = null;
-let notificationsLoading = null;
-
 async function renderNotifications() {
   const content = document.getElementById('app-content');
   if (!content) return;
@@ -9550,6 +9527,8 @@ const { data: profiles, error: profilesError } = await db
   .in('id', senderIds);
 
 if (profilesError) throw profilesError;
+
+    if (profilesError) throw profilesError;
 
     const profileMap = new Map(
       (profiles || []).map(profile => [String(profile.id), profile])

@@ -4154,7 +4154,9 @@ background: linear-gradient(145deg, #35243F, #5A315A);
   font-size: 36px;
 }
 
-
+#filter-marital-status {
+  height: 46px;
+}
 
 /* תיקון הגדלה אוטומטית של Safari באייפון */
 input,
@@ -4190,6 +4192,33 @@ select,
   transition: none !important;
 }
 
+
+
+
+/* שדה אזור מגורים בהרשמה */
+.auth-form-group select#region {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #ead5de;
+  border-radius: 12px;
+  background: #fffafb;
+  color: #4b1930;
+  font: inherit;
+  font-size: 15px;
+  outline: none;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.auth-form-group select#region:focus {
+  border-color: #7d2345;
+  box-shadow: 0 0 0 3px #7d234514;
+}
+
+.auth-form-group select#region:invalid {
+  color: #718096;
+}
 
 
 </style>
@@ -4451,6 +4480,11 @@ async function loginWithGoogle() {
 async function finishRegistration() {
   collectRegisterStep();
 
+  if (!selectedProfilePhotos || selectedProfilePhotos.length === 0) {
+  alert('כדי להשלים את ההרשמה, חובה להעלות לפחות תמונת פרופיל אחת.');
+  return;
+}
+
   showRegistrationLoading();
 
   try {
@@ -4469,6 +4503,11 @@ async function finishRegistration() {
 
     // העלאת התמונות
     const photoKeys = await uploadProfilePhotos();
+
+
+    if (!photoKeys || photoKeys.length === 0) {
+  throw new Error('חובה להעלות לפחות תמונת פרופיל אחת כדי להשלים את ההרשמה.');
+}
 
     const profileData = {
       id: user.id,
@@ -4571,6 +4610,8 @@ function showSuccessBanner(message) {
   }, 3000);
 }
 
+let currentUserGender = '';
+
 async function afterAuthSuccess(user) {
   if (!user) {
     renderLogin();
@@ -4591,6 +4632,8 @@ async function afterAuthSuccess(user) {
     alert('לא הצלחנו לטעון את הפרופיל. בדוק את הגדרות Supabase.');
     return;
   }
+
+currentUserGender = profile?.gender || '';
 
   document.body.classList.remove('auth-only');
 document.body.classList.remove('registration-mode');
@@ -5024,6 +5067,16 @@ function renderRegisterStep(step) {
           lockAttrs('city')
         )}
       </div>
+
+      <div class="auth-form-group">
+  <label for="region">אזור מגורים</label>
+  <select id="region" name="region" required>
+    <option value="">בחר/י אזור</option>
+    <option value="צפון">צפון</option>
+    <option value="מרכז">מרכז</option>
+    <option value="דרום">דרום</option>
+  </select>
+</div>
     `;
   }
 
@@ -5031,8 +5084,8 @@ function renderRegisterStep(step) {
   if (step === 3) {
     const heightOptions = [];
 
-    for (let h = 130; h <= 220; h += 5) {
-      heightOptions.push(h + ' ס"מ');
+for (let h = 130; h <= 220; h += 1) {
+        heightOptions.push(h + ' ס"מ');
     }
 
     return `
@@ -5067,26 +5120,48 @@ function renderRegisterStep(step) {
         </select>
       </div>
 
-      <div class="auth-form-group ${isLocked('children') ? 'auth-locked-field' : ''}">
-        <label>
-          ${required('יש ילדים?', 'children')}
-        </label>
+      
+<div class="auth-form-group ${isLocked('children') ? 'auth-locked-field' : ''}">
+  <label>
+    ${required('יש ילדים?', 'children')}
+  </label>
 
-        <div class="auth-choice-list">
-          ${['כן', 'לא'].map(o => `
-            <label class="auth-choice">
-              <input
-                type="radio"
-                name="children"
-                value="${o}"
-                ${registerData.children === o ? 'checked' : ''}
-                ${isLocked('children') ? 'disabled' : ''}
-              >
-              ${o}
-            </label>
-          `).join('')}
-        </div>
-      </div>
+  <div class="auth-choice-list">
+    ${['כן', 'לא'].map(o => `
+      <label class="auth-choice">
+        <input
+          type="radio"
+          name="children"
+          value="${o}"
+          ${registerData.children === o ? 'checked' : ''}
+          ${isLocked('children') ? 'disabled' : ''}
+          onchange="handleChildrenChange(this.value)"
+        >
+        ${o}
+      </label>
+    `).join('')}
+  </div>
+</div>
+
+${registerData.children === 'כן' ? `
+  <div class="auth-form-group" id="children-count-group">
+    <label for="reg-children-count">
+      ${required('כמה ילדים?', 'children_count')}
+    </label>
+    <input
+      type="number"
+      id="reg-children-count"
+      name="children_count"
+      min="1"
+      max="20"
+      step="1"
+      value="${escapeHTML(String(registerData.children_count || ''))}"
+      placeholder="מספר הילדים"
+      required
+    >
+  </div>
+` : ''}
+
 
       <div class="auth-form-group ${isLocked('religiousView') ? 'auth-locked-field' : ''}">
         <label for="reg-religious">
@@ -5263,7 +5338,7 @@ function renderRegisterStep(step) {
       </div>
     </div>
         <div class="auth-form-group">
-      <label for="reg-profile-photos">תמונות הפרופיל</label>
+<label for="reg-profile-photos">${requiredLabel('תמונות הפרופיל')}</label>
 
       <div class="auth-hint">
         אפשר להוסיף עד 3 תמונות. בחר/י תמונות ברורות שלך.
@@ -5282,6 +5357,17 @@ function renderRegisterStep(step) {
   `;
 }
   
+function handleChildrenChange(value) {
+  collectRegisterStep();
+
+  registerData.children = value;
+
+  if (value === 'לא') {
+    registerData.children_count = '';
+  }
+
+  renderRegister();
+}
   
 function requiredLabel(text) {
   return `${text} <span class="required-mark" aria-hidden="true">*</span>`;
@@ -5423,9 +5509,14 @@ registerData.gender = getValue('gender');
     registerData.occupation = getValue('occupation');
     registerData.status = getValue('status');
     registerData.children = getValue('children');
+    registerData.children_count =
+  registerData.children === 'כן'
+    ? getValue('children_count')
+    : '';
     registerData.religiousView = getValue('religiousView');
     registerData.height = getValue('height');
     registerData.service = getValue('service');
+    
   }
 
   
@@ -5544,6 +5635,22 @@ function validateRegisterStep() {
       addMissing('children', 'יש לבחור תשובה.');
     }
 
+ if (registerData.children === 'כן') {
+  const count = Number(registerData.children_count);
+
+  if (
+    registerData.children_count === '' ||
+    !Number.isInteger(count) ||
+    count < 1 ||
+    count > 20
+  ) {
+    addMissing(
+      'children_count',
+      'יש להזין מספר ילדים תקין, בין 1 ל־20.'
+    );
+  }
+}
+
     if (!registerData.religiousView) {
       addMissing('religiousView');
     }
@@ -5645,14 +5752,12 @@ function registerPrevStep() {
 }
 
 
-
 let profileFilterOpen = false;
 let profileFilters = {
-  search: '',
   minAge: '',
   maxAge: '',
   city: '',
-  gender: ''
+  maritalStatus: ''
 };
 
 function escapeHTML(value) {
@@ -5702,36 +5807,53 @@ function renderProfiles() {
   const content = document.getElementById('app-content');
   if (!content) return;
 
-  const filteredProfiles = swipeProfiles.filter(profile => {
-    const name = getProfileName(profile).toLowerCase();
-    const city = getProfileCity(profile).toLowerCase();
-    const age = getProfileAge(profile);
-    const search = profileFilters.search.trim().toLowerCase();
+  const email = String(currentUser?.email || '').toLowerCase();
 
-    if (search && !name.includes(search) && !city.includes(search)) {
-      return false;
-    }
+const isAdmin = [
+  'o156ms@gmail.com',
+  'netzach353@gmail.com'
+].includes(email);
 
-    if (profileFilters.minAge && age < Number(profileFilters.minAge)) {
-      return false;
-    }
+if (!isAdmin) {
+  const myGender = String(currentUserGender || '').toLowerCase();
+  const profileGender = String(profile.gender || '').toLowerCase();
 
-    if (profileFilters.maxAge && age > Number(profileFilters.maxAge)) {
-      return false;
-    }
+  if (
+    (myGender === 'male' && profileGender !== 'female') ||
+    (myGender === 'female' && profileGender !== 'male')
+  ) {
+    return false;
+  }
+}
 
-    if (profileFilters.city &&
-        !city.includes(profileFilters.city.trim().toLowerCase())) {
-      return false;
-    }
+ const filteredProfiles = swipeProfiles.filter(profile => {
+  const city = getProfileCity(profile).toLowerCase();
+  const age = getProfileAge(profile);
 
-    if (profileFilters.gender &&
-        String(profile.gender || '') !== profileFilters.gender) {
-      return false;
-    }
+  if (profileFilters.minAge && age < Number(profileFilters.minAge)) {
+    return false;
+  }
 
-    return true;
-  });
+  if (profileFilters.maxAge && age > Number(profileFilters.maxAge)) {
+    return false;
+  }
+
+  if (
+    profileFilters.city &&
+    !city.includes(profileFilters.city.trim().toLowerCase())
+  ) {
+    return false;
+  }
+
+  if (
+    profileFilters.maritalStatus &&
+    String(profile.marital_status || '').trim() !== profileFilters.maritalStatus
+  ) {
+    return false;
+  }
+
+  return true;
+});
 
   content.innerHTML = `
 
@@ -5760,77 +5882,73 @@ function renderProfiles() {
   </button>
 </div>
 
+${profileFilterOpen ? `
+  <section class="filter-panel">
+    <div class="filter-grid">
 
+      <div class="filter-field">
+        <label for="filter-min-age">גיל מינימלי</label>
+        <input id="filter-min-age"
+          type="number" min="18" max="120"
+          value="${escapeHTML(profileFilters.minAge)}"
+          placeholder="מגיל"
+          oninput="updateProfileFilter('minAge', this.value)">
+      </div>
 
-    ${profileFilterOpen ? `
-      <section class="filter-panel">
-        <div class="filter-grid">
-          <div class="filter-field">
-            <label for="filter-search">שם או עיר</label>
-            <input id="filter-search"
-              value="${escapeHTML(profileFilters.search)}"
-              placeholder="חיפוש..."
-              oninput="updateProfileFilter('search', this.value)">
-          </div>
+      <div class="filter-field">
+        <label for="filter-max-age">גיל מקסימלי</label>
+        <input id="filter-max-age"
+          type="number" min="18" max="120"
+          value="${escapeHTML(profileFilters.maxAge)}"
+          placeholder="עד גיל"
+          oninput="updateProfileFilter('maxAge', this.value)">
+      </div>
 
-          <div class="filter-field">
-            <label for="filter-city">עיר</label>
-            <input id="filter-city"
-              value="${escapeHTML(profileFilters.city)}"
-              placeholder="לדוגמה: נתניה"
-              oninput="updateProfileFilter('city', this.value)">
-          </div>
+      <div class="filter-field">
+        <label for="filter-city">עיר</label>
+        <input id="filter-city"
+          value="${escapeHTML(profileFilters.city)}"
+          placeholder="לדוגמה: נתניה"
+          oninput="updateProfileFilter('city', this.value)">
+      </div>
 
-          <div class="filter-field">
-            <label for="filter-min-age">גיל מינימלי</label>
-            <input id="filter-min-age" type="number" min="18" max="120"
-              value="${escapeHTML(profileFilters.minAge)}"
-              placeholder="מגיל"
-              oninput="updateProfileFilter('minAge', this.value)">
-          </div>
+      <div class="filter-field">
+        <label for="filter-marital-status">מצב משפחתי</label>
+        <select id="filter-marital-status"
+          onchange="updateProfileFilter('maritalStatus', this.value)">
+          <option value="">כל המצבים</option>
+          <option value="רווק/ה" ${profileFilters.maritalStatus === 'רווק/ה' ? 'selected' : ''}>רווק/ה</option>
+          <option value="נשוי/אה" ${profileFilters.maritalStatus === 'נשוי/אה' ? 'selected' : ''}>נשוי/אה</option>
+          <option value="גרוש/ה" ${profileFilters.maritalStatus === 'גרוש/ה' ? 'selected' : ''}>גרוש/ה</option>
+          <option value="אלמן/ה" ${profileFilters.maritalStatus === 'אלמן/ה' ? 'selected' : ''}>אלמן/ה</option>
+        </select>
+      </div>
 
-          <div class="filter-field">
-            <label for="filter-max-age">גיל מקסימלי</label>
-            <input id="filter-max-age" type="number" min="18" max="120"
-              value="${escapeHTML(profileFilters.maxAge)}"
-              placeholder="עד גיל"
-              oninput="updateProfileFilter('maxAge', this.value)">
-          </div>
+    </div>
 
-          <div class="filter-field" style="grid-column:1/-1">
-            <label for="filter-gender">מגדר</label>
-            <select id="filter-gender"
-              onchange="updateProfileFilter('gender', this.value)">
-              <option value="">הכול</option>
-              <option value="female" ${profileFilters.gender === 'female' ? 'selected' : ''}>נשים</option>
-              <option value="male" ${profileFilters.gender === 'male' ? 'selected' : ''}>גברים</option>
-            </select>
-          </div>
+    <div class="filter-actions">
+      <button class="filter-apply" type="button"
+        onclick="applyProfileFilters()">הצגת תוצאות</button>
+
+      <button class="filter-reset" type="button"
+        onclick="resetProfileFilters()">איפוס</button>
+    </div>
+  </section>
+` : ''}
+
+<div class="profiles-grid">
+  ${filteredProfiles.length ? filteredProfiles.map(profile => `
+    <article class="profile-tile"
+      onclick="openProfileDetail('${escapeHTML(profile.id)}')">
+      <img
+        src="${escapeHTML(getProfileImage(profile))}"
+        alt="${escapeHTML(getProfileName(profile))}"
+        loading="lazy">
+
+      <div class="profile-tile-info">
+        <div class="profile-tile-name">
+          ${escapeHTML(getProfileName(profile))}${getProfileAge(profile) ? ', ' + getProfileAge(profile) : ''}
         </div>
-
-        <div class="filter-actions">
-          <button class="filter-apply" type="button"
-            onclick="applyProfileFilters()">הצגת תוצאות</button>
-          <button class="filter-reset" type="button"
-            onclick="resetProfileFilters()">איפוס</button>
-        </div>
-      </section>
-    ` : ''}
-
-    <div class="profiles-grid">
-      ${filteredProfiles.length ? filteredProfiles.map(profile => `
-        <article class="profile-tile"
-          onclick="openProfileDetail('${escapeHTML(profile.id)}')">
-          <img
-            src="${escapeHTML(getProfileImage(profile))}"
-            alt="${escapeHTML(getProfileName(profile))}"
-            loading="lazy">
-
-          <div class="profile-tile-info">
-            <div class="profile-tile-name">
-              ${escapeHTML(getProfileName(profile))}${getProfileAge(profile) ? ', ' + getProfileAge(profile) : ''}
-            </div>
-
        
 <div class="profile-tile-details">
 
@@ -7292,6 +7410,15 @@ function filterCityDropdown(id) {
   if (!input || !dropdown || !picker) return;
 
   const matches = getCityPickerMatches(id);
+
+  if (matches.length === 0) {
+  dropdown.innerHTML = '';
+  picker.classList.remove('open');
+  input.setAttribute('aria-expanded', 'false');
+  return;
+}
+
+
   const currentValue = input.value.trim();
 
   dropdown.innerHTML =
@@ -7890,7 +8017,8 @@ const citySuggestions = [
   'צפת',
   'אילת',
   'קריית גת',
-  'קריית שמונה'
+  'קריית שמונה',
+  'מירון'
 ];
   
 
@@ -8826,9 +8954,9 @@ function personalRadioField(key, label, options, value) {
 function renderPersonalDetails(details) {
   const heightOptions = [];
 
-  for (let height = 130; height <= 220; height += 5) {
-    heightOptions.push(`${height} ס"מ`);
-  }
+for (let height = 130; height <= 220; height += 1) {
+  heightOptions.push(`${height} ס"מ`);
+}
 
   const editMode = !!personalEditMode;
 
@@ -9570,11 +9698,14 @@ function showPage(page) {
 const heart = document.getElementById('adminHeartIcon');
 
 if (heart) {
-  heart.style.display =
-    ['o156ms@gmail.com', 'netzach353@gmail.com']
-      .includes(String(currentUser?.email || '').toLowerCase())
-      ? 'none'
-      : '';
+  const email = String(currentUser?.email || '').toLowerCase();
+
+  const isAdmin = [
+    'o156ms@gmail.com',
+    'netzach353@gmail.com'
+  ].includes(email);
+
+  heart.style.display = isAdmin ? 'none' : '';
 }
 
 
